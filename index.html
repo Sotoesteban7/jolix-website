@@ -272,15 +272,40 @@
     background:var(--ink);color:var(--paper);border-radius:26px;padding:44px;
     position:relative;overflow:hidden;
   }
-  :root[data-theme="dark"] .contact-panel, :root:not([data-theme="light"]) .contact-panel{background:var(--surface);border:1px solid var(--mist-line);}
+  :root[data-theme="dark"] .contact-panel, :root:not([data-theme="light"]) .contact-panel{background:var(--surface);border:1px solid var(--mist-line);color:var(--ink);}
   .contact-panel::before{
     content:"";position:absolute;top:-30%;right:-20%;width:280px;height:280px;
     background:radial-gradient(circle, var(--coral) 0%, transparent 70%);opacity:.25;
+    pointer-events:none;
   }
   .contact-panel h3{position:relative;color:inherit;font-size:23px;}
   .contact-panel p{position:relative;margin-top:14px;color:color-mix(in srgb, var(--paper) 72%, transparent);font-size:15px;}
   :root[data-theme="dark"] .contact-panel p, :root:not([data-theme="light"]) .contact-panel p{color:var(--muted);}
-  .contact-panel .btn{position:relative;margin-top:26px;}
+  .contact-panel .btn{position:relative;margin-top:4px;width:100%;justify-content:center;border:none;}
+
+  .lead-form{position:relative;margin-top:26px;display:flex;flex-direction:column;gap:14px;}
+  .lead-form .field{display:flex;flex-direction:column;gap:6px;}
+  .lead-form label{font-size:12.5px;font-weight:500;color:color-mix(in srgb, currentColor 68%, transparent);}
+  .lead-form input[type="text"],
+  .lead-form input[type="email"],
+  .lead-form textarea{
+    font-family:'Work Sans', sans-serif;font-size:14.5px;color:inherit;
+    background:color-mix(in srgb, currentColor 7%, transparent);
+    border:1px solid color-mix(in srgb, currentColor 18%, transparent);
+    border-radius:12px;padding:11px 14px;resize:vertical;
+  }
+  .lead-form input::placeholder, .lead-form textarea::placeholder{color:color-mix(in srgb, currentColor 45%, transparent);}
+  .lead-form input:focus, .lead-form textarea:focus{outline:2px solid var(--purple);outline-offset:1px;}
+  .captcha-row{display:flex;align-items:center;gap:12px;}
+  .captcha-question{
+    font-family:'Poppins',sans-serif;font-weight:600;font-size:14.5px;white-space:nowrap;
+    background:color-mix(in srgb, currentColor 10%, transparent);
+    border-radius:10px;padding:10px 14px;
+  }
+  .captcha-row input{width:80px;flex:none;text-align:center;}
+  .form-status{position:relative;margin-top:2px;font-size:13.5px;min-height:18px;}
+  .form-status.ok{color:#4ADE80;}
+  .form-status.err{color:var(--coral);}
 
   footer{padding:36px 0;}
   .foot-row{display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;color:var(--muted);font-size:13px;}
@@ -349,7 +374,7 @@
         <h1 class="hero-title">Los números claros.<br>La mente <span class="tranquila"><span class="mark"></span><span>tranquila</span></span>.</h1>
         <p class="hero-sub">Llevamos la contabilidad y los impuestos de tu pyme con cercanía real: hablas con quien lleva tus números, sin derivaciones ni tecnicismos.</p>
         <div class="hero-ctas">
-          <a class="btn btn-primary" href="mailto:contacto@jolixasesorias.com">Agenda una reunión sin costo</a>
+          <a class="btn btn-primary" href="#formulario">Pide que te llamemos</a>
           <a class="btn btn-ghost" href="#precios">Ver planes y precios</a>
         </div>
         <div class="hero-meta">
@@ -425,7 +450,7 @@
           <div class="plan">
             <h3>Plan Inicia</h3>
             <p class="segment">Emprendedores y SpA/EIRL sin trabajadores.</p>
-            <div class="price"><span class="amount">$40.000</span><span class="unit">/mes + IVA</span></div>
+            <div class="price"><span class="amount">$40.000</span><span class="unit">/mes</span></div>
             <ul>
               <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M5 12.5 9.5 17 19 7"/></svg>Contabilidad Simplificada</li>
               <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M5 12.5 9.5 17 19 7"/></svg>Declaración mensual F29</li>
@@ -433,14 +458,14 @@
               <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M5 12.5 9.5 17 19 7"/></svg>Boletas de Honorarios</li>
               <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M5 12.5 9.5 17 19 7"/></svg>Hasta 100 DTEs mensuales</li>
             </ul>
-            <a href="mailto:contacto@jolixasesorias.com?subject=Quiero%20el%20Plan%20Inicia" class="btn btn-ghost cta">Elegir Inicia</a>
+            <a href="#formulario" class="btn btn-ghost cta plan-select" data-plan="Inicia">Elegir Inicia</a>
           </div>
 
           <div class="plan popular">
             <span class="badge">Más popular</span>
             <h3>Plan Impulsa</h3>
             <p class="segment">Pymes en crecimiento (1 a 5 trabajadores).</p>
-            <div class="price"><span class="amount">$80.000</span><span class="unit">/mes + IVA</span></div>
+            <div class="price"><span class="amount">$80.000</span><span class="unit">/mes</span></div>
             <p class="extra">+ $12.000 por trabajador adicional</p>
             <ul>
               <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M5 12.5 9.5 17 19 7"/></svg>Todo lo del Plan Inicia</li>
@@ -449,13 +474,13 @@
               <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M5 12.5 9.5 17 19 7"/></svg>Libro de Remuneraciones (LRE)</li>
               <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M5 12.5 9.5 17 19 7"/></svg>Soporte prioritario WhatsApp</li>
             </ul>
-            <a href="mailto:contacto@jolixasesorias.com?subject=Quiero%20el%20Plan%20Impulsa" class="btn btn-primary cta">Elegir Impulsa</a>
+            <a href="#formulario" class="btn btn-primary cta plan-select" data-plan="Impulsa">Elegir Impulsa</a>
           </div>
 
           <div class="plan">
             <h3>Plan Consolida</h3>
             <p class="segment">Empresas estructuradas (+5 trabajadores).</p>
-            <div class="price"><span class="amount">$115.000</span><span class="unit">/mes + IVA</span></div>
+            <div class="price"><span class="amount">$115.000</span><span class="unit">/mes</span></div>
             <ul>
               <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M5 12.5 9.5 17 19 7"/></svg>Todo lo del Plan Impulsa</li>
               <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M5 12.5 9.5 17 19 7"/></svg>Contabilidad Completa</li>
@@ -463,10 +488,10 @@
               <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M5 12.5 9.5 17 19 7"/></svg>Soporte WhatsApp / Email</li>
               <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M5 12.5 9.5 17 19 7"/></svg>Hasta 200 DTEs mensuales</li>
             </ul>
-            <a href="mailto:contacto@jolixasesorias.com?subject=Quiero%20el%20Plan%20Consolida" class="btn btn-ghost cta">Elegir Consolida</a>
+            <a href="#formulario" class="btn btn-ghost cta plan-select" data-plan="Consolida">Elegir Consolida</a>
           </div>
         </div>
-        <p class="price-foot">* Valores netos en pesos chilenos (CLP).</p>
+        <p class="price-foot">* Valores en pesos chilenos (CLP), sin IVA.</p>
       </div>
 
       <!-- A LA CARTA -->
@@ -563,10 +588,40 @@
             <div><div class="label">Instagram</div><div class="value">@jolixasesorias</div></div>
           </a>
         </div>
-        <div class="contact-panel">
-          <h3>Agenda tu primera reunión sin costo</h3>
-          <p>Cuéntanos de tu negocio y te recomendamos el plan que mejor se ajusta a tu pyme.</p>
-          <a class="btn btn-primary" href="mailto:contacto@jolixasesorias.com?subject=Quiero%20agendar%20una%20reuni%C3%B3n">Escríbenos ahora</a>
+        <div class="contact-panel" id="formulario">
+          <h3>Cuéntanos qué necesitas</h3>
+          <p>Completa el formulario y te llamamos para conversar de tu negocio.</p>
+          <form class="lead-form" id="leadForm">
+            <input type="hidden" name="access_key" value="196b694f-a98d-4bef-8b41-8f35cabb0925">
+            <input type="hidden" name="subject" value="Nueva consulta desde jolixasesorias.com">
+            <input type="hidden" name="from_name" value="Sitio Jolix Asesorías">
+            <input type="checkbox" name="botcheck" style="display:none" tabindex="-1" autocomplete="off">
+            <div class="field">
+              <label for="lf-name">Nombre</label>
+              <input id="lf-name" name="name" type="text" required autocomplete="name">
+            </div>
+            <div class="field">
+              <label for="lf-company">Empresa</label>
+              <input id="lf-company" name="company" type="text" autocomplete="organization">
+            </div>
+            <div class="field">
+              <label for="lf-email">Correo</label>
+              <input id="lf-email" name="email" type="email" required autocomplete="email">
+            </div>
+            <div class="field">
+              <label for="lf-message">Mensaje</label>
+              <textarea id="lf-message" name="message" rows="4" required placeholder="Cuéntanos qué necesitas resolver"></textarea>
+            </div>
+            <div class="field captcha-field">
+              <label for="lf-captcha" id="lf-captcha-label">Verificación</label>
+              <div class="captcha-row">
+                <span id="lfCaptchaQuestion" class="captcha-question"></span>
+                <input id="lf-captcha" name="captcha_answer" type="text" inputmode="numeric" autocomplete="off" required aria-describedby="lf-captcha-label">
+              </div>
+            </div>
+            <button type="submit" class="btn btn-primary" id="lfSubmit">Enviar solicitud</button>
+            <p class="form-status" id="lfStatus" role="status" aria-live="polite"></p>
+          </form>
         </div>
       </div>
     </div>
@@ -595,6 +650,78 @@
     links.classList.remove('open');
     toggle.setAttribute('aria-expanded', 'false');
   }));
+
+  const leadForm = document.getElementById('leadForm');
+  const lfStatus = document.getElementById('lfStatus');
+  const lfSubmit = document.getElementById('lfSubmit');
+  const lfMessage = document.getElementById('lf-message');
+
+  document.querySelectorAll('.plan-select').forEach((el) => {
+    el.addEventListener('click', () => {
+      lfMessage.value = `Hola, me gustaría más información sobre el Plan ${el.dataset.plan}.`;
+    });
+  });
+
+  // Lightweight in-page captcha (arithmetic challenge + hidden honeypot).
+  // Keeps out simple automated/mass submissions without loading a third-party
+  // widget script, which this preview environment's CSP does not allow.
+  // On the site's own domain, swap this block for real hCaptcha (Web3Forms
+  // supports it natively, see docs.web3forms.com) for stronger protection.
+  let captchaAnswer = 0;
+  const captchaQuestionEl = document.getElementById('lfCaptchaQuestion');
+  function newCaptcha() {
+    const a = 1 + Math.floor(Math.random() * 8);
+    const b = 1 + Math.floor(Math.random() * 8);
+    captchaAnswer = a + b;
+    captchaQuestionEl.textContent = `¿Cuánto es ${a} + ${b}?`;
+  }
+  newCaptcha();
+
+  leadForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    lfStatus.textContent = '';
+    lfStatus.classList.remove('ok', 'err');
+
+    if (leadForm.querySelector('[name="botcheck"]').checked) {
+      return; // honeypot tripped, silently drop
+    }
+    const captchaInput = document.getElementById('lf-captcha');
+    if (parseInt(captchaInput.value, 10) !== captchaAnswer) {
+      lfStatus.textContent = 'La verificación no es correcta, inténtalo de nuevo.';
+      lfStatus.classList.add('err');
+      newCaptcha();
+      captchaInput.value = '';
+      captchaInput.focus();
+      return;
+    }
+
+    lfSubmit.disabled = true;
+    lfSubmit.textContent = 'Enviando…';
+    try {
+      const payload = Object.fromEntries(new FormData(leadForm).entries());
+      delete payload.captcha_answer;
+      const res = await fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+      if (data.success) {
+        leadForm.reset();
+        newCaptcha();
+        lfStatus.textContent = '¡Gracias! Te contactaremos pronto.';
+        lfStatus.classList.add('ok');
+      } else {
+        throw new Error(data.message || 'No se pudo enviar');
+      }
+    } catch (err) {
+      lfStatus.textContent = 'No pudimos enviar tu solicitud. Escríbenos directo a contacto@jolixasesorias.com';
+      lfStatus.classList.add('err');
+    } finally {
+      lfSubmit.disabled = false;
+      lfSubmit.textContent = 'Enviar solicitud';
+    }
+  });
 </script>
 </body>
 </html>
