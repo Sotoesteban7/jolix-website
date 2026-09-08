@@ -612,13 +612,7 @@
               <label for="lf-message">Mensaje</label>
               <textarea id="lf-message" name="message" rows="4" required placeholder="Cuéntanos qué necesitas resolver"></textarea>
             </div>
-            <div class="field captcha-field">
-              <label for="lf-captcha" id="lf-captcha-label">Verificación</label>
-              <div class="captcha-row">
-                <span id="lfCaptchaQuestion" class="captcha-question"></span>
-                <input id="lf-captcha" name="captcha_answer" type="text" inputmode="numeric" autocomplete="off" required aria-describedby="lf-captcha-label">
-              </div>
-            </div>
+            <div class="h-captcha" data-captcha="true"></div>
             <button type="submit" class="btn btn-primary" id="lfSubmit">Enviar solicitud</button>
             <p class="form-status" id="lfStatus" role="status" aria-live="polite"></p>
           </form>
@@ -662,21 +656,9 @@
     });
   });
 
-  // Lightweight in-page captcha (arithmetic challenge + hidden honeypot).
-  // Keeps out simple automated/mass submissions without loading a third-party
-  // widget script, which this preview environment's CSP does not allow.
-  // On the site's own domain, swap this block for real hCaptcha (Web3Forms
-  // supports it natively, see docs.web3forms.com) for stronger protection.
-  let captchaAnswer = 0;
-  const captchaQuestionEl = document.getElementById('lfCaptchaQuestion');
-  function newCaptcha() {
-    const a = 1 + Math.floor(Math.random() * 8);
-    const b = 1 + Math.floor(Math.random() * 8);
-    captchaAnswer = a + b;
-    captchaQuestionEl.textContent = `¿Cuánto es ${a} + ${b}?`;
-  }
-  newCaptcha();
-
+  // Bot protection: hidden honeypot field + real hCaptcha widget (loaded via
+  // the Web3Forms client script below). hCaptcha's response token is verified
+  // server-side by Web3Forms before it will relay the email.
   leadForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     lfStatus.textContent = '';
@@ -685,13 +667,10 @@
     if (leadForm.querySelector('[name="botcheck"]').checked) {
       return; // honeypot tripped, silently drop
     }
-    const captchaInput = document.getElementById('lf-captcha');
-    if (parseInt(captchaInput.value, 10) !== captchaAnswer) {
-      lfStatus.textContent = 'La verificación no es correcta, inténtalo de nuevo.';
+    const hcaptchaResponse = leadForm.querySelector('[name="h-captcha-response"]');
+    if (!hcaptchaResponse || !hcaptchaResponse.value) {
+      lfStatus.textContent = 'Por favor completa la verificación hCaptcha.';
       lfStatus.classList.add('err');
-      newCaptcha();
-      captchaInput.value = '';
-      captchaInput.focus();
       return;
     }
 
@@ -699,7 +678,6 @@
     lfSubmit.textContent = 'Enviando…';
     try {
       const payload = Object.fromEntries(new FormData(leadForm).entries());
-      delete payload.captcha_answer;
       const res = await fetch('https://api.web3forms.com/submit', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
@@ -708,7 +686,7 @@
       const data = await res.json();
       if (data.success) {
         leadForm.reset();
-        newCaptcha();
+        if (window.hcaptcha) window.hcaptcha.reset();
         lfStatus.textContent = '¡Gracias! Te contactaremos pronto.';
         lfStatus.classList.add('ok');
       } else {
@@ -723,5 +701,6 @@
     }
   });
 </script>
+<script src="https://web3forms.com/client/script.js" async defer></script>
 </body>
 </html>
