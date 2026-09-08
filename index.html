@@ -24,6 +24,9 @@
     --surface:#FFFFFF;
     --muted:#5B5670;
     --calm-yellow:#FCE896;
+    --rubro-g1:#71717A;
+    --rubro-g2:#A1A1AA;
+    --rubro-g3:#D4D4D8;
     --shadow: 0 20px 45px -20px rgba(59,25,148,0.35);
   }
   @media (prefers-color-scheme: dark){
@@ -41,6 +44,9 @@
       --coral:#FF9D9D;
       --coral-deep:#FFB0B0;
       --calm-yellow:#E3C468;
+      --rubro-g1:#F4F4F5;
+      --rubro-g2:#D4D4D8;
+      --rubro-g3:#A1A1AA;
       --shadow: 0 20px 45px -20px rgba(0,0,0,0.6);
     }
   }
@@ -53,9 +59,14 @@
     --muted:#B6ADD1;
     --purple:#9B7BFF;
     --purple-deep:#7C58F0;
+    --purple-soft:#C3AEFF;
     --purple-ink:#C9B8FF;
     --coral:#FF9D9D;
     --coral-deep:#FFB0B0;
+    --calm-yellow:#E3C468;
+    --rubro-g1:#F4F4F5;
+    --rubro-g2:#D4D4D8;
+    --rubro-g3:#A1A1AA;
     --shadow: 0 20px 45px -20px rgba(0,0,0,0.6);
   }
 
@@ -153,40 +164,32 @@
   }
   h1.hero-title .tranquila > span{position:relative;}
   .hero-sub{margin-top:22px;font-size:18px;color:var(--muted);max-width:46ch;}
-  .hero-ctas{display:flex;gap:16px;margin-top:34px;flex-wrap:wrap;}
-  .hero-meta{display:flex;gap:28px;margin-top:44px;flex-wrap:wrap;}
-  .hero-meta div{display:flex;flex-direction:column;gap:2px;}
+  .hero-right{display:flex;flex-direction:column;justify-content:center;gap:30px;}
+  .hero-ctas{display:flex;gap:16px;flex-wrap:wrap;}
+  .hero-meta{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;}
+  .hero-meta div{display:flex;flex-direction:column;align-items:center;gap:2px;text-align:center;}
   .hero-meta .n{font-family:'Poppins',sans-serif;font-weight:600;font-size:15px;color:var(--ink);}
   .hero-meta .l{font-size:13px;color:var(--muted);}
 
-  .mark-panel{
-    position:relative;min-width:0;
-    display:flex;flex-direction:column;justify-content:center;gap:22px;
-  }
-  .mark-panel .rubro-lead{
+  .rubro-full{position:relative;width:100%;margin-top:56px;}
+  .rubro-lead{
     font-family:'Poppins',sans-serif;font-weight:600;font-size:19px;
-    text-align:center;line-height:1.35;padding:0 20px;
+    text-align:center;line-height:1.35;padding:0 20px;margin-bottom:24px;
   }
-  .rubro-stack{display:flex;flex-direction:column;gap:2px;min-width:0;}
-  .rubro-marquee{width:100%;min-width:0;overflow:hidden;line-height:1;-webkit-mask-image:linear-gradient(90deg,transparent,#000 10%,#000 90%,transparent);mask-image:linear-gradient(90deg,transparent,#000 10%,#000 90%,transparent);}
-  .rubro-track{display:flex;gap:38px;width:max-content;padding:4px 0;align-items:baseline;animation-timing-function:linear;animation-iteration-count:infinite;}
+  .rubro-stack{display:flex;flex-direction:column;gap:6px;min-width:0;}
+  .rubro-marquee{width:100%;min-width:0;overflow:hidden;line-height:1;-webkit-mask-image:linear-gradient(90deg,transparent,#000 4%,#000 96%,transparent);mask-image:linear-gradient(90deg,transparent,#000 4%,#000 96%,transparent);}
+  .rubro-track{display:flex;gap:52px;width:max-content;padding:6px 0;align-items:baseline;animation-timing-function:linear;animation-iteration-count:infinite;}
   .rubro-track.right{animation-name:rubroScrollLeft;}
   .rubro-track.left{animation-name:rubroScrollRight;}
   @keyframes rubroScrollLeft{from{transform:translateX(0);}to{transform:translateX(-50%);}}
   @keyframes rubroScrollRight{from{transform:translateX(-50%);}to{transform:translateX(0);}}
-  .rubro-row-1 .rubro-track{animation-duration:120s;}
-  .rubro-row-2 .rubro-track{animation-duration:90s;}
-  .rubro-row-3 .rubro-track{animation-duration:130s;}
-  .rubro-row-4 .rubro-track{animation-duration:65s;}
-  .rubro-row-5 .rubro-track{animation-duration:95s;}
-  .rubro-row-6 .rubro-track{animation-duration:70s;}
+  .rubro-row-1 .rubro-track{animation-duration:210s;}
+  .rubro-row-2 .rubro-track{animation-duration:150s;}
+  .rubro-row-3 .rubro-track{animation-duration:230s;}
   .rubro-word{flex:none;font-family:'Poppins',sans-serif;font-weight:600;white-space:nowrap;letter-spacing:-.01em;line-height:1;}
-  .rubro-row-1 .rubro-word{font-size:clamp(24px,2.6vw,32px);color:var(--purple);}
-  .rubro-row-2 .rubro-word{font-size:clamp(20px,2.1vw,25px);color:var(--coral-deep);}
-  .rubro-row-3 .rubro-word{font-size:clamp(24px,2.6vw,32px);color:var(--purple-soft);opacity:.9;}
-  .rubro-row-4 .rubro-word{font-size:16px;color:var(--coral);}
-  .rubro-row-5 .rubro-word{font-size:clamp(20px,2.1vw,25px);color:var(--purple-deep);}
-  .rubro-row-6 .rubro-word{font-size:16px;color:var(--coral-deep);opacity:.8;}
+  .rubro-row-1 .rubro-word{font-size:clamp(24px,2.94vw,38px);color:var(--rubro-g1);}
+  .rubro-row-2 .rubro-word{font-size:clamp(15px,1.82vw,21px);color:var(--rubro-g3);}
+  .rubro-row-3 .rubro-word{font-size:clamp(21px,2.66vw,34px);color:var(--rubro-g2);}
   @media (prefers-reduced-motion: reduce){.rubro-track{animation:none !important;}}
 
   /* ---------- Section shell ---------- */
@@ -350,7 +353,8 @@
 
   @media (max-width:980px){
     .hero-grid{grid-template-columns:1fr;}
-    .mark-panel{order:-1;max-width:360px;margin:0 auto;}
+    .rubro-row-1 .rubro-word{font-size:20px;}
+    .rubro-row-3 .rubro-word{font-size:17px;}
     .steps{grid-template-columns:repeat(2,1fr);}
     .why-grid{grid-template-columns:repeat(2,1fr);}
     .price-grid{grid-template-columns:1fr;max-width:420px;margin:0 auto;}
@@ -373,7 +377,7 @@
     .gloss-grid{grid-template-columns:1fr;}
     .terms{grid-template-columns:1fr;}
     .hero-ctas{flex-direction:column;align-items:stretch;}
-    .hero-meta{gap:18px;}
+    .hero-meta{grid-template-columns:1fr;gap:18px;}
   }
 </style>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -410,19 +414,22 @@
         <div class="hero-eyebrow"><span class="dot"></span><span class="eyebrow">Asesoría contable y fiscal para pymes en Chile</span></div>
         <h1 class="hero-title">Los números claros.<br>La mente <span class="tranquila"><span class="mark"></span><span>tranquila</span></span>.</h1>
         <p class="hero-sub">Llevamos la contabilidad y los impuestos de tu pyme con cercanía real: hablas con quien lleva tus números, sin derivaciones ni tecnicismos.</p>
-        <div class="hero-ctas">
-          <a class="btn btn-primary" href="#formulario">Pide que te llamemos</a>
-          <a class="btn btn-ghost" href="#precios">Ver planes y precios</a>
-        </div>
+      </div>
+      <div class="hero-right">
         <div class="hero-meta">
           <div><span class="n">Mes a mes</span><span class="l">sin permanencia forzosa</span></div>
           <div><span class="n">WhatsApp directo</span><span class="l">no un call center</span></div>
           <div><span class="n">Precios transparentes</span><span class="l">sin cobros escondidos</span></div>
         </div>
+        <div class="hero-ctas">
+          <a class="btn btn-primary" href="#formulario">Pide que te llamemos</a>
+          <a class="btn btn-ghost" href="#precios">Ver planes y precios</a>
+        </div>
       </div>
-      <div class="mark-panel">
-        <p class="rubro-lead">Asesoría contable a la medida de tu rubro</p>
-        <div class="rubro-stack">
+    </div>
+    <div class="rubro-full">
+      <p class="rubro-lead">Asesoría contable a la medida de tu rubro</p>
+      <div class="rubro-stack">
         <div class="rubro-marquee rubro-row-1">
           <div class="rubro-track right">
             <span class="rubro-word">Minimarket</span>
@@ -434,6 +441,15 @@
             <span class="rubro-word">Restaurantes</span>
             <span class="rubro-word">Constructoras</span>
             <span class="rubro-word">Farmacias</span>
+            <span class="rubro-word">Ferreterías</span>
+            <span class="rubro-word">Peluquerías</span>
+            <span class="rubro-word">Veterinarias</span>
+            <span class="rubro-word">Panaderías</span>
+            <span class="rubro-word">Kinesiólogos</span>
+            <span class="rubro-word">Abogados</span>
+            <span class="rubro-word">Contadores</span>
+            <span class="rubro-word">Inmobiliarias</span>
+            <span class="rubro-word">Barberías</span>
             <span class="rubro-word">Minimarket</span>
             <span class="rubro-word">Odontólogos</span>
             <span class="rubro-word">Camioneros</span>
@@ -443,76 +459,59 @@
             <span class="rubro-word">Restaurantes</span>
             <span class="rubro-word">Constructoras</span>
             <span class="rubro-word">Farmacias</span>
+            <span class="rubro-word">Ferreterías</span>
+            <span class="rubro-word">Peluquerías</span>
+            <span class="rubro-word">Veterinarias</span>
+            <span class="rubro-word">Panaderías</span>
+            <span class="rubro-word">Kinesiólogos</span>
+            <span class="rubro-word">Abogados</span>
+            <span class="rubro-word">Contadores</span>
+            <span class="rubro-word">Inmobiliarias</span>
+            <span class="rubro-word">Barberías</span>
           </div>
         </div>
         <div class="rubro-marquee rubro-row-2">
           <div class="rubro-track left">
-            <span class="rubro-word">Ferreterías</span>
-            <span class="rubro-word">Peluquerías</span>
-            <span class="rubro-word">Veterinarias</span>
-            <span class="rubro-word">Panaderías</span>
-            <span class="rubro-word">Kinesiólogos</span>
-            <span class="rubro-word">Abogados</span>
-            <span class="rubro-word">Contadores</span>
-            <span class="rubro-word">Inmobiliarias</span>
-            <span class="rubro-word">Barberías</span>
-            <span class="rubro-word">Ferreterías</span>
-            <span class="rubro-word">Peluquerías</span>
-            <span class="rubro-word">Veterinarias</span>
-            <span class="rubro-word">Panaderías</span>
-            <span class="rubro-word">Kinesiólogos</span>
-            <span class="rubro-word">Abogados</span>
-            <span class="rubro-word">Contadores</span>
-            <span class="rubro-word">Inmobiliarias</span>
-            <span class="rubro-word">Barberías</span>
+            <span class="rubro-word">Talleres mecánicos</span>
+            <span class="rubro-word">Electricistas</span>
+            <span class="rubro-word">Gasfíter</span>
+            <span class="rubro-word">Food trucks</span>
+            <span class="rubro-word">Arquitectos</span>
+            <span class="rubro-word">Contratistas</span>
+            <span class="rubro-word">Gimnasios</span>
+            <span class="rubro-word">Floristerías</span>
+            <span class="rubro-word">Nutricionistas</span>
+            <span class="rubro-word">Cafeterías</span>
+            <span class="rubro-word">Boutiques</span>
+            <span class="rubro-word">Carnicerías</span>
+            <span class="rubro-word">Pastelerías</span>
+            <span class="rubro-word">Mueblerías</span>
+            <span class="rubro-word">Imprentas</span>
+            <span class="rubro-word">Ópticas</span>
+            <span class="rubro-word">Zapaterías</span>
+            <span class="rubro-word">Verdulerías</span>
+            <span class="rubro-word">Talleres mecánicos</span>
+            <span class="rubro-word">Electricistas</span>
+            <span class="rubro-word">Gasfíter</span>
+            <span class="rubro-word">Food trucks</span>
+            <span class="rubro-word">Arquitectos</span>
+            <span class="rubro-word">Contratistas</span>
+            <span class="rubro-word">Gimnasios</span>
+            <span class="rubro-word">Floristerías</span>
+            <span class="rubro-word">Nutricionistas</span>
+            <span class="rubro-word">Cafeterías</span>
+            <span class="rubro-word">Boutiques</span>
+            <span class="rubro-word">Carnicerías</span>
+            <span class="rubro-word">Pastelerías</span>
+            <span class="rubro-word">Mueblerías</span>
+            <span class="rubro-word">Imprentas</span>
+            <span class="rubro-word">Ópticas</span>
+            <span class="rubro-word">Zapaterías</span>
+            <span class="rubro-word">Verdulerías</span>
           </div>
         </div>
         <div class="rubro-marquee rubro-row-3">
           <div class="rubro-track right">
-            <span class="rubro-word">Talleres mecánicos</span>
-            <span class="rubro-word">Electricistas</span>
-            <span class="rubro-word">Gasfíter</span>
-            <span class="rubro-word">Food trucks</span>
-            <span class="rubro-word">Arquitectos</span>
-            <span class="rubro-word">Contratistas</span>
-            <span class="rubro-word">Gimnasios</span>
-            <span class="rubro-word">Floristerías</span>
-            <span class="rubro-word">Nutricionistas</span>
-            <span class="rubro-word">Talleres mecánicos</span>
-            <span class="rubro-word">Electricistas</span>
-            <span class="rubro-word">Gasfíter</span>
-            <span class="rubro-word">Food trucks</span>
-            <span class="rubro-word">Arquitectos</span>
-            <span class="rubro-word">Contratistas</span>
-            <span class="rubro-word">Gimnasios</span>
-            <span class="rubro-word">Floristerías</span>
-            <span class="rubro-word">Nutricionistas</span>
-          </div>
-        </div>
-        <div class="rubro-marquee rubro-row-4">
-          <div class="rubro-track left">
-            <span class="rubro-word">Cafeterías</span>
-            <span class="rubro-word">Boutiques</span>
-            <span class="rubro-word">Carnicerías</span>
-            <span class="rubro-word">Pastelerías</span>
-            <span class="rubro-word">Mueblerías</span>
-            <span class="rubro-word">Imprentas</span>
-            <span class="rubro-word">Ópticas</span>
-            <span class="rubro-word">Zapaterías</span>
-            <span class="rubro-word">Verdulerías</span>
-            <span class="rubro-word">Cafeterías</span>
-            <span class="rubro-word">Boutiques</span>
-            <span class="rubro-word">Carnicerías</span>
-            <span class="rubro-word">Pastelerías</span>
-            <span class="rubro-word">Mueblerías</span>
-            <span class="rubro-word">Imprentas</span>
-            <span class="rubro-word">Ópticas</span>
-            <span class="rubro-word">Zapaterías</span>
-            <span class="rubro-word">Verdulerías</span>
-          </div>
-        </div>
-        <div class="rubro-marquee rubro-row-5">
-          <div class="rubro-track right">
             <span class="rubro-word">Fotógrafos</span>
             <span class="rubro-word">Diseñadores</span>
             <span class="rubro-word">Consultoras</span>
@@ -522,19 +521,6 @@
             <span class="rubro-word">Productoras audiovisuales</span>
             <span class="rubro-word">Empresas de eventos</span>
             <span class="rubro-word">Viñas</span>
-            <span class="rubro-word">Fotógrafos</span>
-            <span class="rubro-word">Diseñadores</span>
-            <span class="rubro-word">Consultoras</span>
-            <span class="rubro-word">Freelancers</span>
-            <span class="rubro-word">Agencias de turismo</span>
-            <span class="rubro-word">Colegios</span>
-            <span class="rubro-word">Productoras audiovisuales</span>
-            <span class="rubro-word">Empresas de eventos</span>
-            <span class="rubro-word">Viñas</span>
-          </div>
-        </div>
-        <div class="rubro-marquee rubro-row-6">
-          <div class="rubro-track left">
             <span class="rubro-word">Cerrajeros</span>
             <span class="rubro-word">Pintores</span>
             <span class="rubro-word">Jardineros</span>
@@ -544,6 +530,15 @@
             <span class="rubro-word">Personal trainers</span>
             <span class="rubro-word">Traductores</span>
             <span class="rubro-word">Academias de idiomas</span>
+            <span class="rubro-word">Fotógrafos</span>
+            <span class="rubro-word">Diseñadores</span>
+            <span class="rubro-word">Consultoras</span>
+            <span class="rubro-word">Freelancers</span>
+            <span class="rubro-word">Agencias de turismo</span>
+            <span class="rubro-word">Colegios</span>
+            <span class="rubro-word">Productoras audiovisuales</span>
+            <span class="rubro-word">Empresas de eventos</span>
+            <span class="rubro-word">Viñas</span>
             <span class="rubro-word">Cerrajeros</span>
             <span class="rubro-word">Pintores</span>
             <span class="rubro-word">Jardineros</span>
@@ -557,7 +552,6 @@
         </div>
         </div>
       </div>
-    </div>
   </section>
 
   <!-- PROCESO -->
