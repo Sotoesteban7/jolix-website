@@ -32,6 +32,19 @@ Sitio estático de una sola página (`index.html`, sin dependencias de build). I
 
 Si prefieres evitar los registros DNS manuales, se puede importar este mismo repositorio en **Vercel**, **Netlify** o **Cloudflare Pages** — los tres tienen plan gratuito, detectan que es HTML estático sin configuración adicional, y guían paso a paso para conectar `jolixasesorias.com` desde su propio panel.
 
+## Formulario de contacto (Web3Forms + hCaptcha)
+
+El formulario de la sección Contacto envía a **Web3Forms** (access key ya incrustada en `index.html`) y protege el envío con **hCaptcha** real (widget cargado desde `web3forms.com/client/script.js`).
+
+**Un paso pendiente en tu panel de Web3Forms** antes de que el captcha se aplique de verdad:
+1. Entra a tu dashboard en [web3forms.com](https://web3forms.com)
+2. Abre el formulario "Contacto" → Settings
+3. Activa la opción **hCaptcha** (usa la site key pública compartida de Web3Forms; no necesitas crear cuenta en hcaptcha.com para el plan gratis)
+
+Sin ese paso, el widget visual igual aparece, pero Web3Forms no exige el token en el servidor.
+
+Nota: este formulario **no funciona dentro de un Artifact de Claude** (la política de seguridad de esa vista bloquea peticiones de red salientes a servicios externos) — solo funciona una vez publicado en un hosting real como GitHub Pages.
+
 ## Editar contenido
 
 Todo el sitio vive en `index.html` (HTML + CSS + un script pequeño para el menú móvil). Los colores y tipografía están centralizados como variables CSS al inicio del archivo (`:root`), incluyendo el modo oscuro automático.
