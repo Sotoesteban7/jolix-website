@@ -256,12 +256,13 @@
   .founder-role{font-size:13px;color:var(--muted);}
 
   /* ---------- Contacto ---------- */
-  .contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center;}
-  .contact-list{display:flex;flex-direction:column;gap:18px;}
+  .contact-stack{display:flex;flex-direction:column;gap:44px;}
+  .contact-list-row{display:flex;gap:20px;flex-wrap:wrap;justify-content:center;}
   .contact-row{
     display:flex;align-items:center;gap:16px;background:var(--surface);
     border:1px solid var(--mist-line);border-radius:16px;padding:18px 20px;
     text-decoration:none;color:var(--ink);
+    flex:1 1 280px;max-width:360px;
   }
   .contact-row:hover{border-color:var(--purple);}
   .contact-icon{width:40px;height:40px;border-radius:12px;background:var(--mist);display:flex;align-items:center;justify-content:center;flex:none;}
@@ -282,10 +283,14 @@
   .contact-panel h3{position:relative;color:inherit;font-size:23px;}
   .contact-panel p{position:relative;margin-top:14px;color:color-mix(in srgb, var(--paper) 72%, transparent);font-size:15px;}
   :root[data-theme="dark"] .contact-panel p, :root:not([data-theme="light"]) .contact-panel p{color:var(--muted);}
-  .contact-panel .btn{position:relative;margin-top:4px;width:100%;justify-content:center;border:none;}
+  .contact-panel .btn{position:relative;border:none;flex:none;}
 
-  .lead-form{position:relative;margin-top:26px;display:flex;flex-direction:column;gap:14px;}
+  .lead-form{position:relative;margin-top:26px;display:grid;grid-template-columns:1fr 1fr;gap:18px 20px;}
   .lead-form .field{display:flex;flex-direction:column;gap:6px;}
+  .lead-form .field.full{grid-column:1/-1;}
+  .lead-form textarea{min-height:140px;}
+  .lead-form .form-actions{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;}
+  .lead-form .form-status{grid-column:1/-1;}
   .lead-form label{font-size:12.5px;font-weight:500;color:color-mix(in srgb, currentColor 68%, transparent);}
   .lead-form input[type="text"],
   .lead-form input[type="email"],
@@ -324,7 +329,8 @@
     .carta-grid{grid-template-columns:repeat(2,1fr);}
     .gloss-grid{grid-template-columns:repeat(2,1fr);}
     .terms{grid-template-columns:repeat(2,1fr);}
-    .about-grid, .contact-grid{grid-template-columns:1fr;}
+    .about-grid{grid-template-columns:1fr;}
+    .lead-form{grid-template-columns:1fr;}
     .about-mark{max-width:320px;margin:0 auto;}
     nav.links{position:fixed;top:64px;left:0;right:0;background:var(--surface);flex-direction:column;padding:22px 28px;border-bottom:1px solid var(--mist-line);gap:18px;display:none;}
     nav.links.open{display:flex;}
@@ -568,23 +574,7 @@
         <span class="eyebrow">Conversemos</span>
         <h2>Ordenemos juntos la contabilidad de tu negocio</h2>
       </div>
-      <div class="contact-grid">
-        <div class="contact-list">
-          <a class="contact-row" href="mailto:contacto@jolixasesorias.com">
-            <div class="contact-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><rect x="3.5" y="5.5" width="17" height="13" rx="2.2"/><path d="m4 7 8 6 8-6"/></svg></div>
-            <div><div class="label">Correo</div><div class="value">contacto@jolixasesorias.com</div></div>
-          </a>
-          <a class="contact-row" href="https://wa.me/56944547820" target="_blank" rel="noopener">
-            <div class="contact-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><path d="M7 17.5 4.5 19l1.1-3.2A7.7 7.7 0 1 1 12 19.7c-1.2 0-2.3-.3-3.3-.8L7 17.5Z"/><path d="M9 10.3c0 3 2.7 5.4 5.6 5.2"/></svg></div>
-            <div><div class="label">WhatsApp</div><div class="value">+56 9 4454 7820 <span class="value-meta">@jolixasesorias</span></div></div>
-          </a>
-          <!-- Instagram: oculto por ahora, se reactiva más adelante
-          <a class="contact-row" href="https://instagram.com/jolixasesorias" target="_blank" rel="noopener">
-            <div class="contact-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><rect x="4" y="4" width="16" height="16" rx="5"/><circle cx="12" cy="12" r="3.6"/><circle cx="16.6" cy="7.4" r="1"/></svg></div>
-            <div><div class="label">Instagram</div><div class="value">@jolixasesorias</div></div>
-          </a>
-          -->
-        </div>
+      <div class="contact-stack">
         <div class="contact-panel" id="formulario">
           <h3>Cuéntanos qué necesitas</h3>
           <p>Completa el formulario y te llamamos para conversar de tu negocio.</p>
@@ -609,14 +599,32 @@
               <label for="lf-phone">Celular</label>
               <input id="lf-phone" name="phone" type="tel" required autocomplete="tel" placeholder="+56 9 1234 5678">
             </div>
-            <div class="field">
+            <div class="field full">
               <label for="lf-message">Mensaje</label>
-              <textarea id="lf-message" name="message" rows="4" required placeholder="Cuéntanos qué necesitas resolver"></textarea>
+              <textarea id="lf-message" name="message" rows="6" required placeholder="Cuéntanos con detalle qué necesitas resolver: tu situación, tamaño de tu empresa, plazos, etc."></textarea>
             </div>
-            <div class="h-captcha" data-captcha="true"></div>
-            <button type="submit" class="btn btn-primary" id="lfSubmit">Enviar solicitud</button>
+            <div class="form-actions">
+              <div class="h-captcha" data-captcha="true"></div>
+              <button type="submit" class="btn btn-primary" id="lfSubmit">Enviar solicitud</button>
+            </div>
             <p class="form-status" id="lfStatus" role="status" aria-live="polite"></p>
           </form>
+        </div>
+        <div class="contact-list-row">
+          <a class="contact-row" href="mailto:contacto@jolixasesorias.com">
+            <div class="contact-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><rect x="3.5" y="5.5" width="17" height="13" rx="2.2"/><path d="m4 7 8 6 8-6"/></svg></div>
+            <div><div class="label">Correo</div><div class="value">contacto@jolixasesorias.com</div></div>
+          </a>
+          <a class="contact-row" href="https://wa.me/56944547820" target="_blank" rel="noopener">
+            <div class="contact-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><path d="M7 17.5 4.5 19l1.1-3.2A7.7 7.7 0 1 1 12 19.7c-1.2 0-2.3-.3-3.3-.8L7 17.5Z"/><path d="M9 10.3c0 3 2.7 5.4 5.6 5.2"/></svg></div>
+            <div><div class="label">WhatsApp</div><div class="value">+56 9 4454 7820 <span class="value-meta">@jolixasesorias</span></div></div>
+          </a>
+          <!-- Instagram: oculto por ahora, se reactiva más adelante
+          <a class="contact-row" href="https://instagram.com/jolixasesorias" target="_blank" rel="noopener">
+            <div class="contact-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><rect x="4" y="4" width="16" height="16" rx="5"/><circle cx="12" cy="12" r="3.6"/><circle cx="16.6" cy="7.4" r="1"/></svg></div>
+            <div><div class="label">Instagram</div><div class="value">@jolixasesorias</div></div>
+          </a>
+          -->
         </div>
       </div>
     </div>
