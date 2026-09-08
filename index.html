@@ -160,16 +160,15 @@
   .hero-meta .l{font-size:13px;color:var(--muted);}
 
   .mark-panel{
-    position:relative;background:var(--surface);border:1px solid var(--mist-line);
-    border-radius:28px;padding:48px 0;box-shadow:var(--shadow);
-    display:flex;flex-direction:column;justify-content:center;gap:30px;
-    min-height:420px;
+    position:relative;min-width:0;
+    display:flex;flex-direction:column;justify-content:center;gap:22px;
   }
   .mark-panel .rubro-lead{
     font-family:'Poppins',sans-serif;font-weight:600;font-size:19px;
-    text-align:center;line-height:1.35;padding:0 40px;
+    text-align:center;line-height:1.35;padding:0 20px;
   }
-  .rubro-marquee{width:100%;overflow:hidden;-webkit-mask-image:linear-gradient(90deg,transparent,#000 10%,#000 90%,transparent);mask-image:linear-gradient(90deg,transparent,#000 10%,#000 90%,transparent);}
+  .rubro-stack{display:flex;flex-direction:column;gap:2px;min-width:0;}
+  .rubro-marquee{width:100%;min-width:0;overflow:hidden;line-height:1;-webkit-mask-image:linear-gradient(90deg,transparent,#000 10%,#000 90%,transparent);mask-image:linear-gradient(90deg,transparent,#000 10%,#000 90%,transparent);}
   .rubro-track{display:flex;gap:38px;width:max-content;padding:4px 0;align-items:baseline;animation-timing-function:linear;animation-iteration-count:infinite;}
   .rubro-track.right{animation-name:rubroScrollLeft;}
   .rubro-track.left{animation-name:rubroScrollRight;}
@@ -178,10 +177,10 @@
   .rubro-row-1 .rubro-track{animation-duration:110s;}
   .rubro-row-2 .rubro-track{animation-duration:75s;}
   .rubro-row-3 .rubro-track{animation-duration:130s;}
-  .rubro-word{flex:none;font-family:'Poppins',sans-serif;font-weight:600;white-space:nowrap;letter-spacing:-.01em;}
-  .rubro-row-1 .rubro-word{font-size:clamp(30px,3.4vw,40px);color:var(--purple);}
-  .rubro-row-2 .rubro-word{font-size:22px;color:var(--coral-deep);}
-  .rubro-row-3 .rubro-word{font-size:22px;color:var(--purple-soft);opacity:.85;}
+  .rubro-word{flex:none;font-family:'Poppins',sans-serif;font-weight:600;white-space:nowrap;letter-spacing:-.01em;line-height:1;}
+  .rubro-row-1 .rubro-word{font-size:clamp(24px,2.6vw,32px);color:var(--purple);}
+  .rubro-row-2 .rubro-word{font-size:18px;color:var(--coral-deep);}
+  .rubro-row-3 .rubro-word{font-size:18px;color:var(--purple-soft);opacity:.85;}
   @media (prefers-reduced-motion: reduce){.rubro-track{animation:none !important;}}
 
   /* ---------- Section shell ---------- */
@@ -417,6 +416,7 @@
       </div>
       <div class="mark-panel">
         <p class="rubro-lead">Asesoría contable a la medida de tu rubro</p>
+        <div class="rubro-stack">
         <div class="rubro-marquee rubro-row-1">
           <div class="rubro-track right">
             <span class="rubro-word">Minimarket</span>
@@ -464,6 +464,7 @@
             <span class="rubro-word">Arquitectos</span>
             <span class="rubro-word">Contratistas</span>
           </div>
+        </div>
         </div>
       </div>
     </div>
