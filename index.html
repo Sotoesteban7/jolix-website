@@ -282,6 +282,13 @@
   .about-points div{display:flex;gap:12px;align-items:flex-start;}
   .about-points svg{flex:none;width:18px;height:18px;stroke:var(--coral-deep);margin-top:3px;}
   .about-points p{font-size:14.5px;color:var(--ink);}
+  .about-credential{margin-top:28px;display:flex;gap:16px;align-items:flex-start;background:var(--mist);border-radius:18px;padding:20px 22px;}
+  .about-credential .avatar{flex:none;width:50px;height:50px;border-radius:50%;background:var(--purple);color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Poppins',sans-serif;font-weight:700;font-size:17px;}
+  .about-credential .name-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+  .about-credential .name{font-family:'Poppins',sans-serif;font-weight:600;font-size:16px;color:var(--ink);}
+  .about-credential .cred-badge{font-size:11px;font-weight:600;background:var(--surface);color:var(--coral-deep);padding:4px 10px;border-radius:999px;border:1px solid var(--mist-line);white-space:nowrap;}
+  .about-credential .role{font-size:13px;color:var(--purple-deep);font-weight:600;margin-top:2px;}
+  .about-credential .desc{margin-top:8px;font-size:14px;color:var(--muted);line-height:1.55;}
   .founder{margin-top:34px;display:flex;align-items:center;gap:14px;padding-top:26px;border-top:1px solid var(--mist-line);}
   .founder-avatar{width:46px;height:46px;border-radius:50%;background:var(--purple);color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Poppins',sans-serif;font-weight:600;}
   .founder-name{font-family:'Poppins',sans-serif;font-weight:600;font-size:14.5px;}
@@ -720,6 +727,15 @@
           <div><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M5 12.5 9.5 17 19 7"/></svg><p>Hablas directo con quien lleva tu contabilidad, sin derivaciones.</p></div>
           <div><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M5 12.5 9.5 17 19 7"/></svg><p>Te explicamos cada obligación en simple, sin tecnicismos.</p></div>
           <div><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M5 12.5 9.5 17 19 7"/></svg><p>Seguimiento cercano de tus plazos ante el SII y la Dirección del Trabajo.</p></div>
+        </div>
+
+        <div class="about-credential">
+          <div class="avatar">IA</div>
+          <div>
+            <div class="name-row"><span class="name">Irena Acevedo González</span><span class="cred-badge">7 años de experiencia</span></div>
+            <div class="role">Contador Auditor</div>
+            <p class="desc">Con trayectoria en finanzas públicas y privadas, y en distintos rubros. En Jolix somos una empresa familiar: cuidamos tus números y tus activos como si fueran los nuestros.</p>
+          </div>
         </div>
       </div>
     </div>
