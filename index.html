@@ -317,11 +317,12 @@
   :root[data-theme="dark"] .contact-panel p, :root:not([data-theme="light"]) .contact-panel p{color:var(--muted);}
   .contact-panel .btn{position:relative;border:none;flex:none;}
 
-  .lead-form{position:relative;margin-top:26px;display:grid;grid-template-columns:1fr 1fr;gap:18px 20px;}
+  .lead-form{position:relative;margin-top:26px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px 20px;}
   .lead-form .field{display:flex;flex-direction:column;gap:6px;}
   .lead-form .field.full{grid-column:1/-1;}
   .lead-form textarea{min-height:140px;}
-  .lead-form .form-actions{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;}
+  .lead-form .form-actions{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;min-width:0;}
+  .lead-form .form-actions .h-captcha{max-width:100%;overflow-x:auto;}
   .lead-form .form-status{grid-column:1/-1;}
   .lead-form label{font-size:12.5px;font-weight:500;color:color-mix(in srgb, currentColor 68%, transparent);}
   .lead-form input[type="text"],
@@ -365,7 +366,7 @@
     .gloss-grid{grid-template-columns:repeat(2,1fr);}
     .terms{grid-template-columns:repeat(2,1fr);}
     .about-grid{grid-template-columns:1fr;}
-    .lead-form{grid-template-columns:1fr;}
+    .lead-form{grid-template-columns:minmax(0,1fr);}
     .about-mark{max-width:320px;margin:0 auto;}
     nav.links{position:fixed;top:64px;left:0;right:0;background:var(--surface);flex-direction:column;padding:22px 28px;border-bottom:1px solid var(--mist-line);gap:18px;display:none;}
     nav.links.open{display:flex;}
