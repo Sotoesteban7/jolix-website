@@ -528,6 +528,24 @@
         <button type="submit" class="btn" id="btn-guardar-clave">Guardar</button>
       </div>
     </form>
+
+    <div id="bloque-admin-clave" hidden>
+      <hr style="border:none; border-top:1px solid var(--line); margin:24px 0 20px;">
+      <h2 style="font-size:15px;">Restablecer la de otra persona</h2>
+      <p class="hint">Úsalo si alguien del equipo olvidó su contraseña. Se cerrarán sus sesiones abiertas y deberá entrar con la nueva.</p>
+      <div class="login-error" id="reset-error" hidden></div>
+      <form id="form-reset">
+        <div class="campo">
+          <label for="sel-persona">Persona</label>
+          <select id="sel-persona" class="control" style="width:100%"></select>
+        </div>
+        <div class="campo">
+          <label for="in-clave-reset">Contraseña temporal</label>
+          <input id="in-clave-reset" type="text" autocomplete="off" required minlength="8" placeholder="mínimo 8 caracteres">
+        </div>
+        <button type="submit" class="btn" id="btn-reset" style="width:100%">Restablecer contraseña</button>
+      </form>
+    </div>
   </div>
 </div>
 
@@ -638,10 +656,46 @@
 
   $("btn-clave").addEventListener("click", function(){
     $("clave-error").hidden = true;
+    $("reset-error").hidden = true;
     $("in-clave-1").value = "";
     $("in-clave-2").value = "";
+    $("in-clave-reset").value = "";
+    $("bloque-admin-clave").hidden = !esAdmin();
+    if (esAdmin()) llenarSelectorPersonas();
     $("modal-clave").hidden = false;
     $("in-clave-1").focus();
+  });
+
+  async function llenarSelectorPersonas(){
+    var res = await sb.from("perfiles").select("usuario, nombre, rol").order("nombre");
+    if (res.error) return;
+    var otros = (res.data || []).filter(function(p){ return p.usuario !== perfil.usuario; });
+    $("sel-persona").innerHTML = otros.map(function(p){
+      return '<option value="' + escapar(p.usuario) + '">' + escapar(p.nombre) + ' (' + escapar(p.usuario) + ')</option>';
+    }).join("");
+  }
+
+  $("form-reset").addEventListener("submit", async function(e){
+    e.preventDefault();
+    var usuario = $("sel-persona").value;
+    var clave = $("in-clave-reset").value;
+    $("reset-error").hidden = true;
+    if (!usuario || clave.length < 8){
+      $("reset-error").textContent = "Elige a la persona y una contraseña de al menos 8 caracteres.";
+      $("reset-error").hidden = false;
+      return;
+    }
+    $("btn-reset").disabled = true;
+    var res = await sb.rpc("restablecer_clave", { usuario_destino: usuario, clave_nueva: clave });
+    $("btn-reset").disabled = false;
+    if (res.error){
+      $("reset-error").textContent = "No se pudo restablecer: " + res.error.message;
+      $("reset-error").hidden = false;
+      return;
+    }
+    $("in-clave-reset").value = "";
+    $("modal-clave").hidden = true;
+    mostrarAviso("Contraseña de " + usuario + " restablecida. Pásasela para que la cambie al entrar.", "ok");
   });
   $("btn-cancelar-clave").addEventListener("click", function(){ $("modal-clave").hidden = true; });
 
