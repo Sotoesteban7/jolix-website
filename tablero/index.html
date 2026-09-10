@@ -279,6 +279,83 @@
     font-size:13px; color:var(--muted); margin-bottom:16px;
   }
 
+  /* --------------------------------------------------------- TAREAS */
+  .tab-badge{
+    display:inline-flex; align-items:center; justify-content:center;
+    min-width:19px; height:19px; padding:0 5px; margin-left:5px;
+    border-radius:999px; background:var(--coral-deep); color:#fff;
+    font-size:11px; font-weight:700; vertical-align:1px;
+  }
+  .form-tarea{display:flex; gap:10px; flex-wrap:wrap; align-items:flex-end;}
+  .form-tarea .g{display:flex; flex-direction:column; gap:5px;}
+  .form-tarea .g.crece{flex:1 1 260px; min-width:0;}
+  .form-tarea .g label{font-size:11.5px; text-transform:uppercase; letter-spacing:.07em; color:var(--faint); font-weight:600;}
+  .form-tarea .control{width:100%;}
+  .form-tarea select.control{min-width:150px;}
+
+  .filtro-tareas{display:flex; align-items:center; gap:14px; flex-wrap:wrap; margin:22px 0 6px;}
+  .segmento{display:inline-flex; background:var(--mist); border-radius:999px; padding:3px;}
+  .seg{
+    background:transparent; border:none; border-radius:999px;
+    padding:7px 15px; font-family:'Poppins',sans-serif; font-weight:600;
+    font-size:12.5px; color:var(--muted);
+  }
+  .seg[aria-pressed="true"]{background:var(--surface); color:var(--purple-deep); box-shadow:0 1px 3px rgba(0,0,0,.08);}
+  .conteo-tareas{font-size:12.5px; color:var(--faint);}
+
+  .titulo-lista{
+    font-size:12px; text-transform:uppercase; letter-spacing:.09em;
+    color:var(--faint); font-weight:600; margin:22px 0 10px;
+  }
+  .nota-lista{font-size:12.5px; color:var(--faint); margin:10px 2px 0;}
+  .lista-tareas{display:flex; flex-direction:column; gap:8px;}
+
+  .tarea{
+    display:flex; align-items:flex-start; gap:13px;
+    background:var(--surface); border:1px solid var(--line);
+    border-radius:var(--radius); padding:13px 15px;
+    cursor:pointer; text-align:left; width:100%; font:inherit; color:inherit;
+    transition:border-color .12s ease;
+  }
+  .tarea:hover{border-color:var(--purple-soft);}
+  .tarea .marca{
+    flex:none; width:21px; height:21px; margin-top:1px; border-radius:50%;
+    border:2px solid var(--line); background:transparent;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .tarea:hover .marca{border-color:var(--purple);}
+  .tarea .marca svg{width:12px; height:12px; opacity:0; color:#fff;}
+  .tarea .cuerpo{flex:1; min-width:0;}
+  .tarea .desc{font-size:14.5px; line-height:1.4; color:var(--ink); overflow-wrap:anywhere;}
+  .tarea .meta{display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-top:6px;}
+  .tarea .cliente{
+    font-family:'Poppins',sans-serif; font-weight:600; font-size:12px;
+    color:var(--purple-deep); background:var(--mist);
+    padding:2px 9px; border-radius:999px;
+  }
+  .tarea .quien{font-size:12px; color:var(--muted);}
+  .tarea .creada{font-size:11.5px; color:var(--faint);}
+  .tarea .limite{font-size:12px; color:var(--muted); font-weight:500;}
+  .tarea .limite.urgente{color:var(--pend); font-weight:600;}
+  .tarea .borrar{
+    flex:none; background:none; border:none; color:var(--faint);
+    font-size:17px; line-height:1; padding:3px 6px; border-radius:7px; margin-top:-1px;
+  }
+  .tarea .borrar:hover{background:var(--pend-bg); color:var(--pend);}
+
+  .tarea.hecha{background:transparent; border-style:dashed;}
+  .tarea.hecha .marca{background:var(--ok); border-color:var(--ok);}
+  .tarea.hecha .marca svg{opacity:1;}
+  .tarea.hecha .desc{text-decoration:line-through; color:var(--faint);}
+  .tarea.hecha .cliente{background:transparent; color:var(--faint); padding-left:0; padding-right:0;}
+
+  @media (max-width:640px){
+    .form-tarea .g, .form-tarea .control{width:100%;}
+    .form-tarea .g.crece{flex-basis:100%;}
+    .form-tarea select.control, .form-tarea input[type="date"]{width:100% !important;}
+    .form-tarea .btn{width:100%;}
+  }
+
   /* ------------------------------------------------------ HISTÓRICO */
   table.hist{width:100%; border-collapse:collapse; font-variant-numeric:tabular-nums;}
   table.hist th{text-align:left; font-family:'Poppins',sans-serif; font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.07em; color:var(--faint); padding:0 12px 10px; border-bottom:1px solid var(--line);}
@@ -373,6 +450,7 @@
       </div>
       <nav class="tabs" role="tablist">
         <button class="tab" role="tab" aria-selected="true" data-vista="mes">Mes</button>
+        <button class="tab" role="tab" aria-selected="false" data-vista="tareas">Tareas <span class="tab-badge" id="tab-badge" hidden></span></button>
         <button class="tab" role="tab" aria-selected="false" data-vista="clientes">Clientes</button>
         <button class="tab" role="tab" aria-selected="false" data-vista="rubros">Rubros</button>
         <button class="tab" role="tab" aria-selected="false" data-vista="historico">Histórico PPM</button>
@@ -411,6 +489,52 @@
         <h3>Todavía no hay clientes cargados</h3>
         <p>Agrega tus clientes en la pestaña Clientes indicando qué servicios tiene contratado cada uno.</p>
       </div>
+    </section>
+
+    <!-- VISTA TAREAS -->
+    <section id="v-tareas" hidden>
+      <div class="panel">
+        <h2>Nueva tarea</h2>
+        <p class="hint">Pendientes del día a día y solicitudes de clientes: qué hay que hacer, para cuándo y quién la toma.</p>
+        <div class="form-tarea">
+          <div class="g">
+            <label for="t-cliente">Cliente</label>
+            <select id="t-cliente" class="control"></select>
+          </div>
+          <div class="g crece">
+            <label for="t-desc">Descripción</label>
+            <input id="t-desc" class="control" placeholder="Enviar carpeta tributaria del último trimestre" autocomplete="off">
+          </div>
+          <div class="g">
+            <label for="t-limite">Fecha límite</label>
+            <input id="t-limite" class="control" type="date" style="width:160px">
+          </div>
+          <div class="g">
+            <label for="t-asignado">Asignada a</label>
+            <select id="t-asignado" class="control" style="width:160px"></select>
+          </div>
+          <button class="btn" id="btn-agregar-tarea">Agregar</button>
+        </div>
+      </div>
+
+      <div class="filtro-tareas">
+        <div class="segmento">
+          <button class="seg" data-filtro="mias" aria-pressed="false">Asignadas a mí</button>
+          <button class="seg" data-filtro="todas" aria-pressed="true">Todas</button>
+        </div>
+        <span class="conteo-tareas" id="conteo-tareas"></span>
+      </div>
+
+      <h3 class="titulo-lista">Pendientes</h3>
+      <div class="lista-tareas" id="tareas-pendientes"></div>
+      <div class="vacio" id="tareas-vacio" hidden>
+        <h3>Sin tareas pendientes</h3>
+        <p>Cuando agregues una aparecerá aquí, de la más antigua a la más nueva.</p>
+      </div>
+
+      <h3 class="titulo-lista" id="titulo-hechas">Completadas</h3>
+      <div class="lista-tareas" id="tareas-hechas"></div>
+      <p class="nota-lista" id="nota-hechas" hidden>Toca una tarea completada para volver a activarla.</p>
     </section>
 
     <!-- VISTA CLIENTES -->
@@ -772,6 +896,7 @@
     perfilesPorId = {};
     (r3.data || []).forEach(function(p){ perfilesPorId[p.id] = p.nombre; });
     await cargarMes();
+    await cargarTareas();
     todoRender();
   }
 
@@ -783,12 +908,14 @@
   }
 
   async function refrescarSuave(){
-    if (document.activeElement && document.activeElement.classList.contains("monto")) return;
+    var foco = document.activeElement;
+    if (foco && (foco.tagName === "INPUT" || foco.tagName === "SELECT")) return;
     var res = await sb.from("registros").select("*").eq("mes", mesSel);
     if (res.error) return;
     registros = {};
     (res.data || []).forEach(function(r){ registros[r.cliente_id] = r; });
     if (vista === "mes") renderMes();
+    await cargarTareas();
   }
 
   function reg(clienteId){ return registros[clienteId] || {}; }
@@ -1302,6 +1429,180 @@
     $("hist-total").textContent = clp(total);
   }
 
+  /* --------------------------------------------------------- TAREAS */
+  var tareas = [];
+  var filtroTareas = "todas";
+
+  async function cargarTareas(){
+    var res = await sb.from("tareas")
+      .select("id, cliente_id, descripcion, fecha_limite, asignado_a, completada, completada_en, completada_por, creada")
+      .order("creada", { ascending: true }).limit(500);
+    if (res.error){ mostrarAviso("No se pudieron cargar las tareas."); return; }
+    tareas = res.data || [];
+    renderTareas();
+  }
+
+  function nombreCliente(id){
+    for (var i = 0; i < clientes.length; i++){ if (clientes[i].id === id) return clientes[i].nombre; }
+    return "Cliente eliminado";
+  }
+
+  function fechaCorta(iso){
+    if (!iso) return "";
+    var p = String(iso).slice(0,10).split("-");
+    return p[2] + "/" + p[1] + "/" + p[0].slice(2);
+  }
+
+  function estadoLimite(fecha){
+    if (!fecha) return null;
+    var hoy = new Date(); hoy.setHours(0,0,0,0);
+    var d = new Date(fecha + "T00:00:00");
+    var dias = Math.round((d - hoy) / 86400000);
+    if (dias < 0)  return { txt: "Vencida " + fechaCorta(fecha), urgente: true };
+    if (dias === 0) return { txt: "Vence hoy", urgente: true };
+    if (dias === 1) return { txt: "Vence mañana", urgente: false };
+    return { txt: "Vence " + fechaCorta(fecha), urgente: false };
+  }
+
+  function tareasFiltradas(){
+    if (filtroTareas === "mias" && perfil){
+      return tareas.filter(function(t){ return t.asignado_a === perfil.id; });
+    }
+    return tareas;
+  }
+
+  function filaTarea(t){
+    var lim = t.completada ? null : estadoLimite(t.fecha_limite);
+    var quien = t.asignado_a ? (perfilesPorId[t.asignado_a] || "") : "";
+    var meta = '<span class="cliente">' + escapar(nombreCliente(t.cliente_id)) + '</span>';
+    if (quien) meta += '<span class="quien">' + escapar(quien) + '</span>';
+    if (lim) meta += '<span class="limite' + (lim.urgente ? " urgente" : "") + '">' + lim.txt + '</span>';
+    if (t.completada && t.completada_en){
+      meta += '<span class="creada">Completada ' + fechaCorta(t.completada_en) +
+              (perfilesPorId[t.completada_por] ? " por " + escapar(perfilesPorId[t.completada_por]) : "") + '</span>';
+    } else {
+      meta += '<span class="creada">Creada ' + fechaCorta(t.creada) + '</span>';
+    }
+    return '<div class="tarea' + (t.completada ? " hecha" : "") + '" data-tarea="' + t.id + '" role="button" tabindex="0">' +
+      '<span class="marca"><svg viewBox="0 0 24 24" fill="none"><path d="M4 12.5l5 5L20 6.5" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>' +
+      '<div class="cuerpo"><div class="desc">' + escapar(t.descripcion) + '</div>' +
+      '<div class="meta">' + meta + '</div></div>' +
+      '<button class="borrar" data-borrar-tarea="' + t.id + '" aria-label="Eliminar tarea">×</button></div>';
+  }
+
+  function renderTareas(){
+    var lista = tareasFiltradas();
+    var pend = lista.filter(function(t){ return !t.completada; });
+    var hechas = lista.filter(function(t){ return t.completada; })
+      .sort(function(a,b){ return String(b.completada_en).localeCompare(String(a.completada_en)); });
+
+    $("tareas-pendientes").innerHTML = pend.map(filaTarea).join("");
+    $("tareas-vacio").hidden = pend.length > 0;
+    $("tareas-hechas").innerHTML = hechas.map(filaTarea).join("");
+    $("titulo-hechas").hidden = hechas.length === 0;
+    $("nota-hechas").hidden = hechas.length === 0;
+
+    $("conteo-tareas").textContent = pend.length === 1
+      ? "1 pendiente" : pend.length + " pendientes";
+
+    var mias = tareas.filter(function(t){
+      return !t.completada && perfil && t.asignado_a === perfil.id;
+    }).length;
+    var badge = $("tab-badge");
+    badge.textContent = mias;
+    badge.hidden = mias === 0;
+
+    document.querySelectorAll("#v-tareas .tarea").forEach(function(el){
+      el.addEventListener("click", function(e){
+        if (e.target.closest("[data-borrar-tarea]")) return;
+        alternarTarea(el.dataset.tarea);
+      });
+      el.addEventListener("keydown", function(e){
+        if (e.key === "Enter" || e.key === " "){ e.preventDefault(); alternarTarea(el.dataset.tarea); }
+      });
+    });
+    document.querySelectorAll("#v-tareas [data-borrar-tarea]").forEach(function(b){
+      b.addEventListener("click", async function(e){
+        e.stopPropagation();
+        if (b.dataset.confirmando !== "1"){
+          b.dataset.confirmando = "1";
+          b.textContent = "¿Eliminar?";
+          b.style.fontSize = "12px";
+          setTimeout(function(){
+            if (!b.isConnected) return;
+            b.dataset.confirmando = ""; b.textContent = "×"; b.style.fontSize = "";
+          }, 4000);
+          return;
+        }
+        var res = await sb.from("tareas").delete().eq("id", b.dataset.borrarTarea);
+        if (res.error){ mostrarAviso("No se pudo eliminar la tarea."); return; }
+        await cargarTareas();
+      });
+    });
+  }
+
+  async function alternarTarea(id){
+    var t = tareas.filter(function(x){ return x.id === id; })[0];
+    if (!t) return;
+    var res = await sb.from("tareas").update({ completada: !t.completada }).eq("id", id);
+    if (res.error){ mostrarAviso("No se pudo actualizar la tarea."); return; }
+    await cargarTareas();
+  }
+
+  function llenarSelectoresTarea(){
+    var selCli = $("t-cliente");
+    var previo = selCli.value;
+    selCli.innerHTML = '<option value="">Selecciona…</option>' +
+      rubrosOrdenados().map(function(r){
+        return '<optgroup label="' + escapar(r) + '">' +
+          clientesDe(r).map(function(c){
+            return '<option value="' + c.id + '">' + escapar(c.nombre) + '</option>';
+          }).join("") + '</optgroup>';
+      }).join("");
+    if (previo) selCli.value = previo;
+
+    var selAsig = $("t-asignado");
+    var previoA = selAsig.value;
+    var ids = Object.keys(perfilesPorId);
+    selAsig.innerHTML = '<option value="">Sin asignar</option>' +
+      ids.map(function(id){
+        return '<option value="' + id + '">' + escapar(perfilesPorId[id]) + '</option>';
+      }).join("");
+    selAsig.value = previoA || (perfil ? perfil.id : "");
+  }
+
+  document.querySelectorAll(".seg[data-filtro]").forEach(function(b){
+    b.addEventListener("click", function(){
+      filtroTareas = b.dataset.filtro;
+      document.querySelectorAll(".seg[data-filtro]").forEach(function(x){
+        x.setAttribute("aria-pressed", String(x.dataset.filtro === filtroTareas));
+      });
+      renderTareas();
+    });
+  });
+
+  $("btn-agregar-tarea").addEventListener("click", async function(){
+    var cliente = $("t-cliente").value;
+    var desc = $("t-desc").value.trim();
+    if (!cliente){ mostrarAviso("Elige el cliente asociado a la tarea."); $("t-cliente").focus(); return; }
+    if (!desc){ $("t-desc").focus(); return; }
+    var res = await sb.from("tareas").insert({
+      cliente_id: cliente,
+      descripcion: desc,
+      fecha_limite: $("t-limite").value || null,
+      asignado_a: $("t-asignado").value || null
+    });
+    if (res.error){ mostrarAviso("No se pudo crear la tarea: " + res.error.message); return; }
+    $("t-desc").value = "";
+    $("t-limite").value = "";
+    $("t-desc").focus();
+    await cargarTareas();
+  });
+
+  $("t-desc").addEventListener("keydown", function(e){
+    if (e.key === "Enter") $("btn-agregar-tarea").click();
+  });
+
   /* ----------------------------------------------------- NAVEGACIÓN */
   function cambiarVista(v){
     vista = v;
@@ -1309,10 +1610,12 @@
       t.setAttribute("aria-selected", String(t.dataset.vista === v));
     });
     $("v-mes").hidden = v !== "mes";
+    $("v-tareas").hidden = v !== "tareas";
     $("v-clientes").hidden = v !== "clientes";
     $("v-rubros").hidden = v !== "rubros";
     $("v-historico").hidden = v !== "historico";
     if (v === "historico") renderHistorico();
+    if (v === "tareas") cargarTareas();
   }
   document.querySelectorAll(".tab").forEach(function(t){
     t.addEventListener("click", function(){ cambiarVista(t.dataset.vista); });
@@ -1400,6 +1703,8 @@
     renderRubros();
     renderSelectorRubros();
     renderSelectorClientes();
+    llenarSelectoresTarea();
+    renderTareas();
     medirTopbar();
   }
 
