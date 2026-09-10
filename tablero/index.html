@@ -512,16 +512,16 @@
 <div class="modal" id="modal-clave" hidden>
   <div class="modal-card">
     <h2>Cambiar contraseña</h2>
-    <p class="hint">Elige una contraseña nueva de al menos 8 caracteres.</p>
+    <p class="hint">Elige una contraseña nueva de al menos 12 caracteres.</p>
     <div class="login-error" id="clave-error" hidden></div>
     <form id="form-clave">
       <div class="campo">
         <label for="in-clave-1">Contraseña nueva</label>
-        <input id="in-clave-1" type="password" autocomplete="new-password" required minlength="8">
+        <input id="in-clave-1" type="password" autocomplete="new-password" required minlength="12">
       </div>
       <div class="campo">
         <label for="in-clave-2">Repítela</label>
-        <input id="in-clave-2" type="password" autocomplete="new-password" required minlength="8">
+        <input id="in-clave-2" type="password" autocomplete="new-password" required minlength="12">
       </div>
       <div class="modal-botones">
         <button type="button" class="btn ghost" id="btn-cancelar-clave">Cancelar</button>
@@ -541,7 +541,7 @@
         </div>
         <div class="campo">
           <label for="in-clave-reset">Contraseña temporal</label>
-          <input id="in-clave-reset" type="text" autocomplete="off" required minlength="8" placeholder="mínimo 8 caracteres">
+          <input id="in-clave-reset" type="text" autocomplete="off" required minlength="12" placeholder="mínimo 12 caracteres">
         </div>
         <button type="submit" class="btn" id="btn-reset" style="width:100%">Restablecer contraseña</button>
       </form>
@@ -680,8 +680,8 @@
     var usuario = $("sel-persona").value;
     var clave = $("in-clave-reset").value;
     $("reset-error").hidden = true;
-    if (!usuario || clave.length < 8){
-      $("reset-error").textContent = "Elige a la persona y una contraseña de al menos 8 caracteres.";
+    if (!usuario || clave.length < 12){
+      $("reset-error").textContent = "Elige a la persona y una contraseña de al menos 12 caracteres.";
       $("reset-error").hidden = false;
       return;
     }
