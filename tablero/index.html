@@ -286,6 +286,24 @@
     border-radius:999px; background:var(--coral-deep); color:#fff;
     font-size:11px; font-weight:700; vertical-align:1px;
   }
+  .panel-captura{border-color:var(--purple-soft);}
+  .captura{
+    width:100%; background:var(--mist); border:1px dashed var(--line); color:var(--ink);
+    border-radius:12px; padding:13px 15px; font-family:inherit; font-size:14px;
+    resize:vertical; line-height:1.5;
+  }
+  .captura:focus{background:var(--surface); border-style:solid; border-color:var(--purple);}
+  .captura::placeholder{color:var(--faint);}
+  #preview{margin-top:18px; padding-top:18px; border-top:1px solid var(--line);}
+  .preview-cab{display:flex; align-items:center; gap:10px; margin-bottom:14px; flex-wrap:wrap;}
+  .preview-tit{
+    font-family:'Poppins',sans-serif; font-weight:600; font-size:12px;
+    text-transform:uppercase; letter-spacing:.08em; color:var(--purple-deep);
+  }
+  .preview-detectado{
+    font-size:12px; color:var(--ok); background:var(--ok-bg);
+    border-radius:999px; padding:3px 11px; font-weight:500;
+  }
   .form-tarea{display:flex; gap:10px; flex-wrap:wrap; align-items:flex-end;}
   .form-tarea .g{display:flex; flex-direction:column; gap:5px;}
   .form-tarea .g.crece{flex:1 1 260px; min-width:0;}
@@ -493,6 +511,39 @@
 
     <!-- VISTA TAREAS -->
     <section id="v-tareas" hidden>
+      <div class="panel panel-captura">
+        <h2>Pegar desde WhatsApp</h2>
+        <p class="hint">Copia el mensaje del cliente en WhatsApp y pégalo aquí. El tablero intenta reconocer de qué cliente se trata y te deja la tarea lista para confirmar.</p>
+        <textarea id="captura" class="captura" rows="2" placeholder="Pega aquí el mensaje (Ctrl+V)"></textarea>
+
+        <div id="preview" hidden>
+          <div class="preview-cab">
+            <span class="preview-tit">Revisa y confirma</span>
+            <span class="preview-detectado" id="preview-detectado" hidden></span>
+          </div>
+          <div class="form-tarea">
+            <div class="g">
+              <label for="p-cliente">Cliente</label>
+              <select id="p-cliente" class="control"></select>
+            </div>
+            <div class="g crece">
+              <label for="p-desc">Descripción</label>
+              <input id="p-desc" class="control" autocomplete="off">
+            </div>
+            <div class="g">
+              <label for="p-limite">Fecha límite</label>
+              <input id="p-limite" class="control" type="date" style="width:160px">
+            </div>
+            <div class="g">
+              <label for="p-asignado">Asignada a</label>
+              <select id="p-asignado" class="control" style="width:160px"></select>
+            </div>
+            <button class="btn" id="btn-confirmar-captura">Crear tarea</button>
+            <button class="btn ghost" id="btn-descartar-captura">Descartar</button>
+          </div>
+        </div>
+      </div>
+
       <div class="panel">
         <h2>Nueva tarea</h2>
         <p class="hint">Pendientes del día a día y solicitudes de clientes: qué hay que hacer, para cuándo y quién la toma.</p>
@@ -1570,6 +1621,125 @@
       }).join("");
     selAsig.value = previoA || (perfil ? perfil.id : "");
   }
+
+  /* --------------------------------- CAPTURA DESDE WHATSAPP */
+
+  // Separa el formato de WhatsApp ("[10/9/26, 11:23] Juan: texto") del texto suelto.
+  function parsearWhatsApp(texto){
+    var re = /^\s*\[?(\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4})[,]?\s+(\d{1,2}:\d{2})(?::\d{2})?\s*(?:[ap]\.?\s?m\.?)?\]?\s*[-–]?\s*([^:]{1,60}):\s*(.*)$/i;
+    var remitente = null, partes = [];
+    texto.split(/\r?\n/).forEach(function(linea){
+      var m = linea.match(re);
+      if (m){
+        if (!remitente) remitente = m[3].trim();
+        if (m[4].trim()) partes.push(m[4].trim());
+      } else if (linea.trim()){
+        partes.push(linea.trim());
+      }
+    });
+    return { remitente: remitente, texto: partes.join(" ").trim() || texto.trim() };
+  }
+
+  // Busca el cliente: primero por nombre mencionado en el texto, luego por remitente.
+  function detectarCliente(texto, remitente){
+    var t = normaliza(texto);
+    var mejor = null, largo = 0;
+    clientes.forEach(function(c){
+      var n = normaliza(c.nombre);
+      if (n.length > 4 && t.indexOf(n) !== -1 && n.length > largo){ mejor = c; largo = n.length; }
+    });
+    if (mejor) return { cliente: mejor, via: "el texto" };
+
+    if (remitente){
+      var palabras = normaliza(remitente).split(/\s+/).filter(function(p){ return p.length > 2; });
+      if (palabras.length){
+        var mejorP = 0;
+        clientes.forEach(function(c){
+          var n = normaliza(c.nombre);
+          var p = palabras.filter(function(w){ return n.indexOf(w) !== -1; }).length;
+          if (p > mejorP){ mejorP = p; mejor = c; }
+        });
+        if (mejorP >= 2 || (mejorP === 1 && palabras.length === 1)){
+          return { cliente: mejor, via: "el remitente" };
+        }
+      }
+    }
+    return { cliente: null, via: null };
+  }
+
+  function detectarFecha(texto){
+    var m = texto.match(/\b(\d{1,2})[\/\-](\d{1,2})(?:[\/\-](\d{2,4}))?\b/);
+    if (!m) return "";
+    var d = parseInt(m[1],10), mes = parseInt(m[2],10);
+    if (d < 1 || d > 31 || mes < 1 || mes > 12) return "";
+    var anio = m[3] ? parseInt(m[3],10) : new Date().getFullYear();
+    if (anio < 100) anio += 2000;
+    return anio + "-" + String(mes).padStart(2,"0") + "-" + String(d).padStart(2,"0");
+  }
+
+  function armarPreview(){
+    var bruto = $("captura").value;
+    if (!bruto.trim()){ $("preview").hidden = true; return; }
+
+    var p = parsearWhatsApp(bruto);
+    var det = detectarCliente(p.texto, p.remitente);
+
+    $("p-cliente").innerHTML = $("t-cliente").innerHTML;
+    $("p-asignado").innerHTML = $("t-asignado").innerHTML;
+    $("p-cliente").value = det.cliente ? det.cliente.id : "";
+    $("p-asignado").value = perfil ? perfil.id : "";
+    $("p-desc").value = p.texto;
+    $("p-limite").value = detectarFecha(p.texto);
+
+    var aviso = $("preview-detectado");
+    if (det.cliente){
+      aviso.textContent = "Cliente reconocido por " + det.via;
+      aviso.hidden = false;
+    } else {
+      aviso.hidden = true;
+    }
+    $("preview").hidden = false;
+  }
+
+  $("captura").addEventListener("input", armarPreview);
+
+  // Pegar en cualquier parte de la pestaña Tareas abre la captura directamente.
+  document.addEventListener("paste", function(e){
+    if (vista !== "tareas") return;
+    var foco = document.activeElement;
+    if (foco && (foco.tagName === "INPUT" || foco.tagName === "TEXTAREA" || foco.tagName === "SELECT")) return;
+    var texto = (e.clipboardData || window.clipboardData).getData("text");
+    if (!texto || !texto.trim()) return;
+    e.preventDefault();
+    $("captura").value = texto;
+    armarPreview();
+    $("p-desc").focus();
+  });
+
+  function limpiarCaptura(){
+    $("captura").value = "";
+    $("preview").hidden = true;
+    $("preview-detectado").hidden = true;
+  }
+
+  $("btn-descartar-captura").addEventListener("click", limpiarCaptura);
+
+  $("btn-confirmar-captura").addEventListener("click", async function(){
+    var cliente = $("p-cliente").value;
+    var desc = $("p-desc").value.trim();
+    if (!cliente){ mostrarAviso("Elige el cliente antes de crear la tarea."); $("p-cliente").focus(); return; }
+    if (!desc){ $("p-desc").focus(); return; }
+    var res = await sb.from("tareas").insert({
+      cliente_id: cliente,
+      descripcion: desc,
+      fecha_limite: $("p-limite").value || null,
+      asignado_a: $("p-asignado").value || null
+    });
+    if (res.error){ mostrarAviso("No se pudo crear la tarea: " + res.error.message); return; }
+    limpiarCaptura();
+    await cargarTareas();
+    mostrarAviso("Tarea creada.", "ok");
+  });
 
   document.querySelectorAll(".seg[data-filtro]").forEach(function(b){
     b.addEventListener("click", function(){
