@@ -286,7 +286,15 @@
     border-radius:999px; background:var(--coral-deep); color:#fff;
     font-size:11px; font-weight:700; vertical-align:1px;
   }
-  .panel-captura{border-color:var(--purple-soft);}
+  .modal-ancho{max-width:560px; max-height:90vh; overflow-y:auto;}
+  .campo-doble{display:flex; gap:12px;}
+  .campo-doble .campo{flex:1; min-width:0;}
+  .campo select.control, .campo input.control{width:100%;}
+  .pista-original{
+    display:block; margin-top:6px; font-size:12px; color:var(--faint);
+    line-height:1.45; overflow-wrap:anywhere;
+  }
+  .filtro-tareas .btn{margin-left:auto;}
   .captura{
     width:100%; background:var(--mist); border:1px dashed var(--line); color:var(--ink);
     border-radius:12px; padding:13px 15px; font-family:inherit; font-size:14px;
@@ -511,69 +519,13 @@
 
     <!-- VISTA TAREAS -->
     <section id="v-tareas" hidden>
-      <div class="panel panel-captura">
-        <h2>Pegar desde WhatsApp</h2>
-        <p class="hint">Copia el mensaje del cliente en WhatsApp y pégalo aquí. El tablero intenta reconocer de qué cliente se trata y te deja la tarea lista para confirmar.</p>
-        <textarea id="captura" class="captura" rows="2" placeholder="Pega aquí el mensaje (Ctrl+V)"></textarea>
-
-        <div id="preview" hidden>
-          <div class="preview-cab">
-            <span class="preview-tit">Revisa y confirma</span>
-            <span class="preview-detectado" id="preview-detectado" hidden></span>
-          </div>
-          <div class="form-tarea">
-            <div class="g">
-              <label for="p-cliente">Cliente</label>
-              <select id="p-cliente" class="control"></select>
-            </div>
-            <div class="g crece">
-              <label for="p-desc">Descripción</label>
-              <input id="p-desc" class="control" autocomplete="off">
-            </div>
-            <div class="g">
-              <label for="p-limite">Fecha límite</label>
-              <input id="p-limite" class="control" type="date" style="width:160px">
-            </div>
-            <div class="g">
-              <label for="p-asignado">Asignada a</label>
-              <select id="p-asignado" class="control" style="width:160px"></select>
-            </div>
-            <button class="btn" id="btn-confirmar-captura">Crear tarea</button>
-            <button class="btn ghost" id="btn-descartar-captura">Descartar</button>
-          </div>
-        </div>
-      </div>
-
-      <div class="panel">
-        <h2>Nueva tarea</h2>
-        <p class="hint">Pendientes del día a día y solicitudes de clientes: qué hay que hacer, para cuándo y quién la toma.</p>
-        <div class="form-tarea">
-          <div class="g">
-            <label for="t-cliente">Cliente</label>
-            <select id="t-cliente" class="control"></select>
-          </div>
-          <div class="g crece">
-            <label for="t-desc">Descripción</label>
-            <input id="t-desc" class="control" placeholder="Enviar carpeta tributaria del último trimestre" autocomplete="off">
-          </div>
-          <div class="g">
-            <label for="t-limite">Fecha límite</label>
-            <input id="t-limite" class="control" type="date" style="width:160px">
-          </div>
-          <div class="g">
-            <label for="t-asignado">Asignada a</label>
-            <select id="t-asignado" class="control" style="width:160px"></select>
-          </div>
-          <button class="btn" id="btn-agregar-tarea">Agregar</button>
-        </div>
-      </div>
-
       <div class="filtro-tareas">
         <div class="segmento">
           <button class="seg" data-filtro="mias" aria-pressed="false">Asignadas a mí</button>
           <button class="seg" data-filtro="todas" aria-pressed="true">Todas</button>
         </div>
         <span class="conteo-tareas" id="conteo-tareas"></span>
+        <button class="btn" id="btn-abrir-tarea">Crear tarea</button>
       </div>
 
       <h3 class="titulo-lista">Pendientes</h3>
@@ -681,6 +633,52 @@
   </main>
 
   <p class="pie">Los cambios se guardan automáticamente. El tablero se actualiza solo cada 20 segundos.</p>
+</div>
+
+<!-- MODAL NUEVA TAREA -->
+<div class="modal" id="modal-tarea" hidden>
+  <div class="modal-card modal-ancho">
+    <h2>Crear tarea</h2>
+    <p class="hint">Pega el mensaje del cliente y el tablero lo resume, o escríbela tú.</p>
+
+    <div class="segmento" style="margin-bottom:18px;">
+      <button class="seg" data-modo="whatsapp" aria-pressed="true">Desde WhatsApp</button>
+      <button class="seg" data-modo="manual" aria-pressed="false">Escribir</button>
+    </div>
+
+    <div id="zona-captura">
+      <textarea id="captura" class="captura" rows="3" placeholder="Pega aquí el mensaje del cliente (Ctrl+V)"></textarea>
+      <div class="preview-cab" id="preview-cab" hidden>
+        <span class="preview-tit">Interpretado</span>
+        <span class="preview-detectado" id="preview-detectado" hidden></span>
+      </div>
+    </div>
+
+    <div class="campo">
+      <label for="t-cliente">Cliente</label>
+      <select id="t-cliente" class="control"></select>
+    </div>
+    <div class="campo">
+      <label for="t-desc">Descripción</label>
+      <input id="t-desc" class="control" placeholder="Enviar carpeta tributaria" autocomplete="off">
+      <span class="pista-original" id="pista-original" hidden></span>
+    </div>
+    <div class="campo-doble">
+      <div class="campo">
+        <label for="t-limite">Fecha límite</label>
+        <input id="t-limite" class="control" type="date">
+      </div>
+      <div class="campo">
+        <label for="t-asignado">Asignada a</label>
+        <select id="t-asignado" class="control"></select>
+      </div>
+    </div>
+
+    <div class="modal-botones">
+      <button type="button" class="btn ghost" id="btn-cancelar-tarea">Cancelar</button>
+      <button type="button" class="btn" id="btn-guardar-tarea">Crear tarea</button>
+    </div>
+  </div>
 </div>
 
 <!-- MODAL CAMBIAR CLAVE -->
@@ -1677,19 +1675,93 @@
     return anio + "-" + String(mes).padStart(2,"0") + "-" + String(d).padStart(2,"0");
   }
 
-  function armarPreview(){
-    var bruto = $("captura").value;
-    if (!bruto.trim()){ $("preview").hidden = true; return; }
+  /* Resume el mensaje del cliente en un título de tarea accionable.
+     Trabaja con el vocabulario contable del despacho, no con IA: es
+     instantáneo, no cuesta nada y siempre da el mismo resultado. */
+  var CORTESIA = /\b(hola+|buenas?( tardes| noches| d[ií]as)?|estimad[oa]s?|qu[eé] tal|c[oó]mo est[aá]s?|espero (que )?est[eé]s bien|disculpa|perd[oó]n|gracias|muchas gracias|se agradece|quedo atent[oa]|saludos|un abrazo|por ?fa(vor)?|cordialmente|atte)\b/gi;
+  var PETICION = /\b(necesito|necesitar[ií]a|necesitamos|requiero|requerimos|quisiera|quer[ií]a|me gustar[ií]a|te quer[ií]a pedir|me pod(r[ií]as?|r[ií]an)|me puedes?|me pueden|pod(r[ií]as?|r[ií]an)|puedes?|pueden|ser[ií]a posible|me ayudas? con|me ayudan con|ay[uú]dame con|solicito|solicitamos|favor de|porfa)\b/gi;
 
+  var ACCIONES = [
+    { re: /\b(env[ií]a(r|me|nos|rme|rnos)?|env[ií]en|mand(a|e|ar)(me|nos)?|manden|comparti(r|rme|rnos|)|compart[ae]n?|pas(a|e|ar)(me|nos)?|adjunt(a|e|ar)\w*|remiti\w*|hacer llegar|facilit(a|e|ar)\w*)\b/i, txt: "Enviar" },
+    { re: /\b(revis\w*|cheque\w*|verific\w*|valid\w*|confirm\w*|consult\w*|averigu\w*|est[aá] list[oa]|estado d[eo])\b/i, txt: "Revisar" },
+    { re: /\b(declar\w*)\b/i, txt: "Declarar" },
+    { re: /\b(pag\w*|transferi\w*)\b/i, txt: "Pagar" },
+    { re: /\b(emiti\w*|gener\w*|confeccion\w*)\b/i, txt: "Emitir" },
+    { re: /\b(actualiz\w*|corri[jg]\w*|corregi\w*|modific\w*|cambi\w*|rectific\w*)\b/i, txt: "Actualizar" },
+    { re: /\b(inscrib\w*|registr\w*|formaliz\w*)\b/i, txt: "Inscribir" }
+  ];
+
+  // De más específico a más general: gana la coincidencia más larga.
+  var CONCEPTOS = [
+    "carpeta tributaria", "certificado de deuda", "certificado de residencia",
+    "certificado de vigencia", "estado de resultados", "balance general",
+    "liquidaciones de sueldo", "liquidacion de sueldo", "liquidaciones",
+    "declaracion de renta", "operacion renta", "inicio de actividades",
+    "libro de compras", "libro de ventas", "boletas de honorarios",
+    "boleta de honorarios", "contrato de trabajo", "formulario 29",
+    "formulario 22", "carpeta", "certificado", "balance", "finiquito",
+    "contrato", "boletas", "facturas", "factura", "previred", "remuneraciones",
+    "cotizaciones", "renta", "f29", "f22", "iva", "informe", "poder", "rut"
+  ];
+
+  function resumirMensaje(texto){
+    var limpio = texto
+      .replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/gu, " ")
+      .replace(CORTESIA, " ")
+      .replace(PETICION, " ")
+      .replace(/\s+/g, " ")
+      .replace(/^[\s,.;:!¡?¿-]+|[\s,.;:!¡?¿-]+$/g, "")
+      .trim();
+    if (!limpio) return texto.trim().slice(0, 80);
+
+    var plano = normaliza(limpio);
+
+    var concepto = null, largo = 0;
+    CONCEPTOS.forEach(function(c){
+      var i = plano.indexOf(c);
+      if (i !== -1 && c.length > largo){ concepto = { txt: c, i: i }; largo = c.length; }
+    });
+
+    if (concepto){
+      // El verbo se busca fuera del concepto: en "declaración de renta" la
+      // palabra "declaración" es el objeto, no la acción pedida.
+      var sinConcepto = limpio.slice(0, concepto.i) + " " + limpio.slice(concepto.i + concepto.txt.length);
+      var accion = "Enviar";
+      for (var k = 0; k < ACCIONES.length; k++){
+        if (ACCIONES[k].re.test(sinConcepto)){ accion = ACCIONES[k].txt; break; }
+      }
+      // Recupera el concepto tal como venía escrito y su complemento ("de agosto").
+      var trozo = limpio.slice(concepto.i, concepto.i + concepto.txt.length);
+      var resto = limpio.slice(concepto.i + concepto.txt.length);
+      var comp = resto.match(/^\s+(de[l]?\s+[\wáéíóúñ]+(\s+[\wáéíóúñ]+)?)/i);
+      var objeto = trozo + (comp ? " " + comp[1] : "");
+      return accion + " " + objeto.toLowerCase().replace(/\s+/g, " ").trim();
+    }
+
+    var frase = limpio.split(/[.!?\n]/)[0].replace(/^\s*que\s+/i, "").trim();
+    if (frase.length > 80) frase = frase.slice(0, 77).trim() + "…";
+    return frase.charAt(0).toUpperCase() + frase.slice(1);
+  }
+
+  function hoyISO(){
+    var d = new Date();
+    return d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0");
+  }
+
+  function interpretarCaptura(){
+    var bruto = $("captura").value;
+    if (!bruto.trim()){
+      $("preview-cab").hidden = true;
+      $("pista-original").hidden = true;
+      return;
+    }
     var p = parsearWhatsApp(bruto);
     var det = detectarCliente(p.texto, p.remitente);
+    var resumen = resumirMensaje(p.texto);
 
-    $("p-cliente").innerHTML = $("t-cliente").innerHTML;
-    $("p-asignado").innerHTML = $("t-asignado").innerHTML;
-    $("p-cliente").value = det.cliente ? det.cliente.id : "";
-    $("p-asignado").value = perfil ? perfil.id : "";
-    $("p-desc").value = p.texto;
-    $("p-limite").value = detectarFecha(p.texto);
+    $("t-cliente").value = det.cliente ? det.cliente.id : "";
+    $("t-desc").value = resumen;
+    $("t-limite").value = detectarFecha(p.texto) || hoyISO();
 
     var aviso = $("preview-detectado");
     if (det.cliente){
@@ -1698,45 +1770,77 @@
     } else {
       aviso.hidden = true;
     }
-    $("preview").hidden = false;
+    $("preview-cab").hidden = false;
+
+    var pista = $("pista-original");
+    if (normaliza(resumen) !== normaliza(p.texto)){
+      pista.textContent = "Mensaje original: " + p.texto;
+      pista.hidden = false;
+    } else {
+      pista.hidden = true;
+    }
   }
 
-  $("captura").addEventListener("input", armarPreview);
+  $("captura").addEventListener("input", interpretarCaptura);
 
-  // Pegar en cualquier parte de la pestaña Tareas abre la captura directamente.
+  function abrirModalTarea(modo){
+    $("captura").value = "";
+    $("t-desc").value = "";
+    $("t-cliente").value = "";
+    $("t-limite").value = hoyISO();
+    $("t-asignado").value = perfil ? perfil.id : "";
+    $("preview-cab").hidden = true;
+    $("preview-detectado").hidden = true;
+    $("pista-original").hidden = true;
+    cambiarModoTarea(modo || "whatsapp");
+    $("modal-tarea").hidden = false;
+  }
+
+  function cambiarModoTarea(modo){
+    document.querySelectorAll(".seg[data-modo]").forEach(function(b){
+      b.setAttribute("aria-pressed", String(b.dataset.modo === modo));
+    });
+    $("zona-captura").hidden = modo !== "whatsapp";
+    setTimeout(function(){
+      if (modo === "whatsapp") $("captura").focus(); else $("t-cliente").focus();
+    }, 30);
+  }
+
+  document.querySelectorAll(".seg[data-modo]").forEach(function(b){
+    b.addEventListener("click", function(){ cambiarModoTarea(b.dataset.modo); });
+  });
+
+  $("btn-abrir-tarea").addEventListener("click", function(){ abrirModalTarea("whatsapp"); });
+  $("btn-cancelar-tarea").addEventListener("click", function(){ $("modal-tarea").hidden = true; });
+
+  // Pegar estando en Tareas abre el modal ya interpretado.
   document.addEventListener("paste", function(e){
-    if (vista !== "tareas") return;
+    if (vista !== "tareas" || !$("modal-tarea").hidden) return;
     var foco = document.activeElement;
     if (foco && (foco.tagName === "INPUT" || foco.tagName === "TEXTAREA" || foco.tagName === "SELECT")) return;
     var texto = (e.clipboardData || window.clipboardData).getData("text");
     if (!texto || !texto.trim()) return;
     e.preventDefault();
+    abrirModalTarea("whatsapp");
     $("captura").value = texto;
-    armarPreview();
-    $("p-desc").focus();
+    interpretarCaptura();
   });
 
-  function limpiarCaptura(){
-    $("captura").value = "";
-    $("preview").hidden = true;
-    $("preview-detectado").hidden = true;
-  }
-
-  $("btn-descartar-captura").addEventListener("click", limpiarCaptura);
-
-  $("btn-confirmar-captura").addEventListener("click", async function(){
-    var cliente = $("p-cliente").value;
-    var desc = $("p-desc").value.trim();
-    if (!cliente){ mostrarAviso("Elige el cliente antes de crear la tarea."); $("p-cliente").focus(); return; }
-    if (!desc){ $("p-desc").focus(); return; }
+  $("btn-guardar-tarea").addEventListener("click", async function(){
+    var cliente = $("t-cliente").value;
+    var desc = $("t-desc").value.trim();
+    if (!cliente){ mostrarAviso("Elige el cliente asociado a la tarea."); $("t-cliente").focus(); return; }
+    if (!desc){ $("t-desc").focus(); return; }
+    $("btn-guardar-tarea").disabled = true;
     var res = await sb.from("tareas").insert({
       cliente_id: cliente,
       descripcion: desc,
-      fecha_limite: $("p-limite").value || null,
-      asignado_a: $("p-asignado").value || null
+      fecha_limite: $("t-limite").value || null,
+      asignado_a: $("t-asignado").value || null
     });
+    $("btn-guardar-tarea").disabled = false;
     if (res.error){ mostrarAviso("No se pudo crear la tarea: " + res.error.message); return; }
-    limpiarCaptura();
+    $("modal-tarea").hidden = true;
     await cargarTareas();
     mostrarAviso("Tarea creada.", "ok");
   });
@@ -1751,26 +1855,12 @@
     });
   });
 
-  $("btn-agregar-tarea").addEventListener("click", async function(){
-    var cliente = $("t-cliente").value;
-    var desc = $("t-desc").value.trim();
-    if (!cliente){ mostrarAviso("Elige el cliente asociado a la tarea."); $("t-cliente").focus(); return; }
-    if (!desc){ $("t-desc").focus(); return; }
-    var res = await sb.from("tareas").insert({
-      cliente_id: cliente,
-      descripcion: desc,
-      fecha_limite: $("t-limite").value || null,
-      asignado_a: $("t-asignado").value || null
-    });
-    if (res.error){ mostrarAviso("No se pudo crear la tarea: " + res.error.message); return; }
-    $("t-desc").value = "";
-    $("t-limite").value = "";
-    $("t-desc").focus();
-    await cargarTareas();
+  $("t-desc").addEventListener("keydown", function(e){
+    if (e.key === "Enter") $("btn-guardar-tarea").click();
   });
 
-  $("t-desc").addEventListener("keydown", function(e){
-    if (e.key === "Enter") $("btn-agregar-tarea").click();
+  document.addEventListener("keydown", function(e){
+    if (e.key === "Escape" && !$("modal-tarea").hidden) $("modal-tarea").hidden = true;
   });
 
   /* ----------------------------------------------------- NAVEGACIÓN */
