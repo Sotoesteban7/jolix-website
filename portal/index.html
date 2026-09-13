@@ -211,7 +211,9 @@
   var CLAVE_PUBLICA = "sb_publishable_55POJIBMgg5JsP-wbnvBRw_UpesY-g8";
   var BUCKET = "documentos-clientes";
 
-  var sb = window.supabase.createClient(URL_SUPABASE, CLAVE_PUBLICA);
+  var sb = window.supabase.createClient(URL_SUPABASE, CLAVE_PUBLICA, {
+    auth: { storageKey: "sb-jolix-portal-auth" }
+  });
   var $ = function(id){ return document.getElementById(id); };
 
   var TIPOS = {

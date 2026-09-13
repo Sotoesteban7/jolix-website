@@ -844,7 +844,9 @@
   var CLAVE_PUBLICA = "sb_publishable_55POJIBMgg5JsP-wbnvBRw_UpesY-g8";
   var DOMINIO = "@jolixasesorias.com";
 
-  var sb = window.supabase.createClient(URL_SUPABASE, CLAVE_PUBLICA);
+  var sb = window.supabase.createClient(URL_SUPABASE, CLAVE_PUBLICA, {
+    auth: { storageKey: "sb-jolix-tablero-auth" }
+  });
 
   var MESES = ["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
   var SIN_RUBRO = "Sin rubro";
