@@ -294,7 +294,7 @@
     border-radius:999px; background:var(--coral-deep); color:#fff;
     font-size:11px; font-weight:700; vertical-align:1px;
   }
-  .modal-ancho{max-width:560px; max-height:90vh; overflow-y:auto;}
+  .modal-card.modal-ancho{max-width:560px; max-height:90vh; overflow-y:auto;}
   .campo-doble{display:flex; gap:12px;}
   .campo-doble .campo{flex:1; min-width:0;}
   .campo select.control, .campo input.control{width:100%;}
@@ -420,6 +420,18 @@
   .modal-card .hint{font-size:13px; color:var(--muted); margin:0 0 18px;}
   .modal-botones{display:flex; gap:9px; margin-top:6px;}
   .modal-botones .btn{flex:1;}
+
+  .zona-arrastre{border:2px dashed var(--line); border-radius:14px; padding:20px; text-align:center; margin:2px 0 16px; transition:border-color .15s, background .15s;}
+  .zona-arrastre.sobre{border-color:var(--purple); background:var(--mist);}
+  .zona-arrastre p{margin:0 0 10px; font-size:13px; color:var(--muted);}
+  .cd-lista{display:flex; flex-direction:column; gap:8px; max-height:260px; overflow-y:auto; margin-bottom:8px;}
+  .cd-fila{display:flex; align-items:center; gap:10px; background:var(--mist); border-radius:12px; padding:9px 11px;}
+  .cd-fila .nom{flex:1 1 auto; min-width:0; font-size:12.5px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .cd-fila select{flex:0 0 auto; max-width:170px;}
+  .cd-fila .quitar{background:none; border:none; color:var(--faint); font-size:17px; line-height:1; cursor:pointer; padding:2px 5px; border-radius:6px;}
+  .cd-fila .quitar:hover{color:var(--coral-deep);}
+  .cd-fila.error{background:var(--pend-bg);}
+  .cd-estado{font-size:11.5px; color:var(--faint); flex:0 0 auto; white-space:nowrap;}
 
   @media (prefers-reduced-motion: reduce){
     *{transition:none !important; animation:none !important;}
@@ -552,14 +564,33 @@
     <!-- VISTA DOCUMENTOS -->
     <section id="v-documentos" hidden>
       <div class="solo-lectura" id="documentos-lectura" hidden>Solo un administrador puede subir o eliminar documentos del portal de clientes.</div>
-      <div class="panel" id="panel-subir-doc">
-        <h2>Subir documento</h2>
-        <p class="hint">El cliente lo va a ver de inmediato en su portal, en jolixasesorias.com/portal.</p>
-        <div class="form-tarea">
-          <div class="g">
-            <label for="d-cliente">Cliente</label>
-            <select id="d-cliente" class="control"></select>
-          </div>
+
+      <!-- Nivel 1: elegir cliente -->
+      <div class="panel" id="panel-doc-clientes">
+        <h2>Documentos por cliente <span id="doc-cli-conteo" style="color:var(--faint); font-weight:500;"></span></h2>
+        <p class="hint">Elige un cliente para ver y subir sus documentos del portal.</p>
+        <div class="buscador" style="margin-bottom:14px">
+          <svg class="lupa" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.6-3.6"/></svg>
+          <input id="doc-buscar" class="control" placeholder="Buscar empresa o RUT…" autocomplete="off" aria-label="Buscar empresa">
+          <button class="limpiar" id="doc-limpiar-buscar" hidden aria-label="Limpiar búsqueda">×</button>
+        </div>
+        <div class="lista-cli" id="lista-doc-clientes"></div>
+        <div class="vacio" id="doc-cli-vacio" hidden>
+          <h3>Aún no hay clientes</h3>
+          <p>Agrégalos primero en la pestaña Clientes.</p>
+        </div>
+      </div>
+
+      <!-- Nivel 2: espacio del cliente elegido -->
+      <div class="panel" id="panel-doc-espacio" hidden>
+        <button class="btn ghost mini" id="btn-doc-volver" style="margin-bottom:14px;">← Todos los clientes</button>
+        <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
+          <h2 id="doc-espacio-nombre" style="margin:0;">Cliente</h2>
+          <button class="btn ghost mini" id="btn-abrir-carga" style="margin-left:auto;">Cargar documentos</button>
+        </div>
+        <p class="hint">El cliente ve estos archivos de inmediato en su portal, en jolixasesorias.com/portal.</p>
+
+        <div class="form-tarea" id="panel-subir-doc" style="margin:16px 0 22px;">
           <div class="g">
             <label for="d-tipo">Tipo de documento</label>
             <select id="d-tipo" class="control" style="min-width:190px">
@@ -581,15 +612,8 @@
           </div>
           <button class="btn" id="btn-subir-doc">Subir</button>
         </div>
-      </div>
 
-      <div class="panel">
-        <h2>Documentos del portal <span id="doc-conteo" style="color:var(--faint); font-weight:500;"></span></h2>
-        <p class="hint">Filtra por cliente para ver rápido qué le falta a cada uno.</p>
-        <div class="field-inline" style="margin-bottom:16px;">
-          <label for="d-filtro-cliente">Cliente</label>
-          <select id="d-filtro-cliente" class="control" style="min-width:220px"></select>
-        </div>
+        <h3 class="titulo-lista">Archivos de este cliente <span id="doc-conteo" style="color:var(--faint); font-weight:500;"></span></h3>
         <div class="lista-cli" id="lista-documentos"></div>
         <div class="vacio" id="doc-vacio" hidden>
           <h3>Sin documentos todavía</h3>
@@ -780,6 +804,32 @@
         </div>
         <button type="submit" class="btn" id="btn-reset" style="width:100%">Restablecer contraseña</button>
       </form>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL CARGA MASIVA DE DOCUMENTOS -->
+<div class="modal" id="modal-carga-docs" hidden>
+  <div class="modal-card modal-ancho">
+    <h2>Cargar documentos <span id="cd-cliente-nombre" style="color:var(--purple-deep);"></span></h2>
+    <p class="hint">Arrastra los archivos o selecciónalos. El tablero intenta reconocer el tipo por el nombre — revisa y corrige lo que haga falta antes de finalizar.</p>
+
+    <div class="campo">
+      <label for="cd-periodo">Período (se aplica a todos estos archivos)</label>
+      <select id="cd-periodo" class="control"></select>
+    </div>
+
+    <div class="zona-arrastre" id="cd-dropzone" tabindex="0" role="button" aria-label="Arrastrar o seleccionar archivos">
+      <p id="cd-dropzone-texto">Arrastra archivos aquí, o</p>
+      <button type="button" class="btn ghost mini" id="cd-btn-elegir">Seleccionar archivos</button>
+      <input type="file" id="cd-input-archivos" multiple hidden>
+    </div>
+
+    <div class="cd-lista" id="cd-lista-archivos"></div>
+
+    <div class="modal-botones">
+      <button type="button" class="btn ghost" id="btn-cancelar-carga">Cancelar</button>
+      <button type="button" class="btn" id="btn-finalizar-carga" disabled>Finalizar carga</button>
     </div>
   </div>
 </div>
@@ -1952,12 +2002,10 @@
     excel_varios: "Planilla / Excel", otros: "Otro"
   };
   var documentos = [];
-  var filtroDocCliente = "";
+  var docClienteActivo = null;
+  var busquedaDocCli = "";
 
-  function armarSelectorPeriodo(){
-    var sel = $("d-periodo");
-    if (sel.dataset.armado) return;
-    sel.dataset.armado = "1";
+  function opcionesPeriodo(){
     var hoy = new Date();
     var opciones = ['<option value="">Sin mes específico</option>'];
     for (var i = -1; i <= 30; i++){
@@ -1965,30 +2013,24 @@
       var ym = d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0");
       opciones.push('<option value="' + ym + '">' + capital(nombreMes(ym)) + '</option>');
     }
-    sel.innerHTML = opciones.join("");
-    sel.value = hoy.getFullYear() + "-" + String(hoy.getMonth()+1).padStart(2,"0");
+    return opciones.join("");
+  }
+
+  function mesActualYM(){
+    var hoy = new Date();
+    return hoy.getFullYear() + "-" + String(hoy.getMonth()+1).padStart(2,"0");
+  }
+
+  function armarSelectorPeriodo(){
+    var sel = $("d-periodo");
+    if (sel.dataset.armado) return;
+    sel.dataset.armado = "1";
+    sel.innerHTML = opcionesPeriodo();
+    sel.value = mesActualYM();
   }
 
   function llenarSelectoresDoc(){
     armarSelectorPeriodo();
-    var opciones = '<option value="">Selecciona…</option>' +
-      rubrosOrdenados().map(function(r){
-        return '<optgroup label="' + escapar(r) + '">' +
-          clientesDe(r).map(function(c){
-            return '<option value="' + c.id + '">' + escapar(c.nombre) + '</option>';
-          }).join("") + '</optgroup>';
-      }).join("");
-    $("d-cliente").innerHTML = opciones;
-
-    var previoF = $("d-filtro-cliente").value;
-    $("d-filtro-cliente").innerHTML = '<option value="">Todos los clientes</option>' +
-      rubrosOrdenados().map(function(r){
-        return '<optgroup label="' + escapar(r) + '">' +
-          clientesDe(r).map(function(c){
-            return '<option value="' + c.id + '">' + escapar(c.nombre) + '</option>';
-          }).join("") + '</optgroup>';
-      }).join("");
-    if (previoF) $("d-filtro-cliente").value = previoF;
   }
 
   async function cargarDocumentos(){
@@ -2005,19 +2047,69 @@
   }
 
   function renderDocumentos(){
+    if (docClienteActivo) renderEspacioDoc(); else renderDocClientes();
+  }
+
+  function fechaCorta(iso){
+    var d = new Date(iso);
+    return d.toLocaleDateString("es-CL", { day:"2-digit", month:"short", year:"numeric" });
+  }
+
+  function renderDocClientes(){
+    $("panel-doc-clientes").hidden = false;
+    $("panel-doc-espacio").hidden = true;
+
+    var conteos = {};
+    documentos.forEach(function(d){ conteos[d.cliente_id] = (conteos[d.cliente_id] || 0) + 1; });
+
+    var q = busquedaDocCli.toLowerCase();
+    var ordenados = [];
+    rubrosOrdenados().forEach(function(r){ ordenados = ordenados.concat(clientesDe(r)); });
+    if (q) ordenados = ordenados.filter(function(c){
+      return c.nombre.toLowerCase().indexOf(q) !== -1 || (c.rut || "").toLowerCase().indexOf(q) !== -1;
+    });
+
+    $("doc-cli-conteo").textContent = clientes.length ? "· " + clientes.length : "";
+    $("doc-cli-vacio").hidden = clientes.length > 0;
+
+    $("lista-doc-clientes").innerHTML = ordenados.map(function(c){
+      var n = conteos[c.id] || 0;
+      return '<div class="cli-row" data-abrir-doc="' + c.id + '" style="cursor:pointer;">' +
+        '<div class="datos"><div class="nom">' + escapar(c.nombre) + '</div>' +
+        (c.rut ? '<div class="rut">' + escapar(c.rut) + '</div>' : '') + '</div>' +
+        '<div class="rut">' + (n ? n + (n === 1 ? " documento" : " documentos") : "Sin documentos") + '</div>' +
+        '</div>';
+    }).join("");
+
+    $("lista-doc-clientes").querySelectorAll("[data-abrir-doc]").forEach(function(row){
+      row.addEventListener("click", function(){ abrirEspacioDoc(row.dataset.abrirDoc); });
+    });
+  }
+
+  function abrirEspacioDoc(id){
+    docClienteActivo = id;
+    renderEspacioDoc();
+  }
+
+  function renderEspacioDoc(){
     var admin = esAdmin();
+    $("panel-doc-clientes").hidden = true;
+    $("panel-doc-espacio").hidden = false;
     $("panel-subir-doc").hidden = !admin;
+    $("btn-abrir-carga").hidden = !admin;
     $("documentos-lectura").hidden = admin;
 
-    var lista = filtroDocCliente ? documentos.filter(function(d){ return d.cliente_id === filtroDocCliente; }) : documentos;
-    $("doc-conteo").textContent = documentos.length ? "· " + documentos.length : "";
+    $("doc-espacio-nombre").textContent = nombreCliente(docClienteActivo);
+
+    var lista = documentos.filter(function(d){ return d.cliente_id === docClienteActivo; });
+    $("doc-conteo").textContent = lista.length ? "· " + lista.length : "";
     $("doc-vacio").hidden = lista.length > 0;
 
     $("lista-documentos").innerHTML = lista.map(function(d){
       var meta = fechaCorta(d.subido_en) + (d.periodo ? " · " + escapar(capital(nombreMes(d.periodo))) : "") + (d.tamano_bytes ? " · " + bytesLegibles(d.tamano_bytes) : "");
       return '<div class="cli-row" data-doc="' + d.id + '">' +
         '<div class="datos"><div class="nom">' + escapar(TIPOS_DOC[d.tipo] || d.tipo) + '</div>' +
-        '<div class="rut">' + escapar(nombreCliente(d.cliente_id)) + ' — ' + escapar(d.nombre_archivo) + ' · ' + meta + '</div></div>' +
+        '<div class="rut">' + escapar(d.nombre_archivo) + ' · ' + meta + '</div></div>' +
         (admin ? '<button class="btn ghost mini" data-borrar-doc="' + d.id + '">Eliminar</button>' : '') +
         '</div>';
     }).join("");
@@ -2040,20 +2132,28 @@
     });
   }
 
-  function fechaCorta(iso){
-    var d = new Date(iso);
-    return d.toLocaleDateString("es-CL", { day:"2-digit", month:"short", year:"numeric" });
-  }
-
-  document.getElementById("d-filtro-cliente").addEventListener("change", function(){
-    filtroDocCliente = this.value;
+  $("btn-doc-volver").addEventListener("click", function(){
+    docClienteActivo = null;
     renderDocumentos();
   });
 
+  $("doc-buscar").addEventListener("input", function(){
+    busquedaDocCli = $("doc-buscar").value.trim();
+    $("doc-limpiar-buscar").hidden = !busquedaDocCli;
+    renderDocClientes();
+  });
+
+  $("doc-limpiar-buscar").addEventListener("click", function(){
+    $("doc-buscar").value = ""; busquedaDocCli = "";
+    $("doc-limpiar-buscar").hidden = true;
+    renderDocClientes();
+    $("doc-buscar").focus();
+  });
+
   $("btn-subir-doc").addEventListener("click", async function(){
-    var cliente = $("d-cliente").value;
+    var cliente = docClienteActivo;
     var archivo = $("d-archivo").files[0];
-    if (!cliente){ mostrarAviso("Elige el cliente."); $("d-cliente").focus(); return; }
+    if (!cliente) return;
     if (!archivo){ mostrarAviso("Elige un archivo."); return; }
 
     $("btn-subir-doc").disabled = true;
@@ -2081,6 +2181,153 @@
     $("d-archivo").value = "";
     await cargarDocumentos();
     mostrarAviso("Documento subido. Ya está visible para el cliente.", "ok");
+  });
+
+  /* ------------------------------------------- CARGA MASIVA DE DOCUMENTOS */
+  var cargaDocsArchivos = [];
+  var cargaDocsIdSeq = 0;
+
+  function detectarTipoDoc(nombreArchivo){
+    var n = nombreArchivo.toLowerCase();
+    if (/f-?29|formulario\s?29/.test(n)) return "f29";
+    if (/liquidaci[oó]n|sueldo|remuneraci/.test(n)) return "liquidaciones";
+    if (/libro.*venta|venta.*libro/.test(n)) return "libro_ventas";
+    if (/factura|boleta|honorario/.test(n)) return "factura_jolix";
+    if (/planilla|\.xlsx?$|\.csv$/.test(n)) return "excel_varios";
+    return "otros";
+  }
+
+  function opcionesTipoDoc(seleccionado){
+    return Object.keys(TIPOS_DOC).map(function(k){
+      return '<option value="' + k + '"' + (k === seleccionado ? " selected" : "") + '>' + escapar(TIPOS_DOC[k]) + '</option>';
+    }).join("");
+  }
+
+  function abrirModalCarga(){
+    if (!docClienteActivo) return;
+    $("cd-cliente-nombre").textContent = "— " + nombreCliente(docClienteActivo);
+    var selP = $("cd-periodo");
+    selP.innerHTML = opcionesPeriodo();
+    selP.value = mesActualYM();
+    cargaDocsArchivos = [];
+    renderListaCarga();
+    $("modal-carga-docs").hidden = false;
+  }
+
+  function cerrarModalCarga(){
+    $("modal-carga-docs").hidden = true;
+    cargaDocsArchivos = [];
+    $("cd-input-archivos").value = "";
+  }
+
+  function agregarArchivosCarga(fileList){
+    Array.prototype.forEach.call(fileList, function(file){
+      cargaDocsArchivos.push({ id: ++cargaDocsIdSeq, file: file, tipo: detectarTipoDoc(file.name) });
+    });
+    renderListaCarga();
+  }
+
+  function renderListaCarga(){
+    var cont = $("cd-lista-archivos");
+    cont.innerHTML = cargaDocsArchivos.map(function(f){
+      return '<div class="cd-fila" data-carga-id="' + f.id + '">' +
+        '<span class="nom" title="' + escapar(f.file.name) + '">' + escapar(f.file.name) + '</span>' +
+        '<select class="control" data-carga-tipo="' + f.id + '">' + opcionesTipoDoc(f.tipo) + '</select>' +
+        '<button type="button" class="quitar" data-carga-quitar="' + f.id + '" aria-label="Quitar archivo">×</button>' +
+        '</div>';
+    }).join("");
+
+    cont.querySelectorAll("[data-carga-tipo]").forEach(function(sel){
+      sel.addEventListener("change", function(){
+        var item = cargaDocsArchivos.filter(function(f){ return f.id === Number(sel.dataset.cargaTipo); })[0];
+        if (item) item.tipo = sel.value;
+      });
+    });
+    cont.querySelectorAll("[data-carga-quitar]").forEach(function(b){
+      b.addEventListener("click", function(){
+        cargaDocsArchivos = cargaDocsArchivos.filter(function(f){ return f.id !== Number(b.dataset.cargaQuitar); });
+        renderListaCarga();
+      });
+    });
+
+    $("btn-finalizar-carga").disabled = cargaDocsArchivos.length === 0;
+  }
+
+  $("btn-abrir-carga").addEventListener("click", abrirModalCarga);
+  $("btn-cancelar-carga").addEventListener("click", cerrarModalCarga);
+
+  $("cd-btn-elegir").addEventListener("click", function(){ $("cd-input-archivos").click(); });
+  $("cd-dropzone").addEventListener("click", function(e){
+    if (e.target === $("cd-btn-elegir")) return;
+    $("cd-input-archivos").click();
+  });
+  $("cd-dropzone").addEventListener("keydown", function(e){
+    if (e.key === "Enter" || e.key === " "){ e.preventDefault(); $("cd-input-archivos").click(); }
+  });
+  $("cd-input-archivos").addEventListener("change", function(){
+    if (this.files.length) agregarArchivosCarga(this.files);
+    this.value = "";
+  });
+
+  ["dragenter", "dragover"].forEach(function(ev){
+    $("cd-dropzone").addEventListener(ev, function(e){
+      e.preventDefault(); e.stopPropagation();
+      $("cd-dropzone").classList.add("sobre");
+    });
+  });
+  ["dragleave", "dragend"].forEach(function(ev){
+    $("cd-dropzone").addEventListener(ev, function(e){
+      e.preventDefault(); e.stopPropagation();
+      $("cd-dropzone").classList.remove("sobre");
+    });
+  });
+  $("cd-dropzone").addEventListener("drop", function(e){
+    e.preventDefault(); e.stopPropagation();
+    $("cd-dropzone").classList.remove("sobre");
+    if (e.dataTransfer && e.dataTransfer.files.length) agregarArchivosCarga(e.dataTransfer.files);
+  });
+
+  $("btn-finalizar-carga").addEventListener("click", async function(){
+    var cliente = docClienteActivo;
+    var items = cargaDocsArchivos.slice();
+    if (!cliente || !items.length) return;
+
+    var periodo = $("cd-periodo").value || null;
+    var btn = $("btn-finalizar-carga");
+    btn.disabled = true;
+    $("btn-cancelar-carga").disabled = true;
+    var errores = [];
+
+    for (var i = 0; i < items.length; i++){
+      btn.textContent = "Subiendo " + (i + 1) + " de " + items.length + "…";
+      var item = items[i];
+      var limpio = item.file.name.replace(/[^a-zA-Z0-9._-]+/g, "_");
+      var ruta = cliente + "/" + Date.now() + "_" + i + "_" + limpio;
+
+      var subida = await sb.storage.from("documentos-clientes").upload(ruta, item.file);
+      if (subida.error){ errores.push(item.file.name); continue; }
+
+      var res = await sb.from("documentos").insert({
+        cliente_id: cliente, tipo: item.tipo, periodo: periodo,
+        nombre_archivo: item.file.name, ruta_storage: ruta, tamano_bytes: item.file.size
+      });
+      if (res.error) errores.push(item.file.name);
+    }
+
+    btn.disabled = false; btn.textContent = "Finalizar carga";
+    $("btn-cancelar-carga").disabled = false;
+    cerrarModalCarga();
+    await cargarDocumentos();
+
+    if (!errores.length){
+      mostrarAviso(items.length + (items.length === 1 ? " documento subido. Ya está visible para el cliente." : " documentos subidos. Ya están visibles para el cliente."), "ok");
+    } else {
+      mostrarAviso("Se subieron " + (items.length - errores.length) + " de " + items.length + ". Con error: " + errores.join(", "));
+    }
+  });
+
+  document.addEventListener("keydown", function(e){
+    if (e.key === "Escape" && !$("modal-carga-docs").hidden) cerrarModalCarga();
   });
 
   /* ----------------------------------------------------- NAVEGACIÓN */
