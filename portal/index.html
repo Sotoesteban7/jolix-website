@@ -97,7 +97,10 @@
   .doc .cuerpo{flex:1;min-width:0;}
   .doc .tipo{font-family:'Poppins',sans-serif;font-weight:600;font-size:14px;}
   .doc .meta{font-size:12.5px;color:var(--faint);margin-top:2px;}
-  .btn-descargar{flex:none;background:var(--mist);color:var(--purple-deep);border:none;border-radius:10px;padding:9px 16px;font-family:'Poppins',sans-serif;font-weight:600;font-size:13px;display:flex;align-items:center;gap:7px;}
+  .doc .acciones{flex:none;display:flex;gap:8px;}
+  .btn-ver{background:transparent;color:var(--purple-deep);border:1px solid var(--line);border-radius:10px;padding:9px 16px;font-family:'Poppins',sans-serif;font-weight:600;font-size:13px;}
+  .btn-ver:hover{background:var(--mist);}
+  .btn-descargar{background:var(--mist);color:var(--purple-deep);border:none;border-radius:10px;padding:9px 16px;font-family:'Poppins',sans-serif;font-weight:600;font-size:13px;display:flex;align-items:center;gap:7px;}
   .btn-descargar:hover{background:var(--purple);color:#fff;}
   .btn-descargar:disabled{opacity:.6;cursor:default;}
 
@@ -105,6 +108,22 @@
   .vacio h3{font-size:16px;margin-bottom:6px;}
   .vacio p{color:var(--muted);font-size:13.5px;max-width:38ch;margin:0 auto;}
   .cargando{text-align:center;padding:60px 20px;color:var(--faint);font-size:14px;}
+
+  .modal{position:fixed;inset:0;background:rgba(20,14,36,.55);display:flex;align-items:center;justify-content:center;padding:24px;z-index:50;}
+  .modal-card{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:28px 26px;width:100%;max-width:820px;max-height:92vh;overflow-y:auto;box-shadow:var(--shadow);}
+  .modal-card h2{font-size:17px;margin:0 0 4px;}
+  .modal-card .meta{font-size:13px;color:var(--muted);margin:0 0 18px;}
+  .visor-cuerpo{background:var(--mist);border-radius:14px;min-height:220px;max-height:65vh;display:flex;align-items:center;justify-content:center;overflow:auto;margin-bottom:16px;}
+  .visor-cuerpo iframe{width:100%;height:65vh;border:none;border-radius:14px;display:block;}
+  .visor-cuerpo img{max-width:100%;max-height:65vh;display:block;margin:0 auto;border-radius:8px;}
+  .visor-mensaje{color:var(--muted);font-size:13.5px;text-align:center;padding:30px 24px;max-width:40ch;}
+  .modal-botones{display:flex;gap:9px;}
+  .modal-botones button{flex:1;border:none;border-radius:10px;padding:11px 18px;font-family:'Poppins',sans-serif;font-weight:600;font-size:13.5px;cursor:pointer;}
+  .btn-cerrar-modal{background:var(--mist);color:var(--muted);}
+  .btn-cerrar-modal:hover{background:var(--line);color:var(--ink);}
+  .btn-descargar-modal{background:var(--purple);color:#fff;}
+  .btn-descargar-modal:hover{background:var(--purple-deep);}
+  .btn-descargar-modal:disabled{opacity:.6;cursor:default;}
 </style>
 </head>
 <body>
@@ -166,6 +185,21 @@
       <p>Cuando tengamos algo listo para ti (tu F29, una boleta, lo que sea), va a aparecer en esta lista.</p>
     </div>
   </main>
+</div>
+
+<!-- MODAL VISOR DE DOCUMENTOS -->
+<div class="modal" id="modal-visor-doc" hidden>
+  <div class="modal-card">
+    <h2 id="visor-titulo">Documento</h2>
+    <p class="meta" id="visor-meta"></p>
+    <div class="visor-cuerpo" id="visor-cuerpo">
+      <p class="visor-mensaje">Cargando vista previa…</p>
+    </div>
+    <div class="modal-botones">
+      <button type="button" class="btn-cerrar-modal" id="btn-cerrar-visor">Cerrar</button>
+      <button type="button" class="btn-descargar-modal" id="btn-descargar-visor" disabled>Descargar</button>
+    </div>
+  </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
@@ -340,13 +374,24 @@
         '<span class="icono">' + (ICONOS[info.icono] || ICONOS.doc) + '</span>' +
         '<div class="cuerpo"><div class="tipo">' + escapar(info.label) + '</div>' +
         '<div class="meta">' + escapar(d.nombre_archivo) + ' · ' + meta + '</div></div>' +
+        '<div class="acciones">' +
+        '<button class="btn-ver" data-ver="' + d.id + '">Ver</button>' +
         '<button class="btn-descargar" data-descargar="' + d.id + '">Descargar</button>' +
-        '</div>';
+        '</div></div>';
     }).join("");
 
     $("lista-docs").querySelectorAll("[data-descargar]").forEach(function(b){
       b.addEventListener("click", function(){ descargar(b.dataset.descargar, b); });
     });
+    $("lista-docs").querySelectorAll("[data-ver]").forEach(function(b){
+      b.addEventListener("click", function(){ verDocumento(b.dataset.ver); });
+    });
+  }
+
+  async function descargarBlob(doc){
+    var res = await sb.storage.from(BUCKET).download(doc.ruta_storage);
+    if (res.error || !res.data) return null;
+    return res.data;
   }
 
   async function descargar(id, boton){
@@ -356,20 +401,74 @@
     boton.disabled = true;
     boton.textContent = "Descargando…";
 
-    var res = await sb.storage.from(BUCKET).download(doc.ruta_storage);
+    var blob = await descargarBlob(doc);
     boton.disabled = false;
     boton.textContent = textoOriginal;
 
-    if (res.error || !res.data){
+    if (!blob){
       alert("No se pudo descargar el archivo. Inténtalo de nuevo.");
       return;
     }
-    var url = URL.createObjectURL(res.data);
+    var url = URL.createObjectURL(blob);
     var a = document.createElement("a");
     a.href = url; a.download = doc.nombre_archivo;
     document.body.appendChild(a); a.click(); a.remove();
     setTimeout(function(){ URL.revokeObjectURL(url); }, 4000);
   }
+
+  /* ---------------- visor de documentos ---------------- */
+  var visorBlobUrl = null;
+
+  function cerrarVisorDoc(){
+    $("modal-visor-doc").hidden = true;
+    if (visorBlobUrl){ URL.revokeObjectURL(visorBlobUrl); visorBlobUrl = null; }
+    $("visor-cuerpo").innerHTML = '<p class="visor-mensaje">Cargando vista previa…</p>';
+    $("btn-descargar-visor").disabled = true;
+  }
+
+  async function verDocumento(id){
+    var doc = documentos.filter(function(d){ return d.id === id; })[0];
+    if (!doc) return;
+    var info = TIPOS[doc.tipo] || { label: doc.tipo };
+
+    if (visorBlobUrl){ URL.revokeObjectURL(visorBlobUrl); visorBlobUrl = null; }
+    $("visor-titulo").textContent = info.label;
+    $("visor-meta").textContent = doc.nombre_archivo + (doc.periodo ? " · " + nombrePeriodo(doc.periodo) : "");
+    $("visor-cuerpo").innerHTML = '<p class="visor-mensaje">Cargando vista previa…</p>';
+    $("btn-descargar-visor").disabled = true;
+    $("modal-visor-doc").hidden = false;
+
+    var blob = await descargarBlob(doc);
+    if (!blob){
+      $("visor-cuerpo").innerHTML = '<p class="visor-mensaje">No se pudo cargar el archivo. Inténtalo de nuevo.</p>';
+      return;
+    }
+
+    visorBlobUrl = URL.createObjectURL(blob);
+    var mime = blob.type || "";
+    var esImagen = mime.indexOf("image/") === 0;
+    var esPdf = mime === "application/pdf" || /\.pdf$/i.test(doc.nombre_archivo);
+
+    if (esPdf){
+      $("visor-cuerpo").innerHTML = '<iframe src="' + visorBlobUrl + '" title="Vista previa del documento"></iframe>';
+    } else if (esImagen){
+      $("visor-cuerpo").innerHTML = '<img src="' + visorBlobUrl + '" alt="Vista previa del documento">';
+    } else {
+      $("visor-cuerpo").innerHTML = '<p class="visor-mensaje">Este tipo de archivo no se puede previsualizar aquí. Descárgalo para abrirlo.</p>';
+    }
+
+    $("btn-descargar-visor").disabled = false;
+    $("btn-descargar-visor").onclick = function(){
+      var a = document.createElement("a");
+      a.href = visorBlobUrl; a.download = doc.nombre_archivo;
+      document.body.appendChild(a); a.click(); a.remove();
+    };
+  }
+
+  $("btn-cerrar-visor").addEventListener("click", cerrarVisorDoc);
+  document.addEventListener("keydown", function(e){
+    if (e.key === "Escape" && !$("modal-visor-doc").hidden) cerrarVisorDoc();
+  });
 
   /* ---------------- sesión ---------------- */
   async function iniciar(){
