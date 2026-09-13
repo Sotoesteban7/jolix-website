@@ -477,6 +477,7 @@
       <nav class="tabs" role="tablist">
         <button class="tab" role="tab" aria-selected="true" data-vista="mes">Mes</button>
         <button class="tab" role="tab" aria-selected="false" data-vista="tareas">Tareas <span class="tab-badge" id="tab-badge" hidden></span></button>
+        <button class="tab" role="tab" aria-selected="false" data-vista="documentos">Documentos</button>
         <button class="tab" role="tab" aria-selected="false" data-vista="clientes">Clientes</button>
         <button class="tab" role="tab" aria-selected="false" data-vista="rubros">Rubros</button>
         <button class="tab" role="tab" aria-selected="false" data-vista="historico">Histórico PPM</button>
@@ -538,6 +539,55 @@
       <h3 class="titulo-lista" id="titulo-hechas">Completadas</h3>
       <div class="lista-tareas" id="tareas-hechas"></div>
       <p class="nota-lista" id="nota-hechas" hidden>Toca una tarea completada para volver a activarla.</p>
+    </section>
+
+    <!-- VISTA DOCUMENTOS -->
+    <section id="v-documentos" hidden>
+      <div class="solo-lectura" id="documentos-lectura" hidden>Solo un administrador puede subir o eliminar documentos del portal de clientes.</div>
+      <div class="panel" id="panel-subir-doc">
+        <h2>Subir documento</h2>
+        <p class="hint">El cliente lo va a ver de inmediato en su portal, en jolixasesorias.com/portal.</p>
+        <div class="form-tarea">
+          <div class="g">
+            <label for="d-cliente">Cliente</label>
+            <select id="d-cliente" class="control"></select>
+          </div>
+          <div class="g">
+            <label for="d-tipo">Tipo de documento</label>
+            <select id="d-tipo" class="control" style="min-width:190px">
+              <option value="f29">F29 declarado</option>
+              <option value="factura_jolix">Boleta o factura Jolix</option>
+              <option value="liquidaciones">Liquidación de sueldo</option>
+              <option value="libro_ventas">Libro de ventas</option>
+              <option value="excel_varios">Planilla / Excel</option>
+              <option value="otros">Otro</option>
+            </select>
+          </div>
+          <div class="g">
+            <label for="d-periodo">Período (opcional)</label>
+            <input id="d-periodo" class="control" placeholder="Septiembre 2026" style="width:170px" autocomplete="off">
+          </div>
+          <div class="g crece">
+            <label for="d-archivo">Archivo</label>
+            <input id="d-archivo" class="control" type="file">
+          </div>
+          <button class="btn" id="btn-subir-doc">Subir</button>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2>Documentos del portal <span id="doc-conteo" style="color:var(--faint); font-weight:500;"></span></h2>
+        <p class="hint">Filtra por cliente para ver rápido qué le falta a cada uno.</p>
+        <div class="field-inline" style="margin-bottom:16px;">
+          <label for="d-filtro-cliente">Cliente</label>
+          <select id="d-filtro-cliente" class="control" style="min-width:220px"></select>
+        </div>
+        <div class="lista-cli" id="lista-documentos"></div>
+        <div class="vacio" id="doc-vacio" hidden>
+          <h3>Sin documentos todavía</h3>
+          <p>Sube el primero con el formulario de arriba.</p>
+        </div>
+      </div>
     </section>
 
     <!-- VISTA CLIENTES -->
@@ -946,6 +996,7 @@
     (r3.data || []).forEach(function(p){ perfilesPorId[p.id] = p.nombre; });
     await cargarMes();
     await cargarTareas();
+    await cargarDocumentos();
     todoRender();
   }
 
@@ -1863,6 +1914,128 @@
     if (e.key === "Escape" && !$("modal-tarea").hidden) $("modal-tarea").hidden = true;
   });
 
+  /* ---------------------------------------------------- DOCUMENTOS */
+  var TIPOS_DOC = {
+    f29: "F29 declarado", factura_jolix: "Boleta o factura Jolix",
+    liquidaciones: "Liquidación de sueldo", libro_ventas: "Libro de ventas",
+    excel_varios: "Planilla / Excel", otros: "Otro"
+  };
+  var documentos = [];
+  var filtroDocCliente = "";
+
+  function llenarSelectoresDoc(){
+    var opciones = '<option value="">Selecciona…</option>' +
+      rubrosOrdenados().map(function(r){
+        return '<optgroup label="' + escapar(r) + '">' +
+          clientesDe(r).map(function(c){
+            return '<option value="' + c.id + '">' + escapar(c.nombre) + '</option>';
+          }).join("") + '</optgroup>';
+      }).join("");
+    $("d-cliente").innerHTML = opciones;
+
+    var previoF = $("d-filtro-cliente").value;
+    $("d-filtro-cliente").innerHTML = '<option value="">Todos los clientes</option>' +
+      rubrosOrdenados().map(function(r){
+        return '<optgroup label="' + escapar(r) + '">' +
+          clientesDe(r).map(function(c){
+            return '<option value="' + c.id + '">' + escapar(c.nombre) + '</option>';
+          }).join("") + '</optgroup>';
+      }).join("");
+    if (previoF) $("d-filtro-cliente").value = previoF;
+  }
+
+  async function cargarDocumentos(){
+    var res = await sb.from("documentos").select("*").order("subido_en", { ascending: false }).limit(500);
+    if (res.error){ mostrarAviso("No se pudieron cargar los documentos."); return; }
+    documentos = res.data || [];
+    renderDocumentos();
+  }
+
+  function bytesLegibles(n){
+    if (!n) return "";
+    if (n < 1024*1024) return Math.round(n/1024) + " KB";
+    return (n/1024/1024).toFixed(1) + " MB";
+  }
+
+  function renderDocumentos(){
+    var admin = esAdmin();
+    $("panel-subir-doc").hidden = !admin;
+    $("documentos-lectura").hidden = admin;
+
+    var lista = filtroDocCliente ? documentos.filter(function(d){ return d.cliente_id === filtroDocCliente; }) : documentos;
+    $("doc-conteo").textContent = documentos.length ? "· " + documentos.length : "";
+    $("doc-vacio").hidden = lista.length > 0;
+
+    $("lista-documentos").innerHTML = lista.map(function(d){
+      var meta = fechaCorta(d.subido_en) + (d.periodo ? " · " + escapar(d.periodo) : "") + (d.tamano_bytes ? " · " + bytesLegibles(d.tamano_bytes) : "");
+      return '<div class="cli-row" data-doc="' + d.id + '">' +
+        '<div class="datos"><div class="nom">' + escapar(TIPOS_DOC[d.tipo] || d.tipo) + '</div>' +
+        '<div class="rut">' + escapar(nombreCliente(d.cliente_id)) + ' — ' + escapar(d.nombre_archivo) + ' · ' + meta + '</div></div>' +
+        (admin ? '<button class="btn ghost mini" data-borrar-doc="' + d.id + '">Eliminar</button>' : '') +
+        '</div>';
+    }).join("");
+
+    if (!admin) return;
+    $("lista-documentos").querySelectorAll("[data-borrar-doc]").forEach(function(b){
+      b.addEventListener("click", async function(){
+        if (b.dataset.confirmando !== "1"){
+          b.dataset.confirmando = "1"; b.className = "btn peligro mini"; b.textContent = "¿Seguro? Eliminar";
+          setTimeout(function(){ if (b.isConnected){ b.dataset.confirmando=""; b.className="btn ghost mini"; b.textContent="Eliminar"; } }, 4000);
+          return;
+        }
+        var d = documentos.filter(function(x){ return x.id === b.dataset.borrarDoc; })[0];
+        if (!d) return;
+        await sb.storage.from("documentos-clientes").remove([d.ruta_storage]);
+        var res = await sb.from("documentos").delete().eq("id", d.id);
+        if (res.error){ mostrarAviso("No se pudo eliminar el documento."); return; }
+        await cargarDocumentos();
+      });
+    });
+  }
+
+  function fechaCorta(iso){
+    var d = new Date(iso);
+    return d.toLocaleDateString("es-CL", { day:"2-digit", month:"short", year:"numeric" });
+  }
+
+  document.getElementById("d-filtro-cliente").addEventListener("change", function(){
+    filtroDocCliente = this.value;
+    renderDocumentos();
+  });
+
+  $("btn-subir-doc").addEventListener("click", async function(){
+    var cliente = $("d-cliente").value;
+    var archivo = $("d-archivo").files[0];
+    if (!cliente){ mostrarAviso("Elige el cliente."); $("d-cliente").focus(); return; }
+    if (!archivo){ mostrarAviso("Elige un archivo."); return; }
+
+    $("btn-subir-doc").disabled = true;
+    $("btn-subir-doc").textContent = "Subiendo…";
+
+    var limpio = archivo.name.replace(/[^a-zA-Z0-9._-]+/g, "_");
+    var ruta = cliente + "/" + Date.now() + "_" + limpio;
+
+    var subida = await sb.storage.from("documentos-clientes").upload(ruta, archivo);
+    if (subida.error){
+      mostrarAviso("No se pudo subir el archivo: " + subida.error.message);
+      $("btn-subir-doc").disabled = false; $("btn-subir-doc").textContent = "Subir";
+      return;
+    }
+    var res = await sb.from("documentos").insert({
+      cliente_id: cliente, tipo: $("d-tipo").value,
+      periodo: $("d-periodo").value.trim() || null,
+      nombre_archivo: archivo.name, ruta_storage: ruta, tamano_bytes: archivo.size
+    });
+    $("btn-subir-doc").disabled = false; $("btn-subir-doc").textContent = "Subir";
+    if (res.error){
+      mostrarAviso("El archivo se subió pero no se pudo registrar: " + res.error.message);
+      return;
+    }
+    $("d-archivo").value = ""; $("d-periodo").value = "";
+    await cargarDocumentos();
+    mostrarAviso("Documento subido. Ya está visible para el cliente.", "ok");
+  });
+
   /* ----------------------------------------------------- NAVEGACIÓN */
   function cambiarVista(v){
     vista = v;
@@ -1871,11 +2044,13 @@
     });
     $("v-mes").hidden = v !== "mes";
     $("v-tareas").hidden = v !== "tareas";
+    $("v-documentos").hidden = v !== "documentos";
     $("v-clientes").hidden = v !== "clientes";
     $("v-rubros").hidden = v !== "rubros";
     $("v-historico").hidden = v !== "historico";
     if (v === "historico") renderHistorico();
     if (v === "tareas") cargarTareas();
+    if (v === "documentos") cargarDocumentos();
   }
   document.querySelectorAll(".tab").forEach(function(t){
     t.addEventListener("click", function(){ cambiarVista(t.dataset.vista); });
@@ -1965,6 +2140,8 @@
     renderSelectorClientes();
     llenarSelectoresTarea();
     renderTareas();
+    llenarSelectoresDoc();
+    renderDocumentos();
     medirTopbar();
   }
 

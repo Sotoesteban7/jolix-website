@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Portal Jolix</title>
+<link rel="icon" href="../favicon.ico">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --purple:#8253F3; --purple-deep:#5B32C9; --purple-soft:#A88CFA;
+    --coral:#FF8585; --coral-deep:#E85F5F;
+    --ink:#1B1730; --paper:#FBFAFE; --surface:#FFFFFF;
+    --mist:#EFEAFB; --line:#DED5F5; --muted:#5B5670; --faint:#8B84A3;
+    --ok:#12855C; --ok-bg:#E1F4EB;
+    --shadow:0 18px 40px -26px rgba(59,25,148,.4);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --purple:#9B7BFF; --purple-deep:#B49BFF; --purple-soft:#C3AEFF;
+      --coral:#FF9D9D; --coral-deep:#FFB0B0;
+      --ink:#F3F1FA; --paper:#15111F; --surface:#1E1930;
+      --mist:#241C38; --line:#3A2E58; --muted:#B4AAC9; --faint:#8F86A8;
+      --ok:#5FD9A6; --ok-bg:#14342A;
+      --shadow:0 18px 40px -26px rgba(0,0,0,.7);
+    }
+  }
+  :root[data-theme="dark"]{
+    --purple:#9B7BFF; --purple-deep:#B49BFF; --purple-soft:#C3AEFF;
+    --coral:#FF9D9D; --coral-deep:#FFB0B0;
+    --ink:#F3F1FA; --paper:#15111F; --surface:#1E1930;
+    --mist:#241C38; --line:#3A2E58; --muted:#B4AAC9; --faint:#8F86A8;
+    --ok:#5FD9A6; --ok-bg:#14342A;
+    --shadow:0 18px 40px -26px rgba(0,0,0,.7);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--paper); color:var(--ink);
+    font-family:'Work Sans', system-ui, -apple-system, sans-serif;
+    line-height:1.5; -webkit-font-smoothing:antialiased;
+  }
+  h1,h2{font-family:'Poppins', system-ui, sans-serif; margin:0; font-weight:600;}
+  button{font-family:inherit; cursor:pointer;}
+  input{font-family:inherit; color:inherit;}
+  :focus-visible{outline:2px solid var(--purple); outline-offset:2px; border-radius:6px;}
+  [hidden]{display:none !important;}
+
+  .centro{min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px; position:relative; overflow:hidden;}
+  .centro::before{content:"";position:absolute;top:-160px;left:-120px;width:420px;height:420px;border-radius:50%;background:var(--purple);opacity:.09;}
+  .centro::after{content:"";position:absolute;bottom:-180px;right:-140px;width:460px;height:460px;border-radius:50%;background:var(--coral);opacity:.10;}
+  .tarjeta{position:relative;z-index:1;width:100%;max-width:400px;background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:38px 34px;box-shadow:var(--shadow);}
+  .marca{display:flex;align-items:center;gap:12px;margin-bottom:26px;}
+  .marca img{width:42px;height:42px;}
+  .marca .n{font-family:'Poppins',sans-serif;font-weight:700;font-size:19px;}
+  .marca .s{font-size:12.5px;color:var(--faint);margin-top:-3px;}
+  .campo{display:flex;flex-direction:column;gap:6px;margin-bottom:16px;}
+  .campo label{font-size:11.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--faint);font-weight:600;}
+  .campo input{background:var(--paper);border:1px solid var(--line);color:var(--ink);border-radius:11px;padding:12px 14px;font-size:15px;width:100%;}
+  .campo input:focus{border-color:var(--purple);background:var(--surface);}
+  .btn-full{width:100%;background:var(--purple);color:#fff;border:none;border-radius:11px;padding:13px 18px;font-family:'Poppins',sans-serif;font-weight:600;font-size:15px;margin-top:6px;}
+  .btn-full:hover{background:var(--purple-deep);}
+  .btn-full:disabled{opacity:.6;cursor:default;}
+  .aviso{border-radius:11px;padding:11px 14px;font-size:13.5px;margin-bottom:16px;}
+  .aviso.err{background:#FBE7E6;border:1px solid #F0BFBD;color:#C4413D;}
+  .aviso.ok{background:var(--ok-bg);border:1px solid var(--ok);color:var(--ok);}
+  .pie{margin-top:20px;font-size:12.5px;color:var(--faint);text-align:center;line-height:1.6;}
+  .icono-correo{width:52px;height:52px;border-radius:50%;background:var(--mist);display:flex;align-items:center;justify-content:center;margin:0 auto 18px;color:var(--purple);}
+
+  /* ---------- panel de documentos ---------- */
+  .topbar{background:var(--surface);border-bottom:1px solid var(--line);overflow:hidden;position:relative;}
+  .topbar::before{content:"";position:absolute;top:-100px;left:-70px;width:200px;height:200px;border-radius:50%;background:var(--purple);opacity:.08;}
+  .topbar-in{max-width:880px;margin:0 auto;padding:16px 20px;display:flex;align-items:center;gap:12px;position:relative;}
+  .topbar-in img{width:32px;height:32px;}
+  .topbar-in .n{font-family:'Poppins',sans-serif;font-weight:700;font-size:15.5px;}
+  .topbar-in .s{font-size:12px;color:var(--faint);margin-top:-2px;}
+  .topbar-in .cliente{margin-left:auto;text-align:right;}
+  .topbar-in .cliente .nom{font-family:'Poppins',sans-serif;font-weight:600;font-size:13.5px;}
+  .btn-salir{background:none;border:1px solid var(--line);color:var(--muted);border-radius:9px;padding:7px 13px;font-size:12.5px;font-weight:500;margin-left:12px;}
+  .btn-salir:hover{background:var(--mist);color:var(--ink);}
+
+  .wrap{max-width:880px;margin:0 auto;padding:32px 20px 60px;}
+  .encabezado{margin-bottom:24px;}
+  .encabezado h1{font-size:22px;}
+  .encabezado p{margin-top:6px;color:var(--muted);font-size:14.5px;}
+
+  .filtros{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px;}
+  .chip-filtro{background:var(--mist);border:1px solid transparent;color:var(--muted);border-radius:999px;padding:8px 15px;font-size:13px;font-weight:600;font-family:'Poppins',sans-serif;}
+  .chip-filtro[aria-pressed="true"]{background:var(--purple);color:#fff;}
+
+  .lista{display:flex;flex-direction:column;gap:10px;}
+  .doc{display:flex;align-items:center;gap:14px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 16px;}
+  .doc .icono{flex:none;width:40px;height:40px;border-radius:11px;background:var(--mist);display:flex;align-items:center;justify-content:center;color:var(--purple);}
+  .doc .cuerpo{flex:1;min-width:0;}
+  .doc .tipo{font-family:'Poppins',sans-serif;font-weight:600;font-size:14px;}
+  .doc .meta{font-size:12.5px;color:var(--faint);margin-top:2px;}
+  .btn-descargar{flex:none;background:var(--mist);color:var(--purple-deep);border:none;border-radius:10px;padding:9px 16px;font-family:'Poppins',sans-serif;font-weight:600;font-size:13px;display:flex;align-items:center;gap:7px;}
+  .btn-descargar:hover{background:var(--purple);color:#fff;}
+  .btn-descargar:disabled{opacity:.6;cursor:default;}
+
+  .vacio{text-align:center;padding:52px 24px;background:var(--surface);border:1px dashed var(--line);border-radius:18px;}
+  .vacio h3{font-size:16px;margin-bottom:6px;}
+  .vacio p{color:var(--muted);font-size:13.5px;max-width:38ch;margin:0 auto;}
+  .cargando{text-align:center;padding:60px 20px;color:var(--faint);font-size:14px;}
+</style>
+</head>
+<body>
+
+<div class="centro" id="pantalla-login">
+  <div class="tarjeta">
+    <div class="marca">
+      <img src="../apple-touch-icon.png" alt="">
+      <div><div class="n">Portal Jolix</div><div class="s">Tus documentos, siempre a mano</div></div>
+    </div>
+
+    <div id="paso-correo">
+      <div class="aviso err" id="login-error" hidden></div>
+      <form id="form-correo">
+        <div class="campo">
+          <label for="in-correo">Correo</label>
+          <input id="in-correo" type="email" autocomplete="email" placeholder="tu@correo.com" required>
+        </div>
+        <button class="btn-full" id="btn-enviar" type="submit">Enviar enlace de acceso</button>
+      </form>
+      <p class="pie">Sin contraseñas. Te enviamos un enlace para entrar directo.<br>Debe ser el correo con el que estás registrado en Jolix.</p>
+    </div>
+
+    <div id="paso-enviado" hidden>
+      <div class="icono-correo">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M3.5 6.5h17v11h-17v-11Z" stroke="currentColor" stroke-width="1.8"/><path d="m4 7 8 6 8-6" stroke="currentColor" stroke-width="1.8"/></svg>
+      </div>
+      <p style="text-align:center;font-size:14.5px;color:var(--muted);margin-bottom:4px;">Te enviamos un enlace a</p>
+      <p style="text-align:center;font-family:'Poppins',sans-serif;font-weight:600;font-size:15px;margin-bottom:18px;" id="correo-enviado-a"></p>
+      <p class="pie">Ábrelo desde este mismo dispositivo. Si no llega en unos minutos, revisa spam o contáctanos por WhatsApp.</p>
+    </div>
+  </div>
+</div>
+
+<div id="app" hidden>
+  <header class="topbar">
+    <div class="topbar-in">
+      <img src="../apple-touch-icon.png" alt="">
+      <div><div class="n">Portal Jolix</div><div class="s">Tus documentos</div></div>
+      <div class="cliente">
+        <div class="nom" id="nombre-cliente">—</div>
+      </div>
+      <button class="btn-salir" id="btn-salir">Salir</button>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <div class="encabezado">
+      <h1>Hola, <span id="saludo-nombre">—</span></h1>
+      <p>Aquí encuentras los documentos que Jolix ha compartido contigo. Puedes verlos y descargarlos cuando quieras.</p>
+    </div>
+
+    <div class="filtros" id="filtros"></div>
+    <div id="cargando-docs" class="cargando">Cargando tus documentos…</div>
+    <div class="lista" id="lista-docs" hidden></div>
+    <div class="vacio" id="docs-vacio" hidden>
+      <h3>Aún no hay documentos aquí</h3>
+      <p>Cuando tengamos algo listo para ti (tu F29, una boleta, lo que sea), va a aparecer en esta lista.</p>
+    </div>
+  </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script>
+(function(){
+  "use strict";
+
+  var URL_SUPABASE = "https://sukfzusznlgrmqiqzweh.supabase.co";
+  var CLAVE_PUBLICA = "sb_publishable_55POJIBMgg5JsP-wbnvBRw_UpesY-g8";
+  var BUCKET = "documentos-clientes";
+
+  var sb = window.supabase.createClient(URL_SUPABASE, CLAVE_PUBLICA);
+  var $ = function(id){ return document.getElementById(id); };
+
+  var TIPOS = {
+    f29:            { label: "F29 declarado",         icono: "doc" },
+    factura_jolix:  { label: "Boleta o factura Jolix", icono: "recibo" },
+    liquidaciones:  { label: "Liquidación de sueldo",  icono: "doc" },
+    libro_ventas:   { label: "Libro de ventas",        icono: "hoja" },
+    excel_varios:   { label: "Planilla",               icono: "hoja" },
+    otros:          { label: "Otro documento",         icono: "doc" }
+  };
+
+  var ICONOS = {
+    doc:   '<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M7 3.5h7l4 4v13h-11v-17Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M14 3.5v4h4" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>',
+    hoja:  '<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M7 3.5h7l4 4v13h-11v-17Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M9 13h6M9 16.5h6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>',
+    recibo:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M6 3.5h12v17l-2.5-1.6-2.5 1.6-2.5-1.6-2.5 1.6-2-1.6V3.5Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M9 8h6M9 11.5h6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>'
+  };
+
+  var documentos = [];
+  var filtroTipo = "";
+
+  function mostrarError(msg){
+    var el = $("login-error");
+    el.textContent = msg;
+    el.hidden = false;
+  }
+
+  function fechaCorta(iso){
+    var d = new Date(iso);
+    return d.toLocaleDateString("es-CL", { day:"2-digit", month:"short", year:"numeric" });
+  }
+
+  function bytesLegibles(n){
+    if (!n) return "";
+    if (n < 1024*1024) return Math.round(n/1024) + " KB";
+    return (n/1024/1024).toFixed(1) + " MB";
+  }
+
+  function escapar(s){
+    return String(s == null ? "" : s).replace(/[&<>"']/g, function(c){
+      return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];
+    });
+  }
+
+  /* ---------------- login ---------------- */
+  $("form-correo").addEventListener("submit", async function(e){
+    e.preventDefault();
+    var correo = $("in-correo").value.trim();
+    if (!correo) return;
+    $("login-error").hidden = true;
+    $("btn-enviar").disabled = true;
+    $("btn-enviar").textContent = "Enviando…";
+
+    var res = await sb.auth.signInWithOtp({
+      email: correo,
+      options: { emailRedirectTo: window.location.origin + window.location.pathname }
+    });
+
+    $("btn-enviar").disabled = false;
+    $("btn-enviar").textContent = "Enviar enlace de acceso";
+
+    if (res.error){
+      mostrarError("No se pudo enviar el enlace. Inténtalo de nuevo en unos minutos.");
+      return;
+    }
+    $("correo-enviado-a").textContent = correo;
+    $("paso-correo").hidden = true;
+    $("paso-enviado").hidden = false;
+  });
+
+  $("btn-salir").addEventListener("click", async function(){
+    await sb.auth.signOut();
+    location.href = window.location.pathname;
+  });
+
+  /* ---------------- documentos ---------------- */
+  async function cargarDocumentos(){
+    var res = await sb.from("documentos").select("*").order("subido_en", { ascending: false });
+    $("cargando-docs").hidden = true;
+    if (res.error){
+      $("docs-vacio").hidden = false;
+      $("docs-vacio").querySelector("h3").textContent = "No pudimos cargar tus documentos";
+      $("docs-vacio").querySelector("p").textContent = "Recarga la página; si sigue fallando, escríbenos por WhatsApp.";
+      return;
+    }
+    documentos = res.data || [];
+    renderFiltros();
+    renderLista();
+  }
+
+  function renderFiltros(){
+    var tiposPresentes = [];
+    documentos.forEach(function(d){ if (tiposPresentes.indexOf(d.tipo) === -1) tiposPresentes.push(d.tipo); });
+    if (tiposPresentes.length < 2){ $("filtros").hidden = true; return; }
+    var html = '<button class="chip-filtro" data-tipo="" aria-pressed="' + (filtroTipo === "") + '">Todos</button>';
+    tiposPresentes.forEach(function(t){
+      var info = TIPOS[t] || { label: t };
+      html += '<button class="chip-filtro" data-tipo="' + t + '" aria-pressed="' + (filtroTipo === t) + '">' + escapar(info.label) + '</button>';
+    });
+    $("filtros").innerHTML = html;
+    $("filtros").querySelectorAll(".chip-filtro").forEach(function(b){
+      b.addEventListener("click", function(){
+        filtroTipo = b.dataset.tipo;
+        renderFiltros();
+        renderLista();
+      });
+    });
+  }
+
+  function renderLista(){
+    var lista = filtroTipo ? documentos.filter(function(d){ return d.tipo === filtroTipo; }) : documentos;
+    $("lista-docs").hidden = lista.length === 0;
+    $("docs-vacio").hidden = lista.length !== 0;
+
+    $("lista-docs").innerHTML = lista.map(function(d){
+      var info = TIPOS[d.tipo] || { label: d.tipo, icono: "doc" };
+      var meta = fechaCorta(d.subido_en) + (d.periodo ? " · " + escapar(d.periodo) : "") + (d.tamano_bytes ? " · " + bytesLegibles(d.tamano_bytes) : "");
+      return '<div class="doc" data-id="' + d.id + '">' +
+        '<span class="icono">' + (ICONOS[info.icono] || ICONOS.doc) + '</span>' +
+        '<div class="cuerpo"><div class="tipo">' + escapar(info.label) + '</div>' +
+        '<div class="meta">' + escapar(d.nombre_archivo) + ' · ' + meta + '</div></div>' +
+        '<button class="btn-descargar" data-descargar="' + d.id + '">Descargar</button>' +
+        '</div>';
+    }).join("");
+
+    $("lista-docs").querySelectorAll("[data-descargar]").forEach(function(b){
+      b.addEventListener("click", function(){ descargar(b.dataset.descargar, b); });
+    });
+  }
+
+  async function descargar(id, boton){
+    var doc = documentos.filter(function(d){ return d.id === id; })[0];
+    if (!doc) return;
+    var textoOriginal = boton.textContent;
+    boton.disabled = true;
+    boton.textContent = "Descargando…";
+
+    var res = await sb.storage.from(BUCKET).download(doc.ruta_storage);
+    boton.disabled = false;
+    boton.textContent = textoOriginal;
+
+    if (res.error || !res.data){
+      alert("No se pudo descargar el archivo. Inténtalo de nuevo.");
+      return;
+    }
+    var url = URL.createObjectURL(res.data);
+    var a = document.createElement("a");
+    a.href = url; a.download = doc.nombre_archivo;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 4000);
+  }
+
+  /* ---------------- sesión ---------------- */
+  async function iniciar(){
+    var ses = await sb.auth.getSession();
+    if (!ses.data.session){
+      $("pantalla-login").hidden = false;
+      $("app").hidden = true;
+      return;
+    }
+    var perfil = await sb.from("clientes").select("nombre").eq("auth_user_id", ses.data.session.user.id).single();
+    if (perfil.error || !perfil.data){
+      mostrarError("Tu correo no está asociado a ningún cliente de Jolix. Si crees que es un error, contáctanos.");
+      await sb.auth.signOut();
+      $("pantalla-login").hidden = false;
+      $("app").hidden = true;
+      return;
+    }
+    $("pantalla-login").hidden = true;
+    $("app").hidden = false;
+    $("nombre-cliente").textContent = perfil.data.nombre;
+    $("saludo-nombre").textContent = perfil.data.nombre.split(" ")[0];
+    cargarDocumentos();
+  }
+
+  sb.auth.onAuthStateChange(function(event){
+    if (event === "SIGNED_IN") iniciar();
+  });
+
+  iniciar();
+})();
+</script>
+</body>
+</html>
