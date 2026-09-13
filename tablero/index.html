@@ -264,6 +264,14 @@
   .rubro-chip:hover:not(:disabled){border-color:var(--line);}
   .rubro-chip:focus{background:var(--surface); border-color:var(--purple);}
   .rubro-chip:disabled{opacity:.6;}
+  .email-input{
+    background:var(--surface); border:1px solid var(--line); color:var(--ink);
+    border-radius:10px; padding:7px 11px; font-size:12.5px; width:190px;
+  }
+  .email-input:hover:not(:disabled){border-color:var(--purple-soft);}
+  .email-input:focus{border-color:var(--purple);}
+  .email-input:disabled{opacity:.6; background:var(--mist);}
+  .email-input::placeholder{color:var(--faint);}
   .orden-btns{display:flex; gap:4px;}
   .orden-btns button{width:30px; height:30px; border-radius:8px; border:1px solid var(--line); background:var(--surface); color:var(--muted); font-size:12px; line-height:1; display:flex; align-items:center; justify-content:center;}
   .orden-btns button:hover:not(:disabled){background:var(--mist); color:var(--ink);}
@@ -564,8 +572,8 @@
             </select>
           </div>
           <div class="g">
-            <label for="d-periodo">Período (opcional)</label>
-            <input id="d-periodo" class="control" placeholder="Septiembre 2026" style="width:170px" autocomplete="off">
+            <label for="d-periodo">Período</label>
+            <select id="d-periodo" class="control" style="width:170px"></select>
           </div>
           <div class="g crece">
             <label for="d-archivo">Archivo</label>
@@ -608,6 +616,10 @@
           <div class="g">
             <label for="n-rubro">Rubro</label>
             <select id="n-rubro" class="control" style="width:170px"></select>
+          </div>
+          <div class="g">
+            <label for="n-email">Correo (portal)</label>
+            <input id="n-email" class="control" type="email" placeholder="cliente@correo.com" style="width:200px" autocomplete="off">
           </div>
           <div class="g">
             <label>Servicios</label>
@@ -987,7 +999,7 @@
   /* -------------------------------------------------------- DATOS */
   async function cargarTodo(){
     var r1 = await sb.from("rubros").select("id, nombre, orden").order("orden");
-    var r2 = await sb.from("clientes").select("id, rut, nombre, rubro_id, f29, remuneraciones, previred").order("nombre");
+    var r2 = await sb.from("clientes").select("id, rut, nombre, rubro_id, email, f29, remuneraciones, previred").order("nombre");
     var r3 = await sb.from("perfiles").select("id, nombre");
     if (r1.error || r2.error){ mostrarAviso("No se pudieron cargar los datos. Revisa tu conexión."); return; }
     rubros = r1.data || [];
@@ -1315,6 +1327,7 @@
         (c.rut ? '<div class="rut">' + escapar(c.rut) + '</div>' : '') + '</div>' +
         '<select class="rubro-chip" data-rubro-de="' + c.id + '" aria-label="Rubro"' + (admin ? "" : " disabled") + '>' +
         opcionesRubro(c.rubro_id) + '</select>' +
+        '<input class="email-input" type="email" data-email-de="' + c.id + '" value="' + escapar(c.email || "") + '" placeholder="Correo del portal"' + (admin ? "" : " disabled") + '>' +
         '<div class="servicios">' +
           '<button class="chk" data-srv="f29" aria-pressed="' + !!c.f29 + '"' + (admin ? "" : " disabled") + '>F29</button>' +
           '<button class="chk" data-srv="remuneraciones" aria-pressed="' + !!c.remuneraciones + '"' + (admin ? "" : " disabled") + '>Remuneraciones</button>' +
@@ -1333,6 +1346,24 @@
         if (res.error){ mostrarAviso("No se pudo guardar el rubro."); return; }
         await cargarTodo();
       });
+    });
+
+    cont.querySelectorAll("input[data-email-de]").forEach(function(inp){
+      inp.addEventListener("blur", async function(){
+        var id = inp.dataset.emailDe;
+        var cli = clientes.filter(function(c){ return c.id === id; })[0];
+        var nuevo = inp.value.trim();
+        if (!cli || nuevo === (cli.email || "")) return;
+        var res = await sb.from("clientes").update({ email: nuevo || null }).eq("id", id);
+        if (res.error){
+          mostrarAviso(res.error.code === "23505" ? "Ese correo ya está en uso por otro cliente." : "No se pudo guardar el correo.");
+          inp.value = cli.email || "";
+          return;
+        }
+        await cargarTodo();
+        mostrarAviso("Correo guardado.", "ok");
+      });
+      inp.addEventListener("keydown", function(e){ if (e.key === "Enter") inp.blur(); });
     });
 
     cont.querySelectorAll(".chk[data-srv]").forEach(function(b){
@@ -1923,7 +1954,23 @@
   var documentos = [];
   var filtroDocCliente = "";
 
+  function armarSelectorPeriodo(){
+    var sel = $("d-periodo");
+    if (sel.dataset.armado) return;
+    sel.dataset.armado = "1";
+    var hoy = new Date();
+    var opciones = ['<option value="">Sin mes específico</option>'];
+    for (var i = -1; i <= 30; i++){
+      var d = new Date(hoy.getFullYear(), hoy.getMonth() - i, 1);
+      var ym = d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0");
+      opciones.push('<option value="' + ym + '">' + capital(nombreMes(ym)) + '</option>');
+    }
+    sel.innerHTML = opciones.join("");
+    sel.value = hoy.getFullYear() + "-" + String(hoy.getMonth()+1).padStart(2,"0");
+  }
+
   function llenarSelectoresDoc(){
+    armarSelectorPeriodo();
     var opciones = '<option value="">Selecciona…</option>' +
       rubrosOrdenados().map(function(r){
         return '<optgroup label="' + escapar(r) + '">' +
@@ -1967,7 +2014,7 @@
     $("doc-vacio").hidden = lista.length > 0;
 
     $("lista-documentos").innerHTML = lista.map(function(d){
-      var meta = fechaCorta(d.subido_en) + (d.periodo ? " · " + escapar(d.periodo) : "") + (d.tamano_bytes ? " · " + bytesLegibles(d.tamano_bytes) : "");
+      var meta = fechaCorta(d.subido_en) + (d.periodo ? " · " + escapar(capital(nombreMes(d.periodo))) : "") + (d.tamano_bytes ? " · " + bytesLegibles(d.tamano_bytes) : "");
       return '<div class="cli-row" data-doc="' + d.id + '">' +
         '<div class="datos"><div class="nom">' + escapar(TIPOS_DOC[d.tipo] || d.tipo) + '</div>' +
         '<div class="rut">' + escapar(nombreCliente(d.cliente_id)) + ' — ' + escapar(d.nombre_archivo) + ' · ' + meta + '</div></div>' +
@@ -2023,7 +2070,7 @@
     }
     var res = await sb.from("documentos").insert({
       cliente_id: cliente, tipo: $("d-tipo").value,
-      periodo: $("d-periodo").value.trim() || null,
+      periodo: $("d-periodo").value || null,
       nombre_archivo: archivo.name, ruta_storage: ruta, tamano_bytes: archivo.size
     });
     $("btn-subir-doc").disabled = false; $("btn-subir-doc").textContent = "Subir";
@@ -2031,7 +2078,7 @@
       mostrarAviso("El archivo se subió pero no se pudo registrar: " + res.error.message);
       return;
     }
-    $("d-archivo").value = ""; $("d-periodo").value = "";
+    $("d-archivo").value = "";
     await cargarDocumentos();
     mostrarAviso("Documento subido. Ya está visible para el cliente.", "ok");
   });
@@ -2097,15 +2144,20 @@
     var res = await sb.from("clientes").insert({
       nombre: nombre, rut: rut,
       rubro_id: $("n-rubro").value || null,
+      email: $("n-email").value.trim() || null,
       f29: nuevoSrv.f29, remuneraciones: nuevoSrv.remuneraciones, previred: nuevoSrv.previred
     });
     if (res.error){
-      mostrarAviso(res.error.code === "23505"
-        ? "Ya existe un cliente con ese RUT."
-        : "No se pudo agregar el cliente: " + res.error.message);
+      if (res.error.code === "23505"){
+        mostrarAviso(res.error.message.indexOf("email") !== -1
+          ? "Ese correo ya está en uso por otro cliente."
+          : "Ya existe un cliente con ese RUT.");
+      } else {
+        mostrarAviso("No se pudo agregar el cliente: " + res.error.message);
+      }
       return;
     }
-    $("n-nombre").value = ""; $("n-rut").value = "";
+    $("n-nombre").value = ""; $("n-rut").value = ""; $("n-email").value = "";
     $("n-nombre").focus();
     await cargarTodo();
   });

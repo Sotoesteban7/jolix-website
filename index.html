@@ -112,6 +112,12 @@
   }
   .btn-primary{background:var(--purple);color:#fff;box-shadow:var(--shadow);}
   .btn-ghost{background:transparent;border-color:var(--mist-line);color:var(--ink);}
+  .btn-portal{
+    display:inline-flex;align-items:center;gap:6px;font-family:'Poppins',sans-serif;
+    font-weight:600;font-size:13.5px;color:var(--purple);text-decoration:none;
+    padding:8px 14px;border-radius:999px;border:1px solid var(--mist-line);
+  }
+  .btn-portal:hover{background:var(--mist);border-color:var(--purple-soft);}
   .btn:focus-visible{outline:3px solid var(--coral);outline-offset:2px;}
 
   /* ---------- Nav ---------- */
@@ -407,6 +413,7 @@
       <a href="#contacto">Contacto</a>
     </nav>
     <div class="nav-cta">
+      <a href="https://jolixasesorias.com/portal/" class="btn-portal">Acceso clientes</a>
       <a href="#contacto" class="btn btn-ghost">Conversemos</a>
       <button class="menu-toggle" id="menuToggle" aria-label="Abrir menú" aria-expanded="false"><span></span><span></span><span></span></button>
     </div>

@@ -158,6 +158,7 @@
     </div>
 
     <div class="filtros" id="filtros"></div>
+    <div class="filtros" id="filtros-periodo" style="margin-top:-10px;"></div>
     <div id="cargando-docs" class="cargando">Cargando tus documentos…</div>
     <div class="lista" id="lista-docs" hidden></div>
     <div class="vacio" id="docs-vacio" hidden>
@@ -194,8 +195,19 @@
     recibo:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M6 3.5h12v17l-2.5-1.6-2.5 1.6-2.5-1.6-2.5 1.6-2-1.6V3.5Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M9 8h6M9 11.5h6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>'
   };
 
+  var MESES = ["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
+
+  function nombrePeriodo(p){
+    var m = String(p || "").match(/^(\d{4})-(\d{2})$/);
+    if (!m) return p || "";
+    var mes = MESES[parseInt(m[2],10) - 1];
+    if (!mes) return p;
+    return mes.charAt(0).toUpperCase() + mes.slice(1) + " " + m[1];
+  }
+
   var documentos = [];
   var filtroTipo = "";
+  var filtroPeriodo = null; // null = todos los meses; "" = sin mes asignado; "YYYY-MM" = ese mes
 
   function mostrarError(msg){
     var el = $("login-error");
@@ -269,30 +281,61 @@
   function renderFiltros(){
     var tiposPresentes = [];
     documentos.forEach(function(d){ if (tiposPresentes.indexOf(d.tipo) === -1) tiposPresentes.push(d.tipo); });
-    if (tiposPresentes.length < 2){ $("filtros").hidden = true; return; }
-    var html = '<button class="chip-filtro" data-tipo="" aria-pressed="' + (filtroTipo === "") + '">Todos</button>';
-    tiposPresentes.forEach(function(t){
-      var info = TIPOS[t] || { label: t };
-      html += '<button class="chip-filtro" data-tipo="' + t + '" aria-pressed="' + (filtroTipo === t) + '">' + escapar(info.label) + '</button>';
-    });
-    $("filtros").innerHTML = html;
-    $("filtros").querySelectorAll(".chip-filtro").forEach(function(b){
-      b.addEventListener("click", function(){
-        filtroTipo = b.dataset.tipo;
-        renderFiltros();
-        renderLista();
+    if (tiposPresentes.length < 2){
+      $("filtros").hidden = true;
+    } else {
+      var html = '<button class="chip-filtro" data-tipo="" aria-pressed="' + (filtroTipo === "") + '">Todos</button>';
+      tiposPresentes.forEach(function(t){
+        var info = TIPOS[t] || { label: t };
+        html += '<button class="chip-filtro" data-tipo="' + t + '" aria-pressed="' + (filtroTipo === t) + '">' + escapar(info.label) + '</button>';
       });
+      $("filtros").hidden = false;
+      $("filtros").innerHTML = html;
+      $("filtros").querySelectorAll(".chip-filtro").forEach(function(b){
+        b.addEventListener("click", function(){
+          filtroTipo = b.dataset.tipo;
+          renderFiltros();
+          renderLista();
+        });
+      });
+    }
+
+    var periodosPresentes = [];
+    documentos.forEach(function(d){
+      var p = d.periodo || "";
+      if (periodosPresentes.indexOf(p) === -1) periodosPresentes.push(p);
     });
+    if (periodosPresentes.length < 2){
+      $("filtros-periodo").hidden = true;
+    } else {
+      periodosPresentes.sort(function(a,b){ return b.localeCompare(a); });
+      var html2 = '<button class="chip-filtro" data-periodo="__todos__" aria-pressed="' + (filtroPeriodo === null) + '">Todos los meses</button>';
+      periodosPresentes.forEach(function(p){
+        var etiqueta = p ? nombrePeriodo(p) : "Sin mes asignado";
+        html2 += '<button class="chip-filtro" data-periodo="' + escapar(p) + '" aria-pressed="' + (filtroPeriodo === p) + '">' + escapar(etiqueta) + '</button>';
+      });
+      $("filtros-periodo").hidden = false;
+      $("filtros-periodo").innerHTML = html2;
+      $("filtros-periodo").querySelectorAll(".chip-filtro").forEach(function(b){
+        b.addEventListener("click", function(){
+          filtroPeriodo = b.dataset.periodo === "__todos__" ? null : b.dataset.periodo;
+          renderFiltros();
+          renderLista();
+        });
+      });
+    }
   }
 
   function renderLista(){
-    var lista = filtroTipo ? documentos.filter(function(d){ return d.tipo === filtroTipo; }) : documentos;
+    var lista = documentos;
+    if (filtroTipo) lista = lista.filter(function(d){ return d.tipo === filtroTipo; });
+    if (filtroPeriodo !== null) lista = lista.filter(function(d){ return (d.periodo || "") === filtroPeriodo; });
     $("lista-docs").hidden = lista.length === 0;
     $("docs-vacio").hidden = lista.length !== 0;
 
     $("lista-docs").innerHTML = lista.map(function(d){
       var info = TIPOS[d.tipo] || { label: d.tipo, icono: "doc" };
-      var meta = fechaCorta(d.subido_en) + (d.periodo ? " · " + escapar(d.periodo) : "") + (d.tamano_bytes ? " · " + bytesLegibles(d.tamano_bytes) : "");
+      var meta = fechaCorta(d.subido_en) + (d.periodo ? " · " + escapar(nombrePeriodo(d.periodo)) : "") + (d.tamano_bytes ? " · " + bytesLegibles(d.tamano_bytes) : "");
       return '<div class="doc" data-id="' + d.id + '">' +
         '<span class="icono">' + (ICONOS[info.icono] || ICONOS.doc) + '</span>' +
         '<div class="cuerpo"><div class="tipo">' + escapar(info.label) + '</div>' +
