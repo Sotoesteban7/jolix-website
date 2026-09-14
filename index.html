@@ -529,11 +529,12 @@
     display:flex;
     align-items:center;
     gap:10px;
+    flex-shrink:0;
     text-decoration:none;
     animation:jhero-rise .8s cubic-bezier(.16,1,.3,1) .05s both;
   }
-  .jhero-brand img{width:28px;height:28px;}
-  .jhero-brand span{font-family:'Poppins',sans-serif;font-weight:600;font-size:16px;color:var(--ink);}
+  .jhero-brand img{width:28px;height:28px;flex-shrink:0;}
+  .jhero-brand span{font-family:'Poppins',sans-serif;font-weight:600;font-size:16px;color:var(--ink);white-space:nowrap;}
 
   .jhero-copy{
     position:relative;
@@ -732,6 +733,14 @@
       border-radius:10px;
     }
     .jhero-links a:hover{background:var(--mist);}
+    .jhero-links a.jhero-access{
+      margin-top:6px;
+      text-align:center;
+      background:var(--purple);
+      border-color:var(--purple);
+      color:#fff;
+    }
+    .jhero-links a.jhero-access:hover{background:var(--purple-deep);border-color:var(--purple-deep);}
   }
 
   @media (max-width:760px){
@@ -773,8 +782,8 @@
           <a href="#servicios">Servicios</a>
           <a href="#precios">Precios</a>
           <a href="#contacto">Contáctanos</a>
+          <a class="jhero-access" href="https://jolixasesorias.com/portal/">Acceso clientes</a>
         </nav>
-        <a class="jhero-access" href="https://jolixasesorias.com/portal/">Acceso clientes</a>
       </div>
     </div>
 
@@ -926,7 +935,6 @@
             <ul>
               <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M5 12.5 9.5 17 19 7"/></svg>Contabilidad Simplificada</li>
               <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M5 12.5 9.5 17 19 7"/></svg>Declaración mensual F29</li>
-              <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M5 12.5 9.5 17 19 7"/></svg>Previred y portal Mi DT</li>
               <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M5 12.5 9.5 17 19 7"/></svg>Boletas de Honorarios</li>
               <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M5 12.5 9.5 17 19 7"/></svg>Hasta 100 DTEs mensuales</li>
             </ul>
