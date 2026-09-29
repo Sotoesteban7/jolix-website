@@ -566,10 +566,6 @@
             <div class="sub">Control mensual de obligaciones</div>
           </div>
         </div>
-        <div class="field-inline">
-          <label for="sel-mes">Mes</label>
-          <select id="sel-mes" class="control"></select>
-        </div>
         <div class="yo">
           <div class="avatar" id="yo-avatar">–</div>
           <div class="datos">
@@ -583,7 +579,7 @@
         </div>
       </div>
       <nav class="tabs" role="tablist">
-        <button class="tab" role="tab" aria-selected="true" data-vista="mes">Mes</button>
+        <button class="tab" role="tab" aria-selected="true" data-vista="mes">Actividades mensuales</button>
         <button class="tab" role="tab" aria-selected="false" data-vista="tareas">Tareas <span class="tab-badge" id="tab-badge" hidden></span></button>
         <button class="tab" role="tab" aria-selected="false" data-vista="documentos">Documentos</button>
         <button class="tab" role="tab" aria-selected="false" data-vista="clientes">Clientes</button>
@@ -598,6 +594,11 @@
 
     <!-- VISTA MES -->
     <section id="v-mes">
+      <div class="field-inline" style="margin-bottom:16px">
+        <label for="sel-mes">Mes</label>
+        <select id="sel-mes" class="control"></select>
+      </div>
+
       <div class="resumen">
         <div class="tile"><div class="k">Clientes al día</div><div class="v" id="t-aldia">—</div><div class="n">todo su mes en verde</div></div>
         <div class="tile"><div class="k">F29 declarados</div><div class="v" id="t-f29">—</div><div class="n">del total con F29</div></div>
