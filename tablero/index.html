@@ -298,6 +298,32 @@
     overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
   }
   .doc-card-date{font-size:11px; color:var(--faint);}
+
+  .vista-toggle{display:flex; gap:4px; background:var(--mist); border-radius:10px; padding:3px;}
+  .vista-btn{
+    width:30px; height:28px; display:flex; align-items:center; justify-content:center;
+    border:none; border-radius:7px; background:transparent; color:var(--faint); cursor:pointer; padding:0;
+  }
+  .vista-btn svg{width:16px; height:16px;}
+  .vista-btn[aria-pressed="true"]{background:var(--surface); color:var(--purple-deep); box-shadow:var(--shadow);}
+  .vista-btn:hover:not([aria-pressed="true"]){color:var(--ink);}
+
+  .doc-toolbar{display:flex; align-items:center; margin:12px 0 14px;}
+
+  .doc-list{display:flex; flex-direction:column; gap:8px;}
+  .doc-list-item{
+    position:relative; display:flex; align-items:center; gap:14px;
+    background:var(--surface); border:1px solid var(--line); border-radius:var(--radius);
+    padding:10px 14px; cursor:pointer; user-select:none;
+    transition:background .15s ease, border-color .15s ease;
+  }
+  .doc-list-item:hover, .doc-list-item:focus-visible{background:var(--mist); border-color:var(--purple-soft); outline:none;}
+  .doc-list-icon{flex:none; width:28px; height:34px;}
+  .doc-list-icon svg{width:100%; height:100%; display:block;}
+  .doc-list-info{flex:1 1 auto; min-width:0;}
+  .doc-list-name{font-size:13.5px; font-weight:600; color:var(--ink); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .doc-list-meta{font-size:11.5px; color:var(--faint); margin-top:2px;}
+  .doc-list-item .doc-card-menu{position:static; flex:none;}
   .rubro-chip{background:var(--mist); color:var(--muted); border:1px solid transparent; border-radius:999px; padding:7px 12px; font-size:12.5px; font-weight:500; width:158px; font-family:inherit;}
   .rubro-chip:hover:not(:disabled){border-color:var(--line);}
   .rubro-chip:focus{background:var(--surface); border-color:var(--purple);}
@@ -630,11 +656,25 @@
         <button class="btn ghost mini" id="btn-doc-volver" style="margin-bottom:14px;">← Todos los clientes</button>
         <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
           <h2 id="doc-espacio-nombre" style="margin:0;">Cliente</h2>
-          <button class="btn mini" id="btn-abrir-carga" style="margin-left:auto;">Cargar documentos</button>
+          <div class="vista-toggle" role="group" aria-label="Vista de documentos" style="margin-left:auto;">
+            <button type="button" class="vista-btn" data-vista-doc="grid" aria-pressed="true" aria-label="Vista de cuadrícula">
+              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2.5" y="2.5" width="6" height="6" rx="1.2"/><rect x="11.5" y="2.5" width="6" height="6" rx="1.2"/><rect x="2.5" y="11.5" width="6" height="6" rx="1.2"/><rect x="11.5" y="11.5" width="6" height="6" rx="1.2"/></svg>
+            </button>
+            <button type="button" class="vista-btn" data-vista-doc="lista" aria-pressed="false" aria-label="Vista de lista">
+              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="2.5" y="3.5" width="4" height="4" rx="1"/><path d="M9.5 5.5h8"/><rect x="2.5" y="8.5" width="4" height="4" rx="1"/><path d="M9.5 10.5h8"/><rect x="2.5" y="13.5" width="4" height="4" rx="1"/><path d="M9.5 15.5h8"/></svg>
+            </button>
+          </div>
+          <button class="btn mini" id="btn-abrir-carga">Cargar documentos</button>
         </div>
         <p class="hint">El cliente ve estos archivos de inmediato en su portal, en jolixasesorias.com/portal.</p>
 
         <h3 class="titulo-lista" style="margin-top:20px;">Archivos de este cliente <span id="doc-conteo" style="color:var(--faint); font-weight:500;"></span></h3>
+        <div class="doc-toolbar">
+          <button type="button" class="btn ghost mini" id="btn-orden-docs" data-orden="desc" style="display:inline-flex; align-items:center; gap:6px;">
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4v12M6 16l-3-3M6 16l3-3"/><path d="M14 16V4M14 4l-3 3M14 4l3 3"/></svg>
+            <span id="orden-docs-label">Más nuevos primero</span>
+          </button>
+        </div>
         <div class="doc-grid" id="lista-documentos"></div>
         <div class="vacio" id="doc-vacio" hidden>
           <h3>Sin documentos todavía</h3>
@@ -833,12 +873,7 @@
 <div class="modal" id="modal-carga-docs" hidden>
   <div class="modal-card modal-ancho">
     <h2>Cargar documentos <span id="cd-cliente-nombre" style="color:var(--purple-deep);"></span></h2>
-    <p class="hint">Arrastra los archivos o selecciónalos. El tablero intenta reconocer el tipo por el nombre — revisa y corrige lo que haga falta antes de finalizar.</p>
-
-    <div class="campo">
-      <label for="cd-periodo">Período (se aplica a todos estos archivos)</label>
-      <select id="cd-periodo" class="control"></select>
-    </div>
+    <p class="hint">Arrastra los archivos o selecciónalos.</p>
 
     <div class="zona-arrastre" id="cd-dropzone" tabindex="0" role="button" aria-label="Arrastrar o seleccionar archivos">
       <p id="cd-dropzone-texto">Arrastra archivos aquí, o</p>
@@ -2034,30 +2069,11 @@
   });
 
   /* ---------------------------------------------------- DOCUMENTOS */
-  var TIPOS_DOC = {
-    f29: "F29 declarado", factura_jolix: "Boleta o factura Jolix",
-    liquidaciones: "Liquidación de sueldo", libro_ventas: "Libro de ventas",
-    excel_varios: "Planilla / Excel", otros: "Otro"
-  };
   var documentos = [];
   var docClienteActivo = null;
   var busquedaDocCli = "";
-
-  function opcionesPeriodo(){
-    var hoy = new Date();
-    var opciones = ['<option value="">Sin mes específico</option>'];
-    for (var i = -1; i <= 30; i++){
-      var d = new Date(hoy.getFullYear(), hoy.getMonth() - i, 1);
-      var ym = d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0");
-      opciones.push('<option value="' + ym + '">' + capital(nombreMes(ym)) + '</option>');
-    }
-    return opciones.join("");
-  }
-
-  function mesActualYM(){
-    var hoy = new Date();
-    return hoy.getFullYear() + "-" + String(hoy.getMonth()+1).padStart(2,"0");
-  }
+  var docVista = localStorage.getItem("jolix_doc_vista") || "grid";
+  var docOrden = localStorage.getItem("jolix_doc_orden") || "desc";
 
   async function cargarDocumentos(){
     var res = await sb.from("documentos").select("*").order("subido_en", { ascending: false }).limit(500);
@@ -2117,6 +2133,36 @@
     renderEspacioDoc();
   }
 
+  function menuDocHtml(d, admin){
+    if (!admin) return "";
+    return '<div class="doc-card-menu">' +
+      '<button class="doc-card-dots" data-doc-menu="' + d.id + '" aria-label="Más opciones" aria-haspopup="true" aria-expanded="false">⋮</button>' +
+      '<div class="doc-card-dropdown" hidden>' +
+        '<button class="doc-card-delete" data-borrar-doc="' + d.id + '">Eliminar</button>' +
+      '</div>' +
+    '</div>';
+  }
+
+  function tarjetaDoc(d, admin){
+    return '<div class="doc-card" data-doc="' + d.id + '" tabindex="0" title="' + escapar(d.nombre_archivo) + '">' +
+      menuDocHtml(d, admin) +
+      '<div class="doc-card-icon">' + iconoDoc(d.nombre_archivo) + '</div>' +
+      '<div class="doc-card-name">' + escapar(d.nombre_archivo) + '</div>' +
+      '<div class="doc-card-date">' + fechaCorta(d.subido_en) + (d.tamano_bytes ? ' · ' + bytesLegibles(d.tamano_bytes) : '') + '</div>' +
+      '</div>';
+  }
+
+  function filaListaDoc(d, admin){
+    return '<div class="doc-list-item" data-doc="' + d.id + '" tabindex="0" title="' + escapar(d.nombre_archivo) + '">' +
+      '<div class="doc-list-icon">' + iconoDoc(d.nombre_archivo) + '</div>' +
+      '<div class="doc-list-info">' +
+        '<div class="doc-list-name">' + escapar(d.nombre_archivo) + '</div>' +
+        '<div class="doc-list-meta">' + fechaCorta(d.subido_en) + (d.tamano_bytes ? ' · ' + bytesLegibles(d.tamano_bytes) : '') + '</div>' +
+      '</div>' +
+      menuDocHtml(d, admin) +
+      '</div>';
+  }
+
   function renderEspacioDoc(){
     var admin = esAdmin();
     $("panel-doc-clientes").hidden = true;
@@ -2127,32 +2173,27 @@
     $("doc-espacio-nombre").textContent = nombreCliente(docClienteActivo);
 
     var lista = documentos.filter(function(d){ return d.cliente_id === docClienteActivo; });
+    lista.sort(function(a, b){
+      var ta = new Date(a.subido_en).getTime();
+      var tb = new Date(b.subido_en).getTime();
+      return docOrden === "asc" ? ta - tb : tb - ta;
+    });
     $("doc-conteo").textContent = lista.length ? "· " + lista.length : "";
     $("doc-vacio").hidden = lista.length > 0;
 
-    $("lista-documentos").innerHTML = lista.map(function(d){
-      return '<div class="doc-card" data-doc="' + d.id + '" tabindex="0" title="' + escapar(d.nombre_archivo) + '">' +
-        (admin ?
-          '<div class="doc-card-menu">' +
-            '<button class="doc-card-dots" data-doc-menu="' + d.id + '" aria-label="Más opciones" aria-haspopup="true" aria-expanded="false">⋮</button>' +
-            '<div class="doc-card-dropdown" hidden>' +
-              '<button class="doc-card-delete" data-borrar-doc="' + d.id + '">Eliminar</button>' +
-            '</div>' +
-          '</div>'
-        : '') +
-        '<div class="doc-card-icon">' + iconoDoc(d.nombre_archivo) + '</div>' +
-        '<div class="doc-card-name">' + escapar(d.nombre_archivo) + '</div>' +
-        '<div class="doc-card-date">' + fechaCorta(d.subido_en) + (d.tamano_bytes ? ' · ' + bytesLegibles(d.tamano_bytes) : '') + '</div>' +
-        '</div>';
+    var cont = $("lista-documentos");
+    cont.className = docVista === "lista" ? "doc-list" : "doc-grid";
+    cont.innerHTML = lista.map(function(d){
+      return docVista === "lista" ? filaListaDoc(d, admin) : tarjetaDoc(d, admin);
     }).join("");
 
-    $("lista-documentos").querySelectorAll("[data-doc]").forEach(function(card){
+    cont.querySelectorAll("[data-doc]").forEach(function(card){
       card.addEventListener("dblclick", function(){ abrirVisorDoc(card.dataset.doc); });
       card.addEventListener("keydown", function(e){ if (e.key === "Enter") abrirVisorDoc(card.dataset.doc); });
     });
 
     if (!admin) return;
-    $("lista-documentos").querySelectorAll("[data-doc-menu]").forEach(function(btn){
+    cont.querySelectorAll("[data-doc-menu]").forEach(function(btn){
       btn.addEventListener("click", function(e){
         e.stopPropagation();
         var yaAbierto = btn.getAttribute("aria-expanded") === "true";
@@ -2186,6 +2227,31 @@
     document.querySelectorAll(".doc-card-dots").forEach(function(b){ b.setAttribute("aria-expanded", "false"); });
   }
   document.addEventListener("click", cerrarMenusDoc);
+
+  document.querySelectorAll("[data-vista-doc]").forEach(function(btn){
+    btn.setAttribute("aria-pressed", String(btn.dataset.vistaDoc === docVista));
+    btn.addEventListener("click", function(){
+      docVista = btn.dataset.vistaDoc;
+      localStorage.setItem("jolix_doc_vista", docVista);
+      document.querySelectorAll("[data-vista-doc]").forEach(function(b){
+        b.setAttribute("aria-pressed", String(b === btn));
+      });
+      renderEspacioDoc();
+    });
+  });
+
+  (function(){
+    var b = $("btn-orden-docs");
+    b.dataset.orden = docOrden;
+    $("orden-docs-label").textContent = docOrden === "desc" ? "Más nuevos primero" : "Más antiguos primero";
+    b.addEventListener("click", function(){
+      docOrden = docOrden === "desc" ? "asc" : "desc";
+      localStorage.setItem("jolix_doc_orden", docOrden);
+      b.dataset.orden = docOrden;
+      $("orden-docs-label").textContent = docOrden === "desc" ? "Más nuevos primero" : "Más antiguos primero";
+      renderEspacioDoc();
+    });
+  })();
 
   var TIPO_ARCHIVO_COLOR = {
     pdf: "#E5484D",
@@ -2230,28 +2296,9 @@
   var cargaDocsArchivos = [];
   var cargaDocsIdSeq = 0;
 
-  function detectarTipoDoc(nombreArchivo){
-    var n = nombreArchivo.toLowerCase();
-    if (/f-?29|formulario\s?29/.test(n)) return "f29";
-    if (/liquidaci[oó]n|sueldo|remuneraci/.test(n)) return "liquidaciones";
-    if (/libro.*venta|venta.*libro/.test(n)) return "libro_ventas";
-    if (/factura|boleta|honorario/.test(n)) return "factura_jolix";
-    if (/planilla|\.xlsx?$|\.csv$/.test(n)) return "excel_varios";
-    return "otros";
-  }
-
-  function opcionesTipoDoc(seleccionado){
-    return Object.keys(TIPOS_DOC).map(function(k){
-      return '<option value="' + k + '"' + (k === seleccionado ? " selected" : "") + '>' + escapar(TIPOS_DOC[k]) + '</option>';
-    }).join("");
-  }
-
   function abrirModalCarga(){
     if (!docClienteActivo) return;
     $("cd-cliente-nombre").textContent = "— " + nombreCliente(docClienteActivo);
-    var selP = $("cd-periodo");
-    selP.innerHTML = opcionesPeriodo();
-    selP.value = mesActualYM();
     cargaDocsArchivos = [];
     renderListaCarga();
     $("modal-carga-docs").hidden = false;
@@ -2265,7 +2312,7 @@
 
   function agregarArchivosCarga(fileList){
     Array.prototype.forEach.call(fileList, function(file){
-      cargaDocsArchivos.push({ id: ++cargaDocsIdSeq, file: file, tipo: detectarTipoDoc(file.name) });
+      cargaDocsArchivos.push({ id: ++cargaDocsIdSeq, file: file });
     });
     renderListaCarga();
   }
@@ -2275,17 +2322,10 @@
     cont.innerHTML = cargaDocsArchivos.map(function(f){
       return '<div class="cd-fila" data-carga-id="' + f.id + '">' +
         '<span class="nom" title="' + escapar(f.file.name) + '">' + escapar(f.file.name) + '</span>' +
-        '<select class="control" data-carga-tipo="' + f.id + '">' + opcionesTipoDoc(f.tipo) + '</select>' +
         '<button type="button" class="quitar" data-carga-quitar="' + f.id + '" aria-label="Quitar archivo">×</button>' +
         '</div>';
     }).join("");
 
-    cont.querySelectorAll("[data-carga-tipo]").forEach(function(sel){
-      sel.addEventListener("change", function(){
-        var item = cargaDocsArchivos.filter(function(f){ return f.id === Number(sel.dataset.cargaTipo); })[0];
-        if (item) item.tipo = sel.value;
-      });
-    });
     cont.querySelectorAll("[data-carga-quitar]").forEach(function(b){
       b.addEventListener("click", function(){
         cargaDocsArchivos = cargaDocsArchivos.filter(function(f){ return f.id !== Number(b.dataset.cargaQuitar); });
@@ -2335,7 +2375,6 @@
     var items = cargaDocsArchivos.slice();
     if (!cliente || !items.length) return;
 
-    var periodo = $("cd-periodo").value || null;
     var btn = $("btn-finalizar-carga");
     btn.disabled = true;
     $("btn-cancelar-carga").disabled = true;
@@ -2351,7 +2390,7 @@
       if (subida.error){ errores.push(item.file.name); continue; }
 
       var res = await sb.from("documentos").insert({
-        cliente_id: cliente, tipo: item.tipo, periodo: periodo,
+        cliente_id: cliente, tipo: "otros", periodo: null,
         nombre_archivo: item.file.name, ruta_storage: ruta, tamano_bytes: item.file.size
       });
       if (res.error) errores.push(item.file.name);
@@ -2388,8 +2427,8 @@
     if (!d) return;
 
     if (visorBlobUrl){ URL.revokeObjectURL(visorBlobUrl); visorBlobUrl = null; }
-    $("visor-titulo").textContent = TIPOS_DOC[d.tipo] || d.tipo;
-    $("visor-meta").textContent = d.nombre_archivo + (d.periodo ? " · " + capital(nombreMes(d.periodo)) : "");
+    $("visor-titulo").textContent = d.nombre_archivo;
+    $("visor-meta").textContent = fechaCorta(d.subido_en) + (d.tamano_bytes ? " · " + bytesLegibles(d.tamano_bytes) : "") + (d.periodo ? " · " + capital(nombreMes(d.periodo)) : "");
     $("visor-cuerpo").innerHTML = '<p class="visor-mensaje">Cargando vista previa…</p>';
     $("btn-descargar-visor").disabled = true;
     $("modal-visor-doc").hidden = false;
