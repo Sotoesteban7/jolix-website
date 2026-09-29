@@ -17,7 +17,9 @@
     --ink:#1B1730; --paper:#FBFAFE; --surface:#FFFFFF;
     --mist:#EFEAFB; --line:#DED5F5; --muted:#5B5670; --faint:#8B84A3;
     --ok:#12855C; --ok-bg:#E1F4EB;
+    --info:#2E6ADF; --info-bg:#E8F0FE; --info-line:#B9D2FB;
     --shadow:0 18px 40px -26px rgba(59,25,148,.4);
+    --radius:14px;
   }
   @media (prefers-color-scheme: dark){
     :root:not([data-theme="light"]){
@@ -26,6 +28,7 @@
       --ink:#F3F1FA; --paper:#15111F; --surface:#1E1930;
       --mist:#241C38; --line:#3A2E58; --muted:#B4AAC9; --faint:#8F86A8;
       --ok:#5FD9A6; --ok-bg:#14342A;
+      --info:#7EA6FF; --info-bg:#1A2A4A; --info-line:#3A5488;
       --shadow:0 18px 40px -26px rgba(0,0,0,.7);
     }
   }
@@ -35,6 +38,7 @@
     --ink:#F3F1FA; --paper:#15111F; --surface:#1E1930;
     --mist:#241C38; --line:#3A2E58; --muted:#B4AAC9; --faint:#8F86A8;
     --ok:#5FD9A6; --ok-bg:#14342A;
+    --info:#7EA6FF; --info-bg:#1A2A4A; --info-line:#3A5488;
     --shadow:0 18px 40px -26px rgba(0,0,0,.7);
   }
   *{box-sizing:border-box;}
@@ -87,22 +91,50 @@
   .encabezado h1{font-size:22px;}
   .encabezado p{margin-top:6px;color:var(--muted);font-size:14.5px;}
 
-  .filtros{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px;}
-  .chip-filtro{background:var(--mist);border:1px solid transparent;color:var(--muted);border-radius:999px;padding:8px 15px;font-size:13px;font-weight:600;font-family:'Poppins',sans-serif;}
-  .chip-filtro[aria-pressed="true"]{background:var(--purple);color:#fff;}
+  .doc-toolbar-top{display:flex;align-items:center;gap:14px;margin-bottom:20px;}
+  .vista-toggle{display:flex;gap:4px;background:var(--mist);border-radius:10px;padding:3px;}
+  .vista-btn{width:32px;height:30px;display:flex;align-items:center;justify-content:center;border:none;border-radius:7px;background:transparent;color:var(--faint);cursor:pointer;padding:0;}
+  .vista-btn svg{width:16px;height:16px;}
+  .vista-btn[aria-pressed="true"]{background:var(--surface);color:var(--purple-deep);box-shadow:var(--shadow);}
+  .vista-btn:hover:not([aria-pressed="true"]){color:var(--ink);}
+  .btn-icono-info{width:34px;height:34px;flex:none;display:flex;align-items:center;justify-content:center;border:1px solid var(--info-line);border-radius:8px;background:transparent;color:var(--info);cursor:pointer;padding:0;}
+  .btn-icono-info svg{width:17px;height:17px;}
+  .btn-icono-info:hover{background:var(--info-bg);}
+  .btn-icono-info[hidden]{display:none;}
 
-  .lista{display:flex;flex-direction:column;gap:10px;}
-  .doc{display:flex;align-items:center;gap:14px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 16px;}
-  .doc .icono{flex:none;width:40px;height:40px;border-radius:11px;background:var(--mist);display:flex;align-items:center;justify-content:center;color:var(--purple);}
-  .doc .cuerpo{flex:1;min-width:0;}
-  .doc .tipo{font-family:'Poppins',sans-serif;font-weight:600;font-size:14px;}
-  .doc .meta{font-size:12.5px;color:var(--faint);margin-top:2px;}
-  .doc .acciones{flex:none;display:flex;gap:8px;}
-  .btn-ver{background:transparent;color:var(--purple-deep);border:1px solid var(--line);border-radius:10px;padding:9px 16px;font-family:'Poppins',sans-serif;font-weight:600;font-size:13px;}
-  .btn-ver:hover{background:var(--mist);}
-  .btn-descargar{background:var(--mist);color:var(--purple-deep);border:none;border-radius:10px;padding:9px 16px;font-family:'Poppins',sans-serif;font-weight:600;font-size:13px;display:flex;align-items:center;gap:7px;}
-  .btn-descargar:hover{background:var(--purple);color:#fff;}
-  .btn-descargar:disabled{opacity:.6;cursor:default;}
+  .doc-grid{display:grid;grid-template-columns:repeat(5, minmax(0,1fr));gap:14px;}
+  @media (max-width:900px){ .doc-grid{grid-template-columns:repeat(4, minmax(0,1fr));} }
+  @media (max-width:680px){ .doc-grid{grid-template-columns:repeat(3, minmax(0,1fr));} }
+  @media (max-width:460px){ .doc-grid{grid-template-columns:repeat(2, minmax(0,1fr));} }
+  .doc-card{
+    position:relative;display:flex;flex-direction:column;align-items:center;gap:8px;
+    background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+    padding:18px 10px 14px;cursor:pointer;user-select:none;
+    transition:background .15s ease, border-color .15s ease;
+  }
+  .doc-card:hover, .doc-card:focus-visible{background:var(--mist);border-color:var(--purple-soft);outline:none;}
+  .doc-card-check{position:absolute;top:6px;left:6px;z-index:2;}
+  .doc-card-check input{display:block;width:16px;height:16px;margin:0;cursor:pointer;accent-color:var(--purple);}
+  .doc-card-icon{width:40px;height:50px;margin-top:2px;}
+  .doc-card-icon svg{width:100%;height:100%;display:block;}
+  .doc-card-name{width:100%;text-align:center;font-size:12.5px;font-weight:600;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .doc-card-date{font-size:11px;color:var(--faint);}
+
+  .doc-list{display:flex;flex-direction:column;gap:8px;}
+  .doc-list-item{
+    position:relative;display:flex;align-items:center;gap:14px;
+    background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+    padding:10px 14px;cursor:pointer;user-select:none;
+    transition:background .15s ease, border-color .15s ease;
+  }
+  .doc-list-item:hover, .doc-list-item:focus-visible{background:var(--mist);border-color:var(--purple-soft);outline:none;}
+  .doc-list-check{flex:none;display:flex;align-items:center;}
+  .doc-list-check input{display:block;width:16px;height:16px;margin:0;cursor:pointer;accent-color:var(--purple);}
+  .doc-list-icon{flex:none;width:28px;height:34px;}
+  .doc-list-icon svg{width:100%;height:100%;display:block;}
+  .doc-list-info{flex:1 1 auto;min-width:0;}
+  .doc-list-name{font-size:13.5px;font-weight:600;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .doc-list-meta{font-size:11.5px;color:var(--faint);margin-top:2px;}
 
   .vacio{text-align:center;padding:52px 24px;background:var(--surface);border:1px dashed var(--line);border-radius:18px;}
   .vacio h3{font-size:16px;margin-bottom:6px;}
@@ -176,10 +208,21 @@
       <p>Aquí encuentras los documentos que Jolix ha compartido contigo. Puedes verlos y descargarlos cuando quieras.</p>
     </div>
 
-    <div class="filtros" id="filtros"></div>
-    <div class="filtros" id="filtros-periodo" style="margin-top:-10px;"></div>
+    <div class="doc-toolbar-top">
+      <div class="vista-toggle" role="group" aria-label="Vista de documentos">
+        <button type="button" class="vista-btn" data-vista-doc="grid" aria-pressed="true" aria-label="Vista de cuadrícula">
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2.5" y="2.5" width="6" height="6" rx="1.2"/><rect x="11.5" y="2.5" width="6" height="6" rx="1.2"/><rect x="2.5" y="11.5" width="6" height="6" rx="1.2"/><rect x="11.5" y="11.5" width="6" height="6" rx="1.2"/></svg>
+        </button>
+        <button type="button" class="vista-btn" data-vista-doc="lista" aria-pressed="false" aria-label="Vista de lista">
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="2.5" y="3.5" width="4" height="4" rx="1"/><path d="M9.5 5.5h8"/><rect x="2.5" y="8.5" width="4" height="4" rx="1"/><path d="M9.5 10.5h8"/><rect x="2.5" y="13.5" width="4" height="4" rx="1"/><path d="M9.5 15.5h8"/></svg>
+        </button>
+      </div>
+      <button type="button" class="btn-icono-info" id="btn-descargar-seleccion" hidden aria-label="Descargar seleccionados">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5v12"/><path d="m7 11 5 5 5-5"/><path d="M4.5 18.5v1a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2v-1"/></svg>
+      </button>
+    </div>
     <div id="cargando-docs" class="cargando">Cargando tus documentos…</div>
-    <div class="lista" id="lista-docs" hidden></div>
+    <div class="doc-grid" id="lista-docs" hidden></div>
     <div class="vacio" id="docs-vacio" hidden>
       <h3>Aún no hay documentos aquí</h3>
       <p>Cuando tengamos algo listo para ti (tu F29, una boleta, lo que sea), va a aparecer en esta lista.</p>
@@ -203,6 +246,7 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
 <script>
 (function(){
   "use strict";
@@ -216,34 +260,30 @@
   });
   var $ = function(id){ return document.getElementById(id); };
 
-  var TIPOS = {
-    f29:            { label: "F29 declarado",         icono: "doc" },
-    factura_jolix:  { label: "Boleta o factura Jolix", icono: "recibo" },
-    liquidaciones:  { label: "Liquidación de sueldo",  icono: "doc" },
-    libro_ventas:   { label: "Libro de ventas",        icono: "hoja" },
-    excel_varios:   { label: "Planilla",               icono: "hoja" },
-    otros:          { label: "Otro documento",         icono: "doc" }
+  var TIPO_ARCHIVO_COLOR = {
+    pdf: "#E5484D",
+    doc: "#2B579A", docx: "#2B579A",
+    xls: "#1B8354", xlsx: "#1B8354", csv: "#1B8354",
+    ppt: "#D35230", pptx: "#D35230",
+    jpg: "#8253F3", jpeg: "#8253F3", png: "#8253F3", gif: "#8253F3", webp: "#8253F3",
+    zip: "#6B7280", rar: "#6B7280"
   };
-
-  var ICONOS = {
-    doc:   '<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M7 3.5h7l4 4v13h-11v-17Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M14 3.5v4h4" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>',
-    hoja:  '<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M7 3.5h7l4 4v13h-11v-17Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M9 13h6M9 16.5h6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>',
-    recibo:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M6 3.5h12v17l-2.5-1.6-2.5 1.6-2.5-1.6-2.5 1.6-2-1.6V3.5Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M9 8h6M9 11.5h6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>'
-  };
-
-  var MESES = ["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
-
-  function nombrePeriodo(p){
-    var m = String(p || "").match(/^(\d{4})-(\d{2})$/);
-    if (!m) return p || "";
-    var mes = MESES[parseInt(m[2],10) - 1];
-    if (!mes) return p;
-    return mes.charAt(0).toUpperCase() + mes.slice(1) + " " + m[1];
+  function iconoDoc(nombreArchivo){
+    var nombre = String(nombreArchivo || "");
+    var tieneExt = nombre.indexOf(".") > 0 && nombre.length - nombre.lastIndexOf(".") <= 6;
+    var ext = tieneExt ? nombre.split(".").pop().toLowerCase() : "";
+    var color = TIPO_ARCHIVO_COLOR[ext] || "#6B7280";
+    var etiqueta = ext ? ext.toUpperCase().slice(0, 4) : "DOC";
+    return '<svg viewBox="0 0 32 40" fill="none" xmlns="http://www.w3.org/2000/svg">' +
+      '<path d="M4 2h14l8 8v26a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2Z" fill="' + color + '"/>' +
+      '<path d="M18 2v6a2 2 0 0 0 2 2h6" fill="#fff" fill-opacity=".35"/>' +
+      '<text x="16" y="30" text-anchor="middle" font-family="Poppins, sans-serif" font-weight="700" font-size="8" fill="#fff">' + escapar(etiqueta) + '</text>' +
+      '</svg>';
   }
 
   var documentos = [];
-  var filtroTipo = "";
-  var filtroPeriodo = null; // null = todos los meses; "" = sin mes asignado; "YYYY-MM" = ese mes
+  var docVista = localStorage.getItem("jolix_portal_vista") || "grid";
+  var docSeleccion = new Set();
 
   function mostrarError(msg){
     var el = $("login-error");
@@ -310,85 +350,72 @@
       return;
     }
     documentos = res.data || [];
-    renderFiltros();
     renderLista();
   }
 
-  function renderFiltros(){
-    var tiposPresentes = [];
-    documentos.forEach(function(d){ if (tiposPresentes.indexOf(d.tipo) === -1) tiposPresentes.push(d.tipo); });
-    if (tiposPresentes.length < 2){
-      $("filtros").hidden = true;
-    } else {
-      var html = '<button class="chip-filtro" data-tipo="" aria-pressed="' + (filtroTipo === "") + '">Todos</button>';
-      tiposPresentes.forEach(function(t){
-        var info = TIPOS[t] || { label: t };
-        html += '<button class="chip-filtro" data-tipo="' + t + '" aria-pressed="' + (filtroTipo === t) + '">' + escapar(info.label) + '</button>';
-      });
-      $("filtros").hidden = false;
-      $("filtros").innerHTML = html;
-      $("filtros").querySelectorAll(".chip-filtro").forEach(function(b){
-        b.addEventListener("click", function(){
-          filtroTipo = b.dataset.tipo;
-          renderFiltros();
-          renderLista();
-        });
-      });
-    }
+  function checkDocHtml(d, clase){
+    var marcado = docSeleccion.has(d.id) ? " checked" : "";
+    return '<div class="' + clase + '"><input type="checkbox" data-doc-check="' + d.id + '" aria-label="Seleccionar archivo"' + marcado + '></div>';
+  }
 
-    var periodosPresentes = [];
-    documentos.forEach(function(d){
-      var p = d.periodo || "";
-      if (periodosPresentes.indexOf(p) === -1) periodosPresentes.push(p);
-    });
-    if (periodosPresentes.length < 2){
-      $("filtros-periodo").hidden = true;
-    } else {
-      periodosPresentes.sort(function(a,b){ return b.localeCompare(a); });
-      var html2 = '<button class="chip-filtro" data-periodo="__todos__" aria-pressed="' + (filtroPeriodo === null) + '">Todos los meses</button>';
-      periodosPresentes.forEach(function(p){
-        var etiqueta = p ? nombrePeriodo(p) : "Sin mes asignado";
-        html2 += '<button class="chip-filtro" data-periodo="' + escapar(p) + '" aria-pressed="' + (filtroPeriodo === p) + '">' + escapar(etiqueta) + '</button>';
-      });
-      $("filtros-periodo").hidden = false;
-      $("filtros-periodo").innerHTML = html2;
-      $("filtros-periodo").querySelectorAll(".chip-filtro").forEach(function(b){
-        b.addEventListener("click", function(){
-          filtroPeriodo = b.dataset.periodo === "__todos__" ? null : b.dataset.periodo;
-          renderFiltros();
-          renderLista();
-        });
-      });
-    }
+  function tarjetaDoc(d){
+    return '<div class="doc-card" data-doc="' + d.id + '" tabindex="0" title="' + escapar(d.nombre_archivo) + '">' +
+      checkDocHtml(d, "doc-card-check") +
+      '<div class="doc-card-icon">' + iconoDoc(d.nombre_archivo) + '</div>' +
+      '<div class="doc-card-name">' + escapar(d.nombre_archivo) + '</div>' +
+      '<div class="doc-card-date">' + fechaCorta(d.subido_en) + (d.tamano_bytes ? ' · ' + bytesLegibles(d.tamano_bytes) : '') + '</div>' +
+      '</div>';
+  }
+
+  function filaListaDoc(d){
+    return '<div class="doc-list-item" data-doc="' + d.id + '" tabindex="0" title="' + escapar(d.nombre_archivo) + '">' +
+      checkDocHtml(d, "doc-list-check") +
+      '<div class="doc-list-icon">' + iconoDoc(d.nombre_archivo) + '</div>' +
+      '<div class="doc-list-info">' +
+        '<div class="doc-list-name">' + escapar(d.nombre_archivo) + '</div>' +
+        '<div class="doc-list-meta">' + fechaCorta(d.subido_en) + (d.tamano_bytes ? ' · ' + bytesLegibles(d.tamano_bytes) : '') + '</div>' +
+      '</div>' +
+      '</div>';
+  }
+
+  function actualizarBarraSeleccionDoc(){
+    $("btn-descargar-seleccion").hidden = docSeleccion.size === 0;
   }
 
   function renderLista(){
     var lista = documentos;
-    if (filtroTipo) lista = lista.filter(function(d){ return d.tipo === filtroTipo; });
-    if (filtroPeriodo !== null) lista = lista.filter(function(d){ return (d.periodo || "") === filtroPeriodo; });
     $("lista-docs").hidden = lista.length === 0;
     $("docs-vacio").hidden = lista.length !== 0;
 
-    $("lista-docs").innerHTML = lista.map(function(d){
-      var info = TIPOS[d.tipo] || { label: d.tipo, icono: "doc" };
-      var meta = fechaCorta(d.subido_en) + (d.periodo ? " · " + escapar(nombrePeriodo(d.periodo)) : "") + (d.tamano_bytes ? " · " + bytesLegibles(d.tamano_bytes) : "");
-      return '<div class="doc" data-id="' + d.id + '">' +
-        '<span class="icono">' + (ICONOS[info.icono] || ICONOS.doc) + '</span>' +
-        '<div class="cuerpo"><div class="tipo">' + escapar(info.label) + '</div>' +
-        '<div class="meta">' + escapar(d.nombre_archivo) + ' · ' + meta + '</div></div>' +
-        '<div class="acciones">' +
-        '<button class="btn-ver" data-ver="' + d.id + '">Ver</button>' +
-        '<button class="btn-descargar" data-descargar="' + d.id + '">Descargar</button>' +
-        '</div></div>';
+    var cont = $("lista-docs");
+    cont.className = docVista === "lista" ? "doc-list" : "doc-grid";
+    cont.innerHTML = lista.map(function(d){
+      return docVista === "lista" ? filaListaDoc(d) : tarjetaDoc(d);
     }).join("");
 
-    $("lista-docs").querySelectorAll("[data-descargar]").forEach(function(b){
-      b.addEventListener("click", function(){ descargar(b.dataset.descargar, b); });
+    cont.querySelectorAll("[data-doc]").forEach(function(card){
+      card.addEventListener("dblclick", function(){ verDocumento(card.dataset.doc); });
+      card.addEventListener("keydown", function(e){ if (e.key === "Enter") verDocumento(card.dataset.doc); });
     });
-    $("lista-docs").querySelectorAll("[data-ver]").forEach(function(b){
-      b.addEventListener("click", function(){ verDocumento(b.dataset.ver); });
+    cont.querySelectorAll("[data-doc-check]").forEach(function(chk){
+      chk.addEventListener("click", function(e){ e.stopPropagation(); });
+      chk.addEventListener("change", function(){
+        if (chk.checked) docSeleccion.add(chk.dataset.docCheck); else docSeleccion.delete(chk.dataset.docCheck);
+        actualizarBarraSeleccionDoc();
+      });
     });
+    actualizarBarraSeleccionDoc();
   }
+
+  document.querySelectorAll("[data-vista-doc]").forEach(function(btn){
+    btn.setAttribute("aria-pressed", String(btn.dataset.vistaDoc === docVista));
+    btn.addEventListener("click", function(){
+      docVista = btn.dataset.vistaDoc;
+      localStorage.setItem("jolix_portal_vista", docVista);
+      document.querySelectorAll("[data-vista-doc]").forEach(function(b){ b.setAttribute("aria-pressed", String(b === btn)); });
+      renderLista();
+    });
+  });
 
   async function descargarBlob(doc){
     var res = await sb.storage.from(BUCKET).download(doc.ruta_storage);
@@ -396,27 +423,67 @@
     return res.data;
   }
 
-  async function descargar(id, boton){
-    var doc = documentos.filter(function(d){ return d.id === id; })[0];
-    if (!doc) return;
-    var textoOriginal = boton.textContent;
-    boton.disabled = true;
-    boton.textContent = "Descargando…";
-
-    var blob = await descargarBlob(doc);
-    boton.disabled = false;
-    boton.textContent = textoOriginal;
-
-    if (!blob){
-      alert("No se pudo descargar el archivo. Inténtalo de nuevo.");
-      return;
-    }
+  function descargarBlobComoArchivo(blob, nombreArchivo){
     var url = URL.createObjectURL(blob);
     var a = document.createElement("a");
-    a.href = url; a.download = doc.nombre_archivo;
+    a.href = url; a.download = nombreArchivo;
     document.body.appendChild(a); a.click(); a.remove();
     setTimeout(function(){ URL.revokeObjectURL(url); }, 4000);
   }
+
+  $("btn-descargar-seleccion").addEventListener("click", async function(){
+    var ids = Array.from(docSeleccion);
+    if (!ids.length) return;
+    var items = documentos.filter(function(d){ return ids.indexOf(d.id) !== -1; });
+    var btn = this;
+    btn.disabled = true;
+
+    try {
+      if (items.length === 1){
+        var blob = await descargarBlob(items[0]);
+        if (!blob){ alert("No se pudo descargar el archivo. Inténtalo de nuevo."); return; }
+        descargarBlobComoArchivo(blob, items[0].nombre_archivo);
+        return;
+      }
+
+      if (typeof JSZip === "undefined"){
+        alert("No se pudo cargar el generador de ZIP. Intenta recargar la página.");
+        return;
+      }
+
+      var zip = new JSZip();
+      var contador = {};
+      var errores = [];
+      for (var i = 0; i < items.length; i++){
+        var d = items[i];
+        var blobItem = await descargarBlob(d);
+        if (!blobItem){ errores.push(d.nombre_archivo); continue; }
+
+        var nombre = d.nombre_archivo;
+        if (contador[nombre] == null){
+          contador[nombre] = 0;
+        } else {
+          contador[nombre]++;
+          var punto = nombre.lastIndexOf(".");
+          nombre = punto > 0
+            ? nombre.slice(0, punto) + " (" + contador[nombre] + ")" + nombre.slice(punto)
+            : nombre + " (" + contador[nombre] + ")";
+        }
+        zip.file(nombre, blobItem);
+      }
+
+      if (!Object.keys(zip.files).length){
+        alert("No se pudo descargar ningún archivo.");
+        return;
+      }
+
+      var contenido = await zip.generateAsync({ type: "blob" });
+      descargarBlobComoArchivo(contenido, "mis_documentos_jolix.zip");
+      if (errores.length) alert("No se pudieron incluir: " + errores.join(", "));
+    } finally {
+      btn.disabled = false;
+    }
+  });
 
   /* ---------------- visor de documentos ---------------- */
   var visorBlobUrl = null;
@@ -431,11 +498,10 @@
   async function verDocumento(id){
     var doc = documentos.filter(function(d){ return d.id === id; })[0];
     if (!doc) return;
-    var info = TIPOS[doc.tipo] || { label: doc.tipo };
 
     if (visorBlobUrl){ URL.revokeObjectURL(visorBlobUrl); visorBlobUrl = null; }
-    $("visor-titulo").textContent = info.label;
-    $("visor-meta").textContent = doc.nombre_archivo + (doc.periodo ? " · " + nombrePeriodo(doc.periodo) : "");
+    $("visor-titulo").textContent = doc.nombre_archivo;
+    $("visor-meta").textContent = fechaCorta(doc.subido_en) + (doc.tamano_bytes ? " · " + bytesLegibles(doc.tamano_bytes) : "");
     $("visor-cuerpo").innerHTML = '<p class="visor-mensaje">Cargando vista previa…</p>';
     $("btn-descargar-visor").disabled = true;
     $("modal-visor-doc").hidden = false;
