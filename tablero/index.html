@@ -18,6 +18,7 @@
     --mist:#EFEAFB; --line:#DED5F5; --muted:#5B5670; --faint:#8B84A3;
     --ok:#12855C; --ok-bg:#E1F4EB; --ok-line:#A9DFC7;
     --pend:#C4413D; --pend-bg:#FBE7E6; --pend-line:#F0BFBD;
+    --info:#2E6ADF; --info-bg:#E8F0FE; --info-line:#B9D2FB;
     --shadow:0 18px 40px -26px rgba(59,25,148,.4);
     --radius:14px;
   }
@@ -29,6 +30,7 @@
       --mist:#241C38; --line:#3A2E58; --muted:#B4AAC9; --faint:#8F86A8;
       --ok:#5FD9A6; --ok-bg:#14342A; --ok-line:#2C6A52;
       --pend:#FF9490; --pend-bg:#381E1E; --pend-line:#7A3F3C;
+      --info:#7EA6FF; --info-bg:#1A2A4A; --info-line:#3A5488;
       --shadow:0 18px 40px -26px rgba(0,0,0,.7);
     }
   }
@@ -39,6 +41,7 @@
     --mist:#241C38; --line:#3A2E58; --muted:#B4AAC9; --faint:#8F86A8;
     --ok:#5FD9A6; --ok-bg:#14342A; --ok-line:#2C6A52;
     --pend:#FF9490; --pend-bg:#381E1E; --pend-line:#7A3F3C;
+    --info:#7EA6FF; --info-bg:#1A2A4A; --info-line:#3A5488;
     --shadow:0 18px 40px -26px rgba(0,0,0,.7);
   }
 
@@ -312,13 +315,16 @@
 
   .doc-toolbar{display:flex; align-items:center; gap:10px; margin:12px 0 14px;}
   .doc-toolbar svg{width:14px; height:14px; flex:none;}
-  .btn-icono-peligro{
+  .btn-icono-peligro, .btn-icono-info{
     width:32px; height:32px; flex:none; display:flex; align-items:center; justify-content:center;
-    border:1px solid var(--pend-line); border-radius:8px; background:transparent; color:var(--pend); cursor:pointer; padding:0;
+    border-radius:8px; background:transparent; cursor:pointer; padding:0;
   }
-  .btn-icono-peligro[hidden]{display:none;}
-  .btn-icono-peligro svg{width:16px; height:16px;}
+  .btn-icono-peligro{border:1px solid var(--pend-line); color:var(--pend);}
   .btn-icono-peligro:hover{background:var(--pend-bg);}
+  .btn-icono-info{border:1px solid var(--info-line); color:var(--info);}
+  .btn-icono-info:hover{background:var(--info-bg);}
+  .btn-icono-peligro[hidden], .btn-icono-info[hidden]{display:none;}
+  .btn-icono-peligro svg, .btn-icono-info svg{width:16px; height:16px;}
 
   .doc-list{display:flex; flex-direction:column; gap:8px;}
   .doc-list-item{
@@ -682,6 +688,9 @@
 
         <h3 class="titulo-lista" style="margin-top:20px;">Archivos de este cliente <span id="doc-conteo" style="color:var(--faint); font-weight:500;"></span></h3>
         <div class="doc-toolbar">
+          <button type="button" class="btn-icono-info" id="btn-descargar-seleccion" hidden aria-label="Descargar seleccionados">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5v12"/><path d="m7 11 5 5 5-5"/><path d="M4.5 18.5v1a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2v-1"/></svg>
+          </button>
           <button type="button" class="btn-icono-peligro" id="btn-eliminar-seleccion" hidden aria-label="Eliminar seleccionados">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M9 7V4.5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1V7"/><path d="M6 7l1 12.5a2 2 0 0 0 2 1.8h6a2 2 0 0 0 2-1.8L18 7"/><path d="M10 11v6M14 11v6"/></svg>
           </button>
@@ -921,6 +930,7 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
 <script>
 (function(){
   "use strict";
@@ -2189,7 +2199,9 @@
   }
 
   function actualizarBarraSeleccionDoc(){
-    $("btn-eliminar-seleccion").hidden = docSeleccion.size === 0;
+    var n = docSeleccion.size;
+    $("btn-eliminar-seleccion").hidden = n === 0;
+    $("btn-descargar-seleccion").hidden = n === 0;
   }
 
   function renderEspacioDoc(){
@@ -2317,6 +2329,72 @@
     docClienteActivo = null;
     docSeleccion.clear();
     renderDocumentos();
+  });
+
+  function descargarBlob(blob, nombreArchivo){
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    a.href = url;
+    a.download = nombreArchivo;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 4000);
+  }
+
+  $("btn-descargar-seleccion").addEventListener("click", async function(){
+    var ids = Array.from(docSeleccion);
+    if (!ids.length) return;
+    var items = documentos.filter(function(d){ return ids.indexOf(d.id) !== -1; });
+    var btn = this;
+    btn.disabled = true;
+
+    try {
+      if (items.length === 1){
+        var res = await sb.storage.from("documentos-clientes").download(items[0].ruta_storage);
+        if (res.error || !res.data){ mostrarAviso("No se pudo descargar el archivo."); return; }
+        descargarBlob(res.data, items[0].nombre_archivo);
+        return;
+      }
+
+      if (typeof JSZip === "undefined"){
+        mostrarAviso("No se pudo cargar el generador de ZIP. Intenta recargar la página.");
+        return;
+      }
+
+      var zip = new JSZip();
+      var contador = {};
+      var errores = [];
+      for (var i = 0; i < items.length; i++){
+        var d = items[i];
+        var descarga = await sb.storage.from("documentos-clientes").download(d.ruta_storage);
+        if (descarga.error || !descarga.data){ errores.push(d.nombre_archivo); continue; }
+
+        var nombre = d.nombre_archivo;
+        if (contador[nombre] == null){
+          contador[nombre] = 0;
+        } else {
+          contador[nombre]++;
+          var punto = nombre.lastIndexOf(".");
+          nombre = punto > 0
+            ? nombre.slice(0, punto) + " (" + contador[nombre] + ")" + nombre.slice(punto)
+            : nombre + " (" + contador[nombre] + ")";
+        }
+        zip.file(nombre, descarga.data);
+      }
+
+      if (!Object.keys(zip.files).length){
+        mostrarAviso("No se pudo descargar ningún archivo.");
+        return;
+      }
+
+      var contenido = await zip.generateAsync({ type: "blob" });
+      var nombreZip = "documentos_" + nombreCliente(docClienteActivo).replace(/[^a-zA-Z0-9._-]+/g, "_") + ".zip";
+      descargarBlob(contenido, nombreZip);
+      if (errores.length) mostrarAviso("No se pudieron incluir: " + errores.join(", "));
+    } finally {
+      btn.disabled = false;
+    }
   });
 
   $("btn-eliminar-seleccion").addEventListener("click", async function(){
