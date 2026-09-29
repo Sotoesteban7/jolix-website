@@ -3,12 +3,32 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Jolix Asesorias: servicios contables y tributarios para pymes chilenas. Planes de precios, quienes somos y contacto.">
+<meta name="description" content="Asesoría contable y tributaria para pymes chilenas: contabilidad, F29, boletas, Previred y más, con acompañamiento cercano todo el año.">
 <title>Jolix Asesorías</title>
 <link rel="icon" href="/favicon.ico" sizes="any">
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png">
 <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-YNJ82N2DDD"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-YNJ82N2DDD');
+</script>
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://jolixasesorias.com/">
+<meta property="og:site_name" content="Jolix Asesorías">
+<meta property="og:locale" content="es_CL">
+<meta property="og:title" content="Jolix Asesorías — Números claros. Mente tranquila.">
+<meta property="og:description" content="Asesoría contable y tributaria para pymes chilenas: contabilidad, F29, boletas, Previred y más, con acompañamiento cercano todo el año.">
+<meta property="og:image" content="https://jolixasesorias.com/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Jolix Asesorías — Números claros. Mente tranquila.">
+<meta name="twitter:description" content="Asesoría contable y tributaria para pymes chilenas: contabilidad, F29, boletas, Previred y más, con acompañamiento cercano todo el año.">
+<meta name="twitter:image" content="https://jolixasesorias.com/og-image.png">
 <style>
   :root{
     --purple:#8253F3;
@@ -972,6 +992,40 @@
     .hiw-row+.hiw-row{margin-top:48px;}
     .hiw-content{gap:16px;}
   }
+
+  /* ---------- Dona de servicios: cue de hover en las solapas no seleccionadas ---------- */
+  .svc-seg-arc.is-hover{stroke:var(--seg-color) !important;}
+  .svc-seg-icon.is-hover{opacity:.85;}
+  .svc-seg-tick.is-hover{opacity:.65;}
+  .svc-donut-label.is-hover{color:var(--ink);}
+
+  /* ---------- FAQ ---------- */
+  .faq-list{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:12px;}
+  .faq-item{background:var(--surface);border:1px solid var(--mist-line);border-radius:16px;padding:4px 22px;}
+  .faq-item summary{
+    display:flex;align-items:center;justify-content:space-between;gap:18px;
+    padding:18px 0;cursor:pointer;list-style:none;
+    font-family:'Poppins',sans-serif;font-weight:600;font-size:15.5px;color:var(--ink);
+  }
+  .faq-item summary::-webkit-details-marker{display:none;}
+  .faq-item summary::marker{content:'';}
+  .faq-icon{flex:none;width:20px;height:20px;stroke:var(--purple);transition:transform .25s ease;}
+  .faq-item[open] .faq-icon{transform:rotate(45deg);}
+  .faq-item p{margin:0;padding:0 0 20px;font-size:14.5px;color:var(--muted);line-height:1.6;max-width:64ch;}
+  @media (prefers-reduced-motion:reduce){ .faq-icon{transition:none;} }
+
+  /* ---------- Botón flotante de WhatsApp ---------- */
+  .wa-float{
+    position:fixed;right:24px;bottom:24px;z-index:40;
+    width:56px;height:56px;border-radius:50%;
+    background:#22C55E;display:flex;align-items:center;justify-content:center;
+    box-shadow:0 14px 30px -10px rgba(27,23,48,.5);
+    transition:transform .2s ease, box-shadow .2s ease;
+  }
+  .wa-float svg{width:28px;height:28px;stroke:#fff;}
+  .wa-float:hover{transform:translateY(-3px) scale(1.05);box-shadow:0 18px 34px -8px rgba(27,23,48,.55);}
+  @media (prefers-reduced-motion:reduce){ .wa-float{transition:none;} .wa-float:hover{transform:none;} }
+  @media (max-width:640px){ .wa-float{right:16px;bottom:16px;width:50px;height:50px;} .wa-float svg{width:24px;height:24px;} }
 </style>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
@@ -995,9 +1049,10 @@
           <span></span><span></span><span></span>
         </button>
         <nav class="jhero-links" id="jheroMenuPanel">
-          <a href="#quienes-somos">Quiénes somos</a>
+          <a href="#proceso">Cómo trabajamos</a>
           <a href="#servicios">Servicios</a>
-          <a href="#precios">Precios</a>
+          <a href="#quienes-somos">Quiénes somos</a>
+          <a href="#faq">FAQ</a>
           <a href="#contacto">Contáctanos</a>
           <a class="jhero-access" href="https://jolixasesorias.com/portal/">Acceso clientes</a>
         </nav>
@@ -1186,35 +1241,9 @@
   <!-- SERVICIOS -->
   <section id="servicios">
     <div class="wrap">
-      <div class="section-head">
-        <span class="eyebrow">Cercanía real, no un call center</span>
-        <h2>Por qué elegir Jolix</h2>
-      </div>
-      <div class="why-grid">
-        <div class="why-card">
-          <div class="why-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><path d="M4 16.5v-9A2.5 2.5 0 0 1 6.5 5h9L20 9.5V19a2.5 2.5 0 0 1-2.5 2.5h-11A2.5 2.5 0 0 1 4 19v-2.5Z"/><path d="M8 12h6M8 15.5h4"/></svg></div>
-          <h3>Atención directa y cercana</h3>
-          <p>Hablas con quien lleva tu contabilidad, por WhatsApp y sin derivaciones.</p>
-        </div>
-        <div class="why-card">
-          <div class="why-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><circle cx="12" cy="12" r="8.2"/><path d="M12 8v4l2.6 2.6"/></svg></div>
-          <h3>Explicaciones sin tecnicismos</h3>
-          <p>Te contamos qué significa cada número y cada obligación, en simple.</p>
-        </div>
-        <div class="why-card">
-          <div class="why-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><path d="M12 3.5 19 7v5.5c0 4.2-3 7-7 8-4-1-7-3.8-7-8V7l7-3.5Z"/><path d="m9 12 2 2 4-4.2"/></svg></div>
-          <h3>Cumplimiento sin sobresaltos</h3>
-          <p>Seguimos de cerca tus plazos ante el SII y la Dirección del Trabajo.</p>
-        </div>
-        <div class="why-card">
-          <div class="why-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><rect x="4" y="6.5" width="16" height="11" rx="2.4"/><path d="M4 10.5h16M8 14.2h3.2"/></svg></div>
-          <h3>Precios transparentes</h3>
-          <p>Sabes exactamente qué incluye tu plan, sin cobros escondidos.</p>
-        </div>
-      </div>
 
       <!-- SERVICIOS (antes: PRECIOS) -->
-      <div id="precios" style="margin-top:96px;">
+      <div>
         <div class="section-head">
           <span class="eyebrow">Nuestros servicios</span>
           <h2>Servicios pensados para tu pyme</h2>
@@ -1225,12 +1254,12 @@
           <div class="svc-donut-wrap" id="svcDonut">
             <svg class="svc-donut" viewBox="0 0 420 420">
               <g class="svc-donut-ring" transform="rotate(-90 210 210)">
-            <circle class="svc-seg-arc is-active" data-seg="contabilidad" cx="210" cy="210" r="150" style="stroke:var(--purple-deep)" stroke-width="74" fill="none" stroke-dasharray="274.89 667.59" stroke-dashoffset="0"/>
-            <circle class="svc-seg-arc is-dim" data-seg="facturacion" cx="210" cy="210" r="150" style="stroke:var(--purple)" stroke-width="74" fill="none" stroke-dasharray="142.94 799.54" stroke-dashoffset="-282.74"/>
-            <circle class="svc-seg-arc is-dim" data-seg="gestion-personas" cx="210" cy="210" r="150" style="stroke:color-mix(in srgb, var(--purple) 55%, var(--coral) 45%)" stroke-width="74" fill="none" stroke-dasharray="124.09 818.38" stroke-dashoffset="-433.54"/>
-            <circle class="svc-seg-arc is-dim" data-seg="formalizacion" cx="210" cy="210" r="150" style="stroke:color-mix(in srgb, var(--purple) 25%, var(--coral) 75%)" stroke-width="74" fill="none" stroke-dasharray="124.09 818.38" stroke-dashoffset="-565.49"/>
-            <circle class="svc-seg-arc is-dim" data-seg="renta" cx="210" cy="210" r="150" style="stroke:var(--coral)" stroke-width="74" fill="none" stroke-dasharray="114.67 827.81" stroke-dashoffset="-697.43"/>
-            <circle class="svc-seg-arc is-dim" data-seg="asesoria" cx="210" cy="210" r="150" style="stroke:var(--coral-deep)" stroke-width="74" fill="none" stroke-dasharray="114.67 827.81" stroke-dashoffset="-819.96"/>
+            <circle class="svc-seg-arc is-active" data-seg="contabilidad" cx="210" cy="210" r="150" style="--seg-color:var(--purple-deep);stroke:var(--purple-deep)" stroke-width="74" fill="none" stroke-dasharray="274.89 667.59" stroke-dashoffset="0"/>
+            <circle class="svc-seg-arc is-dim" data-seg="facturacion" cx="210" cy="210" r="150" style="--seg-color:var(--purple);stroke:var(--purple)" stroke-width="74" fill="none" stroke-dasharray="142.94 799.54" stroke-dashoffset="-282.74"/>
+            <circle class="svc-seg-arc is-dim" data-seg="gestion-personas" cx="210" cy="210" r="150" style="--seg-color:color-mix(in srgb, var(--purple) 55%, var(--coral) 45%);stroke:color-mix(in srgb, var(--purple) 55%, var(--coral) 45%)" stroke-width="74" fill="none" stroke-dasharray="124.09 818.38" stroke-dashoffset="-433.54"/>
+            <circle class="svc-seg-arc is-dim" data-seg="formalizacion" cx="210" cy="210" r="150" style="--seg-color:color-mix(in srgb, var(--purple) 25%, var(--coral) 75%);stroke:color-mix(in srgb, var(--purple) 25%, var(--coral) 75%)" stroke-width="74" fill="none" stroke-dasharray="124.09 818.38" stroke-dashoffset="-565.49"/>
+            <circle class="svc-seg-arc is-dim" data-seg="renta" cx="210" cy="210" r="150" style="--seg-color:var(--coral);stroke:var(--coral)" stroke-width="74" fill="none" stroke-dasharray="114.67 827.81" stroke-dashoffset="-697.43"/>
+            <circle class="svc-seg-arc is-dim" data-seg="asesoria" cx="210" cy="210" r="150" style="--seg-color:var(--coral-deep);stroke:var(--coral-deep)" stroke-width="74" fill="none" stroke-dasharray="114.67 827.81" stroke-dashoffset="-819.96"/>
               </g>
           <g class="svc-seg-tick is-active" data-seg="contabilidad" style="color:var(--purple-deep)"><line x1="367.76" y1="95.38" x2="377.47" y2="88.33" stroke="currentColor"/><circle cx="377.47" cy="88.33" r="3.5" fill="currentColor"/></g>
           <g class="svc-seg-tick is-dim" data-seg="facturacion" style="color:var(--purple)"><line x1="343.49" y1="352.15" x2="351.7" y2="360.9" stroke="currentColor"/><circle cx="351.7" cy="360.9" r="3.5" fill="currentColor"/></g>
@@ -1340,15 +1369,59 @@
           <div><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M5 12.5 9.5 17 19 7"/></svg><p>Te explicamos cada obligación en simple, sin tecnicismos.</p></div>
           <div><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M5 12.5 9.5 17 19 7"/></svg><p>Seguimiento cercano de tus plazos ante el SII y la Dirección del Trabajo.</p></div>
         </div>
+      </div>
+    </div>
+  </section>
 
-        <div class="about-credential">
-          <div class="avatar">IA</div>
-          <div>
-            <div class="name-row"><span class="name">Irena Acevedo González</span><span class="cred-badge">7 años de experiencia</span></div>
-            <div class="role">Contador Auditor</div>
-            <p class="desc">Con trayectoria en finanzas públicas y privadas, y en distintos rubros. En Jolix somos una empresa familiar: cuidamos tus números y tus activos como si fueran los nuestros.</p>
-          </div>
-        </div>
+  <!-- FAQ -->
+  <section id="faq">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="eyebrow">Antes de escribirnos</span>
+        <h2>Preguntas frecuentes</h2>
+        <p>Las dudas que más nos repiten las pymes antes de partir con nosotros. Si la tuya no está aquí, escríbenos directo por WhatsApp.</p>
+      </div>
+      <div class="faq-list">
+        <details class="faq-item" name="faq">
+          <summary>¿Qué pasa si llego con atrasos o problemas pendientes con el SII?<svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></summary>
+          <p>Partimos con una auditoría de tu situación contable y laboral. Si encontramos algo pendiente, te lo indicamos con claridad y lo corregimos antes de iniciar tu contabilidad mensual, para partir con una base ordenada.</p>
+        </details>
+        <details class="faq-item" name="faq">
+          <summary>¿Puedo cambiarme de contador a mitad de año?<svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></summary>
+          <p>Sí. Coordinamos directamente el traspaso de claves y la revisión de tu historial contable y laboral, sin que tengas que gestionar tú el cambio.</p>
+        </details>
+        <details class="faq-item" name="faq">
+          <summary>¿Trabajan con empresas fuera de Santiago?<svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></summary>
+          <p>Sí. Nuestro servicio es remoto y trabajamos con pymes de todo Chile a través de WhatsApp y las plataformas del SII, Previred y la Dirección del Trabajo.</p>
+        </details>
+        <details class="faq-item" name="faq">
+          <summary>¿Ustedes emiten mis boletas y facturas, o debo hacerlo yo?<svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></summary>
+          <p>Depende del servicio contratado. Dentro de Facturación emitimos tus documentos por ti dentro de los primeros días hábiles del mes; si prefieres emitirlos tú, te asesoramos igual para que queden correctos.</p>
+        </details>
+        <details class="faq-item" name="faq">
+          <summary>Aún no tengo mi empresa formalizada, ¿pueden ayudarme?<svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></summary>
+          <p>Sí. Nuestro servicio de Formalización de empresa incluye la constitución de tu SpA o EIRL, la obtención de RUT y el inicio de actividades ante el SII.</p>
+        </details>
+        <details class="faq-item" name="faq">
+          <summary>¿Cómo es la forma de pago?<svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></summary>
+          <p>El pago es mensual, solo por transferencia bancaria, hasta el día 5 de cada mes.</p>
+        </details>
+        <details class="faq-item" name="faq">
+          <summary>¿Es seguro entregarles mis claves del SII, Previred y Mi DT?<svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></summary>
+          <p>Sí. Tu información se maneja con estricta reserva profesional y se usa únicamente para gestionar tus obligaciones ante esas plataformas — nunca se comparte con terceros.</p>
+        </details>
+        <details class="faq-item" name="faq">
+          <summary>Tengo trabajadores, ¿ustedes hacen las liquidaciones de sueldo y Previred?<svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></summary>
+          <p>Sí. Nuestro servicio de Gestión de personas incluye contratos de trabajo, liquidaciones de sueldo mensuales, finiquitos y el cumplimiento ante la Dirección del Trabajo.</p>
+        </details>
+        <details class="faq-item" name="faq">
+          <summary>¿Tengo que hacer algo yo durante la Operación Renta?<svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></summary>
+          <p>Muy poco: te pedimos los antecedentes puntuales que falten y nosotros preparamos y enviamos tu Declaración de Renta, revisando además los beneficios tributarios que te correspondan.</p>
+        </details>
+        <details class="faq-item" name="faq">
+          <summary>¿Puedo cambiar de plan o dejar el servicio cuando quiera?<svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></summary>
+          <p>Sí. El servicio es mes a mes, sin contratos de permanencia forzada; puedes ajustar tu plan o poner término al servicio avisando con 30 días de anticipación.</p>
+        </details>
       </div>
     </div>
   </section>
@@ -1484,6 +1557,10 @@
   </div>
   <p class="foot-privacy wrap">Tus datos personales se solicitan solo para responder tu consulta y no se comparten con terceros, salvo el proveedor que procesa el envío del formulario. Puedes solicitar su eliminación escribiendo a <a href="mailto:contacto@jolixasesorias.com">contacto@jolixasesorias.com</a>. Tratamos tus datos conforme a la normativa chilena de protección de datos personales.</p>
 </footer>
+
+<a class="wa-float" href="https://wa.me/56944547820?text=Hola%2C%20me%20gustar%C3%ADa%20m%C3%A1s%20informaci%C3%B3n%20sobre%20los%20servicios%20de%20Jolix%20Asesor%C3%ADas." target="_blank" rel="noopener" aria-label="Escríbenos por WhatsApp">
+  <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17.5 4.5 19l1.1-3.2A7.7 7.7 0 1 1 12 19.7c-1.2 0-2.3-.3-3.3-.8L7 17.5Z"/><path d="M9 10.3c0 3 2.7 5.4 5.6 5.2"/></svg>
+</a>
 
 <script>
   const toggle = document.getElementById('menuToggle');
@@ -1679,9 +1756,23 @@
         p.classList.toggle('is-active', p.getAttribute('data-seg') === key);
       });
     }
+    function setHover(key) {
+      donut.querySelectorAll('.svc-seg-arc, .svc-seg-icon, .svc-seg-tick, .svc-donut-label').forEach(function (el) {
+        var isHover = key !== null && el.getAttribute('data-seg') === key && el.classList.contains('is-dim');
+        el.classList.toggle('is-hover', isHover);
+      });
+    }
     donut.addEventListener('click', function (e) {
       var el = e.target.closest('[data-seg]');
       if (el) select(el.getAttribute('data-seg'));
+    });
+    donut.addEventListener('mouseover', function (e) {
+      var el = e.target.closest('[data-seg]');
+      if (el) setHover(el.getAttribute('data-seg'));
+    });
+    donut.addEventListener('mouseout', function (e) {
+      var el = e.target.closest('[data-seg]');
+      if (el) setHover(null);
     });
   })();
 </script>
