@@ -1679,6 +1679,28 @@
         });
         var data = await res.json();
         if (!data.success) throw new Error(data.message || 'No se pudo enviar');
+
+        try {
+          await fetch('https://sukfzusznlgrmqiqzweh.supabase.co/rest/v1/leads', {
+            method: 'POST',
+            headers: {
+              apikey: 'sb_publishable_55POJIBMgg5JsP-wbnvBRw_UpesY-g8',
+              Authorization: 'Bearer sb_publishable_55POJIBMgg5JsP-wbnvBRw_UpesY-g8',
+              'Content-Type': 'application/json',
+              Prefer: 'return=minimal'
+            },
+            body: JSON.stringify({
+              empresa_constituida: answers.empresa,
+              rubro: answers.rubro,
+              facturacion_mensual: answers.facturacion,
+              trabajadores: answers.trabajadores,
+              nombre: name, correo: email, telefono: phone
+            })
+          });
+        } catch (leadErr) {
+          console.warn('No se pudo registrar el lead en el CRM interno (el correo sí se envió):', leadErr);
+        }
+
         document.getElementById('interviewDoneName').textContent = name.split(' ')[0];
         document.getElementById('interviewDonePhone').textContent = phone;
         showStep('done');
