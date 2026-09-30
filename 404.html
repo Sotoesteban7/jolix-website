@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Esta página no existe o cambió de lugar. Vuelve al inicio de Jolix Asesorías.">
+<title>Página no encontrada — Jolix Asesorías</title>
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<meta name="robots" content="noindex, follow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --purple:#8253F3; --purple-deep:#5B32C9; --purple-soft:#A88CFA;
+    --coral:#FF8585; --coral-deep:#E85F5F;
+    --ink:#1B1730; --paper:#FBFAFE; --mist:#EFEAFB; --mist-line:#DED5F5;
+    --surface:#FFFFFF; --muted:#5B5670; --calm-yellow:#FCE896;
+    --shadow:0 20px 45px -20px rgba(59,25,148,0.35);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ink:#F1EEFA; --paper:#140F22; --mist:#1E1735; --mist-line:#332755;
+      --surface:#1B1430; --muted:#B6ADD1;
+      --purple:#9B7BFF; --purple-deep:#7C58F0; --coral:#FF9D9D; --coral-deep:#FFB0B0;
+      --calm-yellow:#E3C468;
+      --shadow:0 20px 45px -20px rgba(0,0,0,0.6);
+    }
+  }
+  :root[data-theme="dark"]{
+    --ink:#F1EEFA; --paper:#140F22; --mist:#1E1735; --mist-line:#332755;
+    --surface:#1B1430; --muted:#B6ADD1;
+    --purple:#9B7BFF; --purple-deep:#7C58F0; --coral:#FF9D9D; --coral-deep:#FFB0B0;
+    --calm-yellow:#E3C468;
+    --shadow:0 20px 45px -20px rgba(0,0,0,0.6);
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:'Work Sans',system-ui,-apple-system,sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased;}
+  h1{font-family:'Poppins',system-ui,sans-serif;font-weight:700;margin:0;text-wrap:balance;color:var(--ink);}
+  p{margin:0;}
+  a{color:var(--purple-deep);}
+  .wrap{max-width:760px;margin:0 auto;padding:0 24px;}
+
+  header{padding:22px 0;border-bottom:1px solid var(--mist-line);}
+  .top-row{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;}
+  .brand{display:flex;align-items:center;gap:10px;text-decoration:none;}
+  .brand img{width:30px;height:30px;display:block;}
+  .brand span{font-family:'Poppins',sans-serif;font-weight:700;font-size:16px;color:var(--ink);}
+  .volver{font-family:'Poppins',sans-serif;font-weight:600;font-size:13.5px;color:var(--purple-deep);text-decoration:none;}
+  .volver:hover{text-decoration:underline;}
+
+  main{position:relative;overflow:hidden;min-height:calc(100vh - 152px);display:flex;align-items:center;padding:56px 0;}
+  .wedge{position:absolute;border-radius:38% 62% 55% 45%/48% 42% 58% 52%;pointer-events:none;z-index:0;}
+  .wedge.one{top:-18%;right:-12%;width:520px;height:520px;background:radial-gradient(circle at 30% 30%, var(--purple) 0%, var(--purple-deep) 62%, transparent 72%);opacity:.16;transform:rotate(18deg);}
+  .wedge.two{bottom:-20%;left:-14%;width:380px;height:380px;background:radial-gradient(circle at 60% 40%, var(--coral) 0%, var(--coral-deep) 60%, transparent 72%);opacity:.14;transform:rotate(-12deg);}
+
+  .err{position:relative;z-index:1;text-align:center;max-width:600px;margin:0 auto;}
+  .err-eyebrow{font-family:'Poppins',sans-serif;font-weight:600;font-size:12.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--coral-deep);}
+  .err-num{font-family:'Poppins',sans-serif;font-weight:800;font-size:clamp(64px,11vw,108px);line-height:1;letter-spacing:-.02em;color:var(--purple);margin-top:14px;}
+  h1.err-title{font-size:clamp(26px,3.6vw,34px);margin-top:10px;}
+  h1.err-title .destaca{position:relative;display:inline-block;color:var(--purple);}
+  h1.err-title .destaca .mark{
+    position:absolute;left:50%;bottom:-2px;
+    width:112%;height:14px;
+    background:var(--calm-yellow);
+    border-radius:40% 60% 55% 45%/60% 50% 50% 40%;
+    transform:translateX(-50%) rotate(-1.2deg);
+    z-index:-1;
+  }
+  .err-sub{margin-top:18px;font-size:16px;color:var(--muted);max-width:50ch;margin-left:auto;margin-right:auto;}
+  .err-actions{margin-top:32px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap;}
+  .btn{
+    display:inline-flex;align-items:center;gap:8px;
+    font-family:'Poppins',sans-serif;font-weight:600;font-size:15px;
+    padding:14px 26px;border-radius:999px;text-decoration:none;
+    border:1px solid transparent;cursor:pointer;
+  }
+  .btn-primary{background:var(--purple);color:#fff;box-shadow:var(--shadow);}
+  .btn-ghost{background:transparent;border-color:var(--mist-line);color:var(--ink);}
+
+  footer{padding:32px 0;border-top:1px solid var(--mist-line);}
+  .foot-row{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;color:var(--muted);font-size:13px;}
+  .foot-brand{display:flex;align-items:center;gap:10px;}
+  .foot-brand img{width:20px;height:20px;}
+
+  @media (max-width:640px){
+    .err-actions{flex-direction:column;align-items:stretch;}
+    .err-actions .btn{justify-content:center;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap top-row">
+    <a class="brand" href="/"><img src="apple-touch-icon.png" alt=""><span>Jolix Asesorías</span></a>
+    <a class="volver" href="/">‹ Volver al inicio</a>
+  </div>
+</header>
+
+<main>
+  <div class="wedge one" aria-hidden="true"></div>
+  <div class="wedge two" aria-hidden="true"></div>
+  <div class="wrap">
+    <div class="err">
+      <div class="err-eyebrow">Error 404</div>
+      <div class="err-num">404</div>
+      <h1 class="err-title">Esta página <span class="destaca">se perdió<span class="mark"></span></span></h1>
+      <p class="err-sub">El enlace que seguiste no existe o cambió de lugar. A tus números nunca se les pierde el rastro — vuelve al inicio o cuéntanos qué buscabas.</p>
+      <div class="err-actions">
+        <a class="btn btn-primary" href="/">Volver al inicio</a>
+        <a class="btn btn-ghost" href="https://wa.me/56944547820?text=Hola%2C%20llegu%C3%A9%20a%20un%20enlace%20roto%20en%20jolixasesorias.com%20y%20quer%C3%ADa%20consultar%20algo." target="_blank" rel="noopener">Escríbenos por WhatsApp</a>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap foot-row">
+    <div class="foot-brand"><img src="apple-touch-icon.png" alt=""><span>© 2026 Jolix Asesorías</span></div>
+    <div>Asesoría Contable y Fiscal para Pymes · Chile</div>
+  </div>
+</footer>
+
+</body>
+</html>
