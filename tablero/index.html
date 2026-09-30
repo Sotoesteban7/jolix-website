@@ -266,7 +266,8 @@
   }
 
   /* ----------------------------------------------------- DASHBOARD */
-  .dash-grid{display:grid; grid-template-columns:1fr 1fr; gap:16px;}
+  .dash-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:16px;}
+  @media (max-width:1180px){ .dash-grid{grid-template-columns:1fr 1fr;} }
   .dash-row{display:flex; align-items:center; justify-content:space-between; gap:10px; padding:9px 2px; border-bottom:1px solid var(--line); font-size:13.5px;}
   .dash-row:last-child{border-bottom:none;}
   .dash-row .n{font-family:'Poppins',sans-serif; font-weight:600; color:var(--purple-deep);}
@@ -290,7 +291,7 @@
 
   .servicios{display:flex; gap:7px; flex-wrap:wrap;}
   .chk{display:inline-flex; align-items:center; gap:7px; background:var(--mist); border:1px solid transparent; color:var(--muted); border-radius:999px; padding:8px 13px; font-size:12.5px; font-weight:600; font-family:'Poppins',sans-serif;}
-  .chk[aria-pressed="true"]{background:var(--purple); border-color:var(--purple); color:#fff;}
+  .chk[aria-pressed="true"]{background:var(--chk-color, var(--purple)); border-color:var(--chk-color, var(--purple)); color:#fff;}
   .chk:disabled{opacity:.55; cursor:not-allowed;}
 
   .btn{background:var(--purple); color:#fff; border:none; border-radius:10px; padding:10px 18px; font-family:'Poppins',sans-serif; font-weight:600; font-size:13.5px;}
@@ -640,6 +641,8 @@
           <div class="tile"><div class="k">F29 declarados</div><div class="v" id="d-f29">—</div><div class="n">del total con F29, este mes</div></div>
           <div class="tile acento"><div class="k">PPM del mes</div><div class="v" id="d-ppm">—</div><div class="n" id="d-ppm-n">suma de montos ingresados</div></div>
           <div class="tile alerta"><div class="k">Tareas pendientes</div><div class="v" id="d-tareas">—</div><div class="n">de todo el equipo</div></div>
+          <div class="tile"><div class="k">Leads nuevos</div><div class="v" id="d-leads">—</div><div class="n">últimos 30 días</div></div>
+          <div class="tile acento"><div class="k">Tasa de conversión</div><div class="v" id="d-conversion">—</div><div class="n">leads convertidos en clientes</div></div>
         </div>
 
         <div class="dash-grid">
@@ -647,6 +650,11 @@
             <h2>Clientes por rubro</h2>
             <p class="hint">Cuántos clientes tiene cada rubro hoy.</p>
             <div id="dash-rubros"></div>
+          </div>
+          <div class="panel">
+            <h2>Clientes por servicio</h2>
+            <p class="hint">Cuántos clientes tienen cada servicio contratado.</p>
+            <div id="dash-servicios"></div>
           </div>
           <div class="panel">
             <h2>Próximos vencimientos</h2>
@@ -781,10 +789,16 @@
 
     <!-- VISTA CLIENTES -->
     <section id="v-clientes" hidden>
+      <div class="segmento" id="seg-clientes-leads" style="margin-bottom:16px;">
+        <button class="seg" data-sub="clientes" aria-pressed="true">Clientes</button>
+        <button class="seg" data-sub="leads" aria-pressed="false">Leads <span class="tab-badge" id="leads-badge" hidden></span></button>
+      </div>
+
+      <div id="sub-clientes">
       <div class="solo-lectura" id="clientes-lectura" hidden>Solo un administrador puede agregar, modificar o eliminar clientes. Puedes consultarlos aquí.</div>
       <div class="panel" id="panel-nuevo-cliente">
         <h2>Agregar cliente</h2>
-        <p class="hint">Marca solo los servicios que ese cliente tiene contratado. En el tablero mensual aparecerán únicamente esos.</p>
+        <p class="hint">Marca los servicios que tiene contratados. Contabilidad activa el seguimiento de F29 y PPM; Gestión de personas activa Remuneraciones y Previred en Operación mensual.</p>
         <div class="form-cliente">
           <div class="g crece">
             <label for="n-nombre">Nombre o razón social</label>
@@ -803,11 +817,18 @@
             <input id="n-email" class="control" type="email" placeholder="cliente@correo.com" style="width:200px" autocomplete="off">
           </div>
           <div class="g">
+            <label for="n-telefono">Teléfono</label>
+            <input id="n-telefono" class="control" type="tel" placeholder="+56 9 1234 5678" style="width:160px" autocomplete="off">
+          </div>
+          <div class="g">
             <label>Servicios</label>
             <div class="servicios">
-              <button class="chk" data-nuevo-srv="f29" aria-pressed="true">F29</button>
-              <button class="chk" data-nuevo-srv="remuneraciones" aria-pressed="false">Remuneraciones</button>
-              <button class="chk" data-nuevo-srv="previred" aria-pressed="false">Previred</button>
+              <button class="chk" data-nuevo-srv="contabilidad" aria-pressed="false" style="--chk-color:#5B32C9">Contabilidad</button>
+              <button class="chk" data-nuevo-srv="facturacion" aria-pressed="false" style="--chk-color:#8253F3">Facturación</button>
+              <button class="chk" data-nuevo-srv="gestion_personas" aria-pressed="false" style="--chk-color:#9A5FBE">Gestión de personas</button>
+              <button class="chk" data-nuevo-srv="formalizacion" aria-pressed="false" style="--chk-color:#D06B7A">Formalización</button>
+              <button class="chk" data-nuevo-srv="renta" aria-pressed="false" style="--chk-color:#FF8585">Operación Renta</button>
+              <button class="chk" data-nuevo-srv="asesoria" aria-pressed="false" style="--chk-color:#E85F5F">Asesoría Contable</button>
             </div>
           </div>
           <button class="btn" id="btn-agregar">Agregar</button>
@@ -821,6 +842,26 @@
         <div class="vacio" id="cli-vacio" hidden>
           <h3>Aún no hay clientes</h3>
           <p>Agrega el primero con el formulario de arriba.</p>
+        </div>
+      </div>
+      </div>
+
+      <div id="sub-leads" hidden>
+        <div class="panel">
+          <h2>Leads <span id="leads-conteo" style="color:var(--faint); font-weight:500;"></span></h2>
+          <p class="hint">Formularios recibidos desde el sitio web.</p>
+          <div class="segmento" id="filtro-leads-estado" style="margin-bottom:14px;">
+            <button class="seg" data-filtro-lead="todos" aria-pressed="true">Todos</button>
+            <button class="seg" data-filtro-lead="nuevo" aria-pressed="false">Nuevos</button>
+            <button class="seg" data-filtro-lead="contactado" aria-pressed="false">Contactados</button>
+            <button class="seg" data-filtro-lead="convertido" aria-pressed="false">Convertidos</button>
+            <button class="seg" data-filtro-lead="descartado" aria-pressed="false">Descartados</button>
+          </div>
+          <div class="lista-cli" id="lista-leads"></div>
+          <div class="vacio" id="leads-vacio" hidden>
+            <h3>Sin leads todavía</h3>
+            <p>Cuando alguien complete el formulario del sitio, va a aparecer aquí.</p>
+          </div>
         </div>
       </div>
     </section>
@@ -995,6 +1036,18 @@
 
   var MESES = ["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
   var SIN_RUBRO = "Sin rubro";
+
+  // Mismos 6 servicios, nombres y colores que el donut de #servicios en el
+  // sitio (jolix-website/index.html) — así un servicio se ve igual en la
+  // web, el tablero y las historias de Instagram.
+  var SERVICIOS_CATALOGO = [
+    { slug: "contabilidad",      nombre: "Contabilidad",           color: "#5B32C9" },
+    { slug: "facturacion",       nombre: "Facturación",            color: "#8253F3" },
+    { slug: "gestion_personas",  nombre: "Gestión de personas",    color: "#9A5FBE" },
+    { slug: "formalizacion",     nombre: "Formalización",          color: "#D06B7A" },
+    { slug: "renta",             nombre: "Operación Renta",        color: "#FF8585" },
+    { slug: "asesoria",          nombre: "Asesoría Contable",      color: "#E85F5F" }
+  ];
 
   var perfil = null;
   var perfilesPorId = {};
@@ -1180,6 +1233,7 @@
     medirTopbar();
     await cargarTodo();
     await cargarTareas();
+    await cargarLeads();
     setInterval(refrescarSuave, 20000);
     window.addEventListener("focus", refrescarSuave);
   }
@@ -1198,7 +1252,7 @@
   /* -------------------------------------------------------- DATOS */
   async function cargarTodo(){
     var r1 = await sb.from("rubros").select("id, nombre, orden").order("orden");
-    var r2 = await sb.from("clientes").select("id, rut, nombre, rubro_id, email, f29, remuneraciones, previred").order("nombre");
+    var r2 = await sb.from("clientes").select("id, rut, nombre, rubro_id, email, telefono, servicios, f29, remuneraciones, previred").order("nombre");
     var r3 = await sb.from("perfiles").select("id, nombre");
     if (r1.error || r2.error){ mostrarAviso("No se pudieron cargar los datos. Revisa tu conexión."); return; }
     rubros = r1.data || [];
@@ -1227,6 +1281,7 @@
     (res.data || []).forEach(function(r){ registros[r.cliente_id] = r; });
     if (vista === "mes") renderMes();
     await cargarTareas();
+    await cargarLeads();
   }
 
   function reg(clienteId){ return registros[clienteId] || {}; }
@@ -1528,9 +1583,10 @@
         opcionesRubro(c.rubro_id) + '</select>' +
         '<input class="email-input" type="email" data-email-de="' + c.id + '" value="' + escapar(c.email || "") + '" placeholder="Correo del portal"' + (admin ? "" : " disabled") + '>' +
         '<div class="servicios">' +
-          '<button class="chk" data-srv="f29" aria-pressed="' + !!c.f29 + '"' + (admin ? "" : " disabled") + '>F29</button>' +
-          '<button class="chk" data-srv="remuneraciones" aria-pressed="' + !!c.remuneraciones + '"' + (admin ? "" : " disabled") + '>Remuneraciones</button>' +
-          '<button class="chk" data-srv="previred" aria-pressed="' + !!c.previred + '"' + (admin ? "" : " disabled") + '>Previred</button>' +
+          SERVICIOS_CATALOGO.map(function(s){
+            var on = (c.servicios || []).indexOf(s.slug) !== -1;
+            return '<button class="chk" data-srv="' + s.slug + '" aria-pressed="' + on + '" style="--chk-color:' + s.color + '"' + (admin ? "" : " disabled") + '>' + escapar(s.nombre) + '</button>';
+          }).join("") +
         '</div>' +
         (admin ? '<button class="btn ghost mini" data-borrar="1">Eliminar</button>' : '') +
         '</div>';
@@ -1568,10 +1624,13 @@
     cont.querySelectorAll(".chk[data-srv]").forEach(function(b){
       b.addEventListener("click", async function(){
         var id = b.closest(".cli-row").dataset.cliente;
-        var on = b.getAttribute("aria-pressed") === "true";
+        var cli = clientes.filter(function(c){ return c.id === id; })[0];
+        var actuales = (cli && cli.servicios) || [];
+        var slug = b.dataset.srv;
+        var on = actuales.indexOf(slug) !== -1;
+        var nuevos = on ? actuales.filter(function(s){ return s !== slug; }) : actuales.concat([slug]);
         b.setAttribute("aria-pressed", String(!on));
-        var patch = {}; patch[b.dataset.srv] = !on;
-        var res = await sb.from("clientes").update(patch).eq("id", id);
+        var res = await sb.from("clientes").update({ servicios: nuevos }).eq("id", id);
         if (res.error){ mostrarAviso("No se pudo guardar el cambio de servicios."); }
         await cargarTodo();
       });
@@ -1716,6 +1775,103 @@
   var tareas = [];
   var filtroTareas = "todas";
 
+  /* ----------------------------------------------------------- LEADS */
+  var leads = [];
+  var filtroLeadEstado = "todos";
+  var leadEnConversion = null;
+
+  function estadoLeadLabel(e){
+    return { nuevo: "Nuevo", contactado: "Contactado", convertido: "Convertido", descartado: "Descartado" }[e] || e;
+  }
+
+  async function cargarLeads(){
+    var res = await sb.from("leads").select("*").order("creado", { ascending: false }).limit(300);
+    if (res.error){ mostrarAviso("No se pudieron cargar los leads."); return; }
+    leads = res.data || [];
+    var badge = $("leads-badge");
+    var nuevos = leads.filter(function(l){ return l.estado === "nuevo"; }).length;
+    badge.textContent = nuevos;
+    badge.hidden = nuevos === 0;
+    renderLeads();
+    renderDashboard();
+  }
+
+  function filaLead(l){
+    var admin = esAdmin();
+    var meta = escapar(l.correo) + (l.telefono ? " · " + escapar(l.telefono) : "");
+    var detalle = [
+      l.rubro,
+      l.facturacion_mensual,
+      l.trabajadores ? l.trabajadores + " trabajadores" : null,
+      l.empresa_constituida ? (l.empresa_constituida === "Sí" ? "empresa constituida" : "sin constituir") : null
+    ].filter(function(x){ return x; }).map(escapar).join(" · ");
+
+    var acciones = admin
+      ? '<select class="rubro-chip" data-lead-estado="' + l.id + '" style="width:132px">' +
+          ["nuevo","contactado","convertido","descartado"].map(function(e){
+            return '<option value="' + e + '"' + (e === l.estado ? " selected" : "") + '>' + estadoLeadLabel(e) + '</option>';
+          }).join("") +
+        '</select>' +
+        '<button class="btn ghost mini" data-convertir-lead="' + l.id + '">Convertir a cliente</button>'
+      : '<span class="rubro-chip" style="pointer-events:none;">' + estadoLeadLabel(l.estado) + '</span>';
+
+    return '<div class="cli-row" data-lead="' + l.id + '">' +
+      '<div class="datos"><div class="nom">' + escapar(l.nombre) + '</div>' +
+      '<div class="rut">' + meta + '</div></div>' +
+      (detalle ? '<div style="font-size:12.5px; color:var(--muted); max-width:320px;">' + detalle + '</div>' : '') +
+      acciones +
+      '</div>';
+  }
+
+  function renderLeads(){
+    var admin = esAdmin();
+    var lista = filtroLeadEstado === "todos" ? leads : leads.filter(function(l){ return l.estado === filtroLeadEstado; });
+    $("leads-conteo").textContent = leads.length ? "· " + leads.length : "";
+    $("leads-vacio").hidden = lista.length > 0;
+    $("lista-leads").innerHTML = lista.map(filaLead).join("");
+    if (!admin) return;
+
+    document.querySelectorAll("[data-lead-estado]").forEach(function(sel){
+      sel.addEventListener("change", async function(){
+        var res = await sb.from("leads").update({ estado: sel.value }).eq("id", sel.dataset.leadEstado);
+        if (res.error){ mostrarAviso("No se pudo actualizar el estado del lead."); return; }
+        await cargarLeads();
+      });
+    });
+    document.querySelectorAll("[data-convertir-lead]").forEach(function(b){
+      b.addEventListener("click", function(){
+        var lead = leads.filter(function(l){ return l.id === b.dataset.convertirLead; })[0];
+        if (!lead) return;
+        leadEnConversion = lead.id;
+        cambiarSubVistaClientes("clientes");
+        $("n-nombre").value = lead.nombre;
+        $("n-email").value = lead.correo || "";
+        $("n-telefono").value = lead.telefono || "";
+        $("n-nombre").focus();
+        mostrarAviso('Completa el RUT, rubro y servicios, y presiona "Agregar" para convertir este lead.', "ok");
+      });
+    });
+  }
+
+  function cambiarSubVistaClientes(v){
+    document.querySelectorAll("#seg-clientes-leads .seg").forEach(function(b){
+      b.setAttribute("aria-pressed", String(b.dataset.sub === v));
+    });
+    $("sub-clientes").hidden = v !== "clientes";
+    $("sub-leads").hidden = v !== "leads";
+    if (v === "leads") cargarLeads();
+  }
+  document.querySelectorAll("#seg-clientes-leads .seg").forEach(function(b){
+    b.addEventListener("click", function(){ cambiarSubVistaClientes(b.dataset.sub); });
+  });
+  document.querySelectorAll("#filtro-leads-estado .seg").forEach(function(b){
+    b.addEventListener("click", function(){
+      filtroLeadEstado = b.dataset.filtroLead;
+      document.querySelectorAll("#filtro-leads-estado .seg").forEach(function(o){ o.setAttribute("aria-pressed", String(o === b)); });
+      renderLeads();
+    });
+  });
+
   async function cargarTareas(){
     var res = await sb.from("tareas")
       .select("id, cliente_id, descripcion, fecha_limite, asignado_a, completada, completada_en, completada_por, creada")
@@ -1844,6 +2000,12 @@
     $("d-ppm-n").textContent = nPend === 0 ? "sin pendientes en SII" : (nPend === 1 ? "1 pendiente en SII" : nPend + " pendientes en SII");
     $("d-tareas").textContent = String(pendTareas);
 
+    var hace30 = new Date(); hace30.setDate(hace30.getDate() - 30);
+    var leadsNuevos = leads.filter(function(l){ return new Date(l.creado) >= hace30; }).length;
+    var convertidos = leads.filter(function(l){ return l.estado === "convertido"; }).length;
+    $("d-leads").textContent = String(leadsNuevos);
+    $("d-conversion").textContent = leads.length ? Math.round(convertidos / leads.length * 100) + "%" : "—";
+
     var filasRubro = rubrosOrdenados().map(function(r){
       return { nombre: r, n: clientesDe(r).length };
     });
@@ -1852,6 +2014,15 @@
           return '<div class="dash-row"><span>' + escapar(r.nombre) + '</span><span class="n">' + r.n + '</span></div>';
         }).join("")
       : '<p class="hint" style="margin:0;">Aún no hay rubros.</p>';
+
+    var filasServicio = SERVICIOS_CATALOGO.map(function(s){
+      return { nombre: s.nombre, n: clientes.filter(function(c){ return (c.servicios || []).indexOf(s.slug) !== -1; }).length };
+    }).filter(function(s){ return s.n > 0; });
+    $("dash-servicios").innerHTML = filasServicio.length
+      ? filasServicio.map(function(s){
+          return '<div class="dash-row"><span>' + escapar(s.nombre) + '</span><span class="n">' + s.n + '</span></div>';
+        }).join("")
+      : '<p class="hint" style="margin:0;">Aún no hay servicios asignados.</p>';
 
     var prox = tareas.filter(function(t){ return !t.completada && t.fecha_limite; })
       .sort(function(a,b){ return String(a.fecha_limite).localeCompare(String(b.fecha_limite)); })
@@ -2690,6 +2861,7 @@
     $("topbar-titulo").textContent = TITULOS_VISTA[v] || "";
     if (v === "tareas") cargarTareas();
     if (v === "documentos") cargarDocumentos();
+    if (v !== "clientes") leadEnConversion = null;
     cerrarSidebar();
   }
   document.querySelectorAll(".snav").forEach(function(t){
@@ -2747,8 +2919,9 @@
   }
   window.addEventListener("resize", medirTopbar);
 
-  var nuevoSrv = { f29:true, remuneraciones:false, previred:false };
+  var nuevoSrv = {};
   document.querySelectorAll("[data-nuevo-srv]").forEach(function(b){
+    nuevoSrv[b.dataset.nuevoSrv] = false;
     b.addEventListener("click", function(){
       var k = b.dataset.nuevoSrv;
       nuevoSrv[k] = !nuevoSrv[k];
@@ -2761,12 +2934,14 @@
     var rut = $("n-rut").value.trim();
     if (!nombre){ $("n-nombre").focus(); return; }
     if (!rut){ $("n-rut").focus(); return; }
+    var servicios = Object.keys(nuevoSrv).filter(function(k){ return nuevoSrv[k]; });
     var res = await sb.from("clientes").insert({
       nombre: nombre, rut: rut,
       rubro_id: $("n-rubro").value || null,
       email: $("n-email").value.trim() || null,
-      f29: nuevoSrv.f29, remuneraciones: nuevoSrv.remuneraciones, previred: nuevoSrv.previred
-    });
+      telefono: $("n-telefono").value.trim() || null,
+      servicios: servicios
+    }).select("id").single();
     if (res.error){
       if (res.error.code === "23505"){
         mostrarAviso(res.error.message.indexOf("email") !== -1
@@ -2777,7 +2952,16 @@
       }
       return;
     }
-    $("n-nombre").value = ""; $("n-rut").value = ""; $("n-email").value = "";
+    if (leadEnConversion){
+      await sb.from("leads").update({ estado: "convertido", cliente_id: res.data.id }).eq("id", leadEnConversion);
+      leadEnConversion = null;
+      await cargarLeads();
+    }
+    $("n-nombre").value = ""; $("n-rut").value = ""; $("n-email").value = ""; $("n-telefono").value = "";
+    document.querySelectorAll("[data-nuevo-srv]").forEach(function(b){
+      nuevoSrv[b.dataset.nuevoSrv] = false;
+      b.setAttribute("aria-pressed", "false");
+    });
     $("n-nombre").focus();
     await cargarTodo();
   });
