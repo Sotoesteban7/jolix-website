@@ -711,7 +711,7 @@
       <div class="board">
         <div class="cols head">
           <span>Cliente</span><span>Docs</span><span>F29</span><span>Remun.</span><span>Previred</span>
-          <span>Monto PPM</span><span>Transf.</span><span>SII</span><span>Actualizado</span>
+          <span>Monto</span><span>Transf.</span><span>SII</span><span>Actualizado</span>
         </div>
         <div class="filas" id="filas"></div>
         <div class="sin-resultados" id="sin-resultados" hidden></div>
@@ -847,12 +847,18 @@
           </div>
         </h2>
         <p class="hint" id="cli-hint">Toca los tres puntos de un cliente para modificarlo.</p>
+        <div class="buscador" style="margin-bottom:14px">
+          <svg class="lupa" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.6-3.6"/></svg>
+          <input id="buscar-clientes" class="control" placeholder="Buscar empresa o RUT…" autocomplete="off" aria-label="Buscar cliente">
+          <button class="limpiar" id="limpiar-buscar-clientes" hidden aria-label="Limpiar búsqueda">×</button>
+        </div>
         <div class="tabla-wrap">
           <table class="tabla-clientes">
             <thead><tr><th>Nombre</th><th>RUT</th><th>Rubro</th><th>Correo</th><th>Servicios</th><th>Estado</th><th></th></tr></thead>
             <tbody id="lista-cli"></tbody>
           </table>
         </div>
+        <div class="sin-resultados" id="cli-sin-resultados" hidden>Sin coincidencias para tu búsqueda.</div>
         <div class="vacio" id="cli-vacio" hidden>
           <h3>Aún no hay clientes</h3>
           <p>Agrega el primero con "Nuevo cliente".</p>
@@ -1585,12 +1591,12 @@
         html += celdaLuz("Remun.", "remuneraciones", !!c.remuneraciones);
         html += celdaLuz("Previred", "previred", !!c.previred);
         if (c.f29){
-          html += '<div class="celda"><span class="lbl">Monto PPM</span>' +
+          html += '<div class="celda"><span class="lbl">Monto</span>' +
             '<input class="monto" data-campo="ppm_monto" inputmode="numeric" placeholder="$0" aria-label="Monto PPM"></div>';
           html += celdaLuz("Transf.", "ppm_transferido", true);
           html += celdaLuz("SII", "ppm_pagado", true);
         } else {
-          html += '<div class="celda"><span class="lbl">Monto PPM</span><span class="na">—</span></div>';
+          html += '<div class="celda"><span class="lbl">Monto</span><span class="na">—</span></div>';
           html += '<div class="celda"><span class="lbl">Transf.</span><span class="na">—</span></div>';
           html += '<div class="celda"><span class="lbl">SII</span><span class="na">—</span></div>';
         }
@@ -1705,12 +1711,22 @@
     return html;
   }
 
+  var busquedaClientes = "";
+
   function renderClientes(){
     var cont = $("lista-cli");
     var admin = esAdmin();
     var ordenados = [];
     rubrosOrdenados().forEach(function(r){ ordenados = ordenados.concat(clientesDe(r)); });
+
+    var q = normaliza(busquedaClientes);
+    if (q) ordenados = ordenados.filter(function(c){
+      return normaliza(c.nombre).indexOf(q) !== -1 ||
+        normaliza(c.rut || "").replace(/[.\-\s]/g, "").indexOf(q.replace(/[.\-\s]/g, "")) !== -1;
+    });
+
     $("cli-vacio").hidden = clientes.length > 0;
+    $("cli-sin-resultados").hidden = clientes.length === 0 || ordenados.length > 0;
     $("cli-conteo").textContent = clientes.length ? "· " + clientes.length : "";
 
     cont.innerHTML = ordenados.map(function(c){
@@ -1749,6 +1765,18 @@
       b.setAttribute("aria-pressed", "false");
     });
   }
+  $("buscar-clientes").addEventListener("input", function(){
+    busquedaClientes = $("buscar-clientes").value.trim();
+    $("limpiar-buscar-clientes").hidden = !busquedaClientes;
+    renderClientes();
+  });
+  $("limpiar-buscar-clientes").addEventListener("click", function(){
+    $("buscar-clientes").value = ""; busquedaClientes = "";
+    $("limpiar-buscar-clientes").hidden = true;
+    renderClientes();
+    $("buscar-clientes").focus();
+  });
+
   $("btn-nuevo-cliente").addEventListener("click", function(){
     limpiarModalClienteNuevo();
     $("modal-cliente-nuevo").hidden = false;
