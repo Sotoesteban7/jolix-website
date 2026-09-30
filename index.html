@@ -9,12 +9,21 @@
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png">
 <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-YNJ82N2DDD"></script>
 <script>
+  // Google Analytics no se carga hasta que la persona acepta cookies en el
+  // banner (ver el bloque junto a #cookie-banner, al final del body).
   window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-  gtag('config', 'G-YNJ82N2DDD');
+  function gtag(){ dataLayer.push(arguments); }
+  function activarAnalyticsJolix(){
+    if (window.jolixAnalyticsActivo) return;
+    window.jolixAnalyticsActivo = true;
+    var s = document.createElement('script');
+    s.async = true;
+    s.src = 'https://www.googletagmanager.com/gtag/js?id=G-YNJ82N2DDD';
+    document.head.appendChild(s);
+    gtag('js', new Date());
+    gtag('config', 'G-YNJ82N2DDD');
+  }
 </script>
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://jolixasesorias.com/">
@@ -1026,6 +1035,26 @@
   .wa-float:hover{transform:translateY(-3px) scale(1.05);box-shadow:0 18px 34px -8px rgba(27,23,48,.55);}
   @media (prefers-reduced-motion:reduce){ .wa-float{transition:none;} .wa-float:hover{transform:none;} }
   @media (max-width:640px){ .wa-float{right:16px;bottom:16px;width:50px;height:50px;} .wa-float svg{width:24px;height:24px;} }
+
+  /* ---------- Banner de cookies ---------- */
+  .cookie-banner{
+    position:fixed;left:0;right:0;bottom:0;z-index:50;
+    background:var(--surface);border-top:1px solid var(--mist-line);
+    box-shadow:0 -12px 30px -18px rgba(27,23,48,.25);
+    padding:18px 24px;
+  }
+  .cookie-banner-in{max-width:1120px;margin:0 auto;display:flex;align-items:center;gap:24px;flex-wrap:wrap;}
+  .cookie-banner p{margin:0;font-size:13.5px;line-height:1.55;color:var(--muted);flex:1 1 320px;}
+  .cookie-banner a{color:var(--purple);text-decoration:underline;}
+  .cookie-banner-btns{display:flex;gap:10px;flex:none;}
+  .cookie-banner .btn{padding:10px 20px;font-size:13.5px;}
+  body.cookies-pendiente .wa-float{bottom:110px;}
+  @media (max-width:640px){
+    .cookie-banner{padding:16px;}
+    .cookie-banner-btns{width:100%;}
+    .cookie-banner-btns .btn{flex:1;justify-content:center;}
+    body.cookies-pendiente .wa-float{bottom:172px;}
+  }
 </style>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
@@ -1553,12 +1582,48 @@
     </div>
     <div>Asesoría Contable y Fiscal para Pymes · Chile</div>
   </div>
-  <p class="foot-privacy wrap">Tus datos personales se solicitan solo para responder tu consulta y no se comparten con terceros, salvo el proveedor que procesa el envío del formulario. Puedes solicitar su eliminación escribiendo a <a href="mailto:contacto@jolixasesorias.com">contacto@jolixasesorias.com</a>. Tratamos tus datos conforme a la normativa chilena de protección de datos personales.</p>
+  <p class="foot-privacy wrap" id="privacidad">Tus datos personales se solicitan solo para responder tu consulta y no se comparten con terceros, salvo el proveedor que procesa el envío del formulario. Puedes solicitar su eliminación escribiendo a <a href="mailto:contacto@jolixasesorias.com">contacto@jolixasesorias.com</a>. Tratamos tus datos conforme a la normativa chilena de protección de datos personales.</p>
 </footer>
 
 <a class="wa-float" href="https://wa.me/56944547820?text=Hola%2C%20me%20gustar%C3%ADa%20m%C3%A1s%20informaci%C3%B3n%20sobre%20los%20servicios%20de%20Jolix%20Asesor%C3%ADas." target="_blank" rel="noopener" aria-label="Escríbenos por WhatsApp">
   <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17.5 4.5 19l1.1-3.2A7.7 7.7 0 1 1 12 19.7c-1.2 0-2.3-.3-3.3-.8L7 17.5Z"/><path d="M9 10.3c0 3 2.7 5.4 5.6 5.2"/></svg>
 </a>
+
+<div class="cookie-banner" id="cookie-banner" hidden role="region" aria-label="Aviso de cookies">
+  <div class="cookie-banner-in">
+    <p>Usamos cookies esenciales para que el sitio funcione y cookies de análisis (Google Analytics) para entender cómo llegas hasta aquí. Nunca las usamos para otra cosa. <a href="#privacidad">Más información</a>.</p>
+    <div class="cookie-banner-btns">
+      <button type="button" class="btn btn-ghost" id="cookie-rechazar">Rechazar</button>
+      <button type="button" class="btn btn-primary" id="cookie-aceptar">Aceptar</button>
+    </div>
+  </div>
+</div>
+<script>
+  (function(){
+    var CLAVE = 'jolix_cookies';
+    var elegido = localStorage.getItem(CLAVE);
+    if (elegido === 'aceptado'){ activarAnalyticsJolix(); return; }
+    if (elegido === 'rechazado') return;
+
+    var banner = document.getElementById('cookie-banner');
+    document.body.classList.add('cookies-pendiente');
+    banner.hidden = false;
+
+    function cerrar(){
+      banner.hidden = true;
+      document.body.classList.remove('cookies-pendiente');
+    }
+    document.getElementById('cookie-aceptar').addEventListener('click', function(){
+      localStorage.setItem(CLAVE, 'aceptado');
+      activarAnalyticsJolix();
+      cerrar();
+    });
+    document.getElementById('cookie-rechazar').addEventListener('click', function(){
+      localStorage.setItem(CLAVE, 'rechazado');
+      cerrar();
+    });
+  })();
+</script>
 
 <script>
   const toggle = document.getElementById('menuToggle');
