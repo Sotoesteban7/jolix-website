@@ -265,6 +265,19 @@
     .resumen{grid-template-columns:1fr 1fr;}
   }
 
+  /* ----------------------------------------------------- DASHBOARD */
+  .dash-grid{display:grid; grid-template-columns:1fr 1fr; gap:16px;}
+  .dash-row{display:flex; align-items:center; justify-content:space-between; gap:10px; padding:9px 2px; border-bottom:1px solid var(--line); font-size:13.5px;}
+  .dash-row:last-child{border-bottom:none;}
+  .dash-row .n{font-family:'Poppins',sans-serif; font-weight:600; color:var(--purple-deep);}
+  .dash-row-tarea{padding:10px 2px; border-bottom:1px solid var(--line);}
+  .dash-row-tarea:last-child{border-bottom:none;}
+  .dash-row-tarea .desc{font-size:13.5px; color:var(--ink);}
+  .dash-row-tarea .meta{font-size:12px; color:var(--muted); margin-top:2px;}
+  @media (max-width:860px){
+    .dash-grid{grid-template-columns:1fr;}
+  }
+
   /* --------------------------------------------------- MANTENEDORES */
   .panel{background:var(--surface); border:1px solid var(--line); border-radius:18px; padding:20px 22px; margin-bottom:16px;}
   .panel h2{font-size:16px; margin-bottom:3px;}
@@ -622,9 +635,27 @@
 
       <!-- VISTA DASHBOARD -->
       <section id="v-dashboard">
-        <div class="vacio">
-          <h3>Panel general en construcción</h3>
-          <p>Aquí vas a ver un resumen de clientes, leads y actividades del mes.</p>
+        <div class="resumen">
+          <div class="tile"><div class="k">Clientes activos</div><div class="v" id="d-clientes">—</div><div class="n">en cartera</div></div>
+          <div class="tile"><div class="k">F29 declarados</div><div class="v" id="d-f29">—</div><div class="n">del total con F29, este mes</div></div>
+          <div class="tile acento"><div class="k">PPM del mes</div><div class="v" id="d-ppm">—</div><div class="n" id="d-ppm-n">suma de montos ingresados</div></div>
+          <div class="tile alerta"><div class="k">Tareas pendientes</div><div class="v" id="d-tareas">—</div><div class="n">de todo el equipo</div></div>
+        </div>
+
+        <div class="dash-grid">
+          <div class="panel">
+            <h2>Clientes por rubro</h2>
+            <p class="hint">Cuántos clientes tiene cada rubro hoy.</p>
+            <div id="dash-rubros"></div>
+          </div>
+          <div class="panel">
+            <h2>Próximos vencimientos</h2>
+            <p class="hint">Las tareas pendientes más próximas a vencer.</p>
+            <div id="dash-vencimientos"></div>
+            <div class="vacio" id="dash-vencimientos-vacio" hidden style="padding:24px;">
+              <p style="margin:0;">No hay tareas con fecha límite pendiente.</p>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -1148,6 +1179,7 @@
     armarSelectorMeses();
     medirTopbar();
     await cargarTodo();
+    await cargarTareas();
     setInterval(refrescarSuave, 20000);
     window.addEventListener("focus", refrescarSuave);
   }
@@ -1790,6 +1822,47 @@
         await cargarTareas();
       });
     });
+    renderDashboard();
+  }
+
+  /* ------------------------------------------------------- DASHBOARD */
+  function renderDashboard(){
+    var conF29 = clientes.filter(function(c){ return c.f29; });
+    var f29Listos = conF29.filter(function(c){ return reg(c.id).f29; }).length;
+    var totalPPM = 0, nPend = 0;
+    conF29.forEach(function(c){
+      var r = reg(c.id);
+      var m = (typeof r.ppm_monto === "number") ? r.ppm_monto : 0;
+      totalPPM += m;
+      if (!r.ppm_pagado && m > 0) nPend++;
+    });
+    var pendTareas = tareas.filter(function(t){ return !t.completada; }).length;
+
+    $("d-clientes").textContent = clientes.length ? String(clientes.length) : "—";
+    $("d-f29").textContent = conF29.length ? f29Listos + "/" + conF29.length : "—";
+    $("d-ppm").textContent = clientes.length ? clp(totalPPM) : "—";
+    $("d-ppm-n").textContent = nPend === 0 ? "sin pendientes en SII" : (nPend === 1 ? "1 pendiente en SII" : nPend + " pendientes en SII");
+    $("d-tareas").textContent = String(pendTareas);
+
+    var filasRubro = rubrosOrdenados().map(function(r){
+      return { nombre: r, n: clientesDe(r).length };
+    });
+    $("dash-rubros").innerHTML = filasRubro.length
+      ? filasRubro.map(function(r){
+          return '<div class="dash-row"><span>' + escapar(r.nombre) + '</span><span class="n">' + r.n + '</span></div>';
+        }).join("")
+      : '<p class="hint" style="margin:0;">Aún no hay rubros.</p>';
+
+    var prox = tareas.filter(function(t){ return !t.completada && t.fecha_limite; })
+      .sort(function(a,b){ return String(a.fecha_limite).localeCompare(String(b.fecha_limite)); })
+      .slice(0, 5);
+    $("dash-vencimientos-vacio").hidden = prox.length > 0;
+    $("dash-vencimientos").innerHTML = prox.map(function(t){
+      var lim = estadoLimite(t.fecha_limite);
+      return '<div class="dash-row-tarea"><div class="desc">' + escapar(t.descripcion) + '</div>' +
+        '<div class="meta">' + escapar(nombreCliente(t.cliente_id)) + ' · <span' +
+        (lim.urgente ? ' style="color:var(--pend); font-weight:600;"' : '') + '>' + lim.txt + '</span></div></div>';
+    }).join("");
   }
 
   async function alternarTarea(id){
