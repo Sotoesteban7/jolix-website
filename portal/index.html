@@ -91,6 +91,16 @@
   .encabezado h1{font-size:22px;}
   .encabezado p{margin-top:6px;color:var(--muted);font-size:14.5px;}
 
+  .breadcrumb{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:13px;color:var(--muted);margin-bottom:10px;}
+  .breadcrumb button{background:none;border:none;padding:0;color:var(--purple-deep);font-weight:600;font-size:13px;cursor:pointer;}
+  .breadcrumb button:hover{text-decoration:underline;}
+  .breadcrumb .sep{color:var(--faint);}
+  .breadcrumb .actual{color:var(--ink);font-weight:600;}
+
+  .segmento{display:inline-flex;background:var(--mist);border-radius:999px;padding:3px;}
+  .seg{background:transparent;border:none;border-radius:999px;padding:7px 15px;font-family:'Poppins',sans-serif;font-weight:600;font-size:12.5px;color:var(--muted);cursor:pointer;}
+  .seg[aria-pressed="true"]{background:var(--surface);color:var(--purple-deep);box-shadow:0 1px 3px rgba(0,0,0,.08);}
+
   .doc-toolbar-top{display:flex;align-items:center;gap:14px;margin-bottom:20px;}
   .vista-toggle{display:flex;gap:4px;background:var(--mist);border-radius:10px;padding:3px;}
   .vista-btn{width:32px;height:30px;display:flex;align-items:center;justify-content:center;border:none;border-radius:7px;background:transparent;color:var(--faint);cursor:pointer;padding:0;}
@@ -216,28 +226,47 @@
       <p>Aquí encuentras los documentos que Jolix ha compartido contigo. Puedes verlos y descargarlos cuando quieras.</p>
     </div>
 
-    <div class="doc-toolbar-top">
-      <div class="vista-toggle" role="group" aria-label="Vista de documentos">
-        <button type="button" class="vista-btn" data-vista-doc="grid" aria-pressed="true" aria-label="Vista de cuadrícula">
-          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2.5" y="2.5" width="6" height="6" rx="1.2"/><rect x="11.5" y="2.5" width="6" height="6" rx="1.2"/><rect x="2.5" y="11.5" width="6" height="6" rx="1.2"/><rect x="11.5" y="11.5" width="6" height="6" rx="1.2"/></svg>
+    <div id="cargando-docs" class="cargando">Cargando tus documentos…</div>
+
+    <!-- Nivel 1: carpetas, por año -->
+    <div id="panel-portal-carpetas" hidden>
+      <div class="segmento" id="filtro-doc-anio" style="margin-bottom:18px;">
+        <button class="seg" data-anio="2025" aria-pressed="false">2025</button>
+        <button class="seg" data-anio="2026" aria-pressed="true">2026</button>
+      </div>
+      <div class="doc-grid" id="lista-carpetas"></div>
+      <div class="vacio" id="carpetas-vacio" hidden>
+        <h3>Aún no hay carpetas en <span id="carpetas-vacio-anio"></span></h3>
+        <p>Cuando Jolix organice tus documentos de ese año, van a aparecer aquí.</p>
+      </div>
+    </div>
+
+    <!-- Nivel 2: documentos de la carpeta elegida -->
+    <div id="panel-portal-espacio" hidden>
+      <div class="breadcrumb" id="doc-breadcrumb"></div>
+      <h2 id="portal-carpeta-nombre" style="margin:4px 0 16px;"></h2>
+      <div class="doc-toolbar-top">
+        <div class="vista-toggle" role="group" aria-label="Vista de documentos">
+          <button type="button" class="vista-btn" data-vista-doc="grid" aria-pressed="true" aria-label="Vista de cuadrícula">
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2.5" y="2.5" width="6" height="6" rx="1.2"/><rect x="11.5" y="2.5" width="6" height="6" rx="1.2"/><rect x="2.5" y="11.5" width="6" height="6" rx="1.2"/><rect x="11.5" y="11.5" width="6" height="6" rx="1.2"/></svg>
+          </button>
+          <button type="button" class="vista-btn" data-vista-doc="lista" aria-pressed="false" aria-label="Vista de lista">
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="2.5" y="3.5" width="4" height="4" rx="1"/><path d="M9.5 5.5h8"/><rect x="2.5" y="8.5" width="4" height="4" rx="1"/><path d="M9.5 10.5h8"/><rect x="2.5" y="13.5" width="4" height="4" rx="1"/><path d="M9.5 15.5h8"/></svg>
+          </button>
+        </div>
+        <button type="button" class="btn-seleccionar-todos" id="btn-seleccionar-todos" data-modo="seleccionar" hidden>
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="14" height="14" rx="3"/><path d="m6.5 10 2.5 2.5 5-5"/></svg>
+          <span id="seleccionar-todos-label">Seleccionar todos</span>
         </button>
-        <button type="button" class="vista-btn" data-vista-doc="lista" aria-pressed="false" aria-label="Vista de lista">
-          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="2.5" y="3.5" width="4" height="4" rx="1"/><path d="M9.5 5.5h8"/><rect x="2.5" y="8.5" width="4" height="4" rx="1"/><path d="M9.5 10.5h8"/><rect x="2.5" y="13.5" width="4" height="4" rx="1"/><path d="M9.5 15.5h8"/></svg>
+        <button type="button" class="btn-icono-info" id="btn-descargar-seleccion" hidden aria-label="Descargar seleccionados">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5v12"/><path d="m7 11 5 5 5-5"/><path d="M4.5 18.5v1a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2v-1"/></svg>
         </button>
       </div>
-      <button type="button" class="btn-seleccionar-todos" id="btn-seleccionar-todos" data-modo="seleccionar" hidden>
-        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="14" height="14" rx="3"/><path d="m6.5 10 2.5 2.5 5-5"/></svg>
-        <span id="seleccionar-todos-label">Seleccionar todos</span>
-      </button>
-      <button type="button" class="btn-icono-info" id="btn-descargar-seleccion" hidden aria-label="Descargar seleccionados">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5v12"/><path d="m7 11 5 5 5-5"/><path d="M4.5 18.5v1a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2v-1"/></svg>
-      </button>
-    </div>
-    <div id="cargando-docs" class="cargando">Cargando tus documentos…</div>
-    <div class="doc-grid" id="lista-docs" hidden></div>
-    <div class="vacio" id="docs-vacio" hidden>
-      <h3>Aún no hay documentos aquí</h3>
-      <p>Cuando tengamos algo listo para ti (tu F29, una boleta, lo que sea), va a aparecer en esta lista.</p>
+      <div class="doc-grid" id="lista-docs" hidden></div>
+      <div class="vacio" id="docs-vacio" hidden>
+        <h3>Aún no hay documentos aquí</h3>
+        <p>Cuando tengamos algo listo para ti (tu F29, una boleta, lo que sea), va a aparecer en esta lista.</p>
+      </div>
     </div>
   </main>
 </div>
@@ -293,7 +322,17 @@
       '</svg>';
   }
 
+  function iconoCarpeta(){
+    return '<svg viewBox="0 0 32 40" fill="none" xmlns="http://www.w3.org/2000/svg">' +
+      '<path d="M2 8.5a2 2 0 0 1 2-2h8.5l3 3.6H28a2 2 0 0 1 2 2V33a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8.5Z" fill="#8253F3"/>' +
+      '</svg>';
+  }
+
   var documentos = [];
+  var carpetas = [];
+  var docCarpetaActiva = null;
+  var docAnioActivo = 2026;
+  var docListaActual = [];
   var docVista = localStorage.getItem("jolix_portal_vista") || "grid";
   var docSeleccion = new Set();
 
@@ -356,12 +395,82 @@
     var res = await sb.from("documentos").select("*").order("subido_en", { ascending: false });
     $("cargando-docs").hidden = true;
     if (res.error){
+      $("panel-portal-carpetas").hidden = true;
+      $("panel-portal-espacio").hidden = false;
       $("docs-vacio").hidden = false;
       $("docs-vacio").querySelector("h3").textContent = "No pudimos cargar tus documentos";
       $("docs-vacio").querySelector("p").textContent = "Recarga la página; si sigue fallando, escríbenos por WhatsApp.";
       return;
     }
     documentos = res.data || [];
+    renderPortalDocs();
+  }
+
+  async function cargarCarpetas(){
+    var res = await sb.from("carpetas").select("*");
+    if (res.error) return;
+    carpetas = res.data || [];
+    renderPortalDocs();
+  }
+
+  function renderPortalDocs(){
+    if (docCarpetaActiva) renderLista(); else renderCarpetas();
+  }
+
+  function renderBreadcrumb(el, segmentos){
+    el.innerHTML = segmentos.map(function(s, i){
+      var sep = i > 0 ? '<span class="sep">/</span>' : '';
+      if (s.ir) return sep + '<button type="button" data-ir-doc="' + s.ir + '">' + escapar(s.texto) + '</button>';
+      return sep + '<span class="actual">' + escapar(s.texto) + '</span>';
+    }).join("");
+  }
+  document.addEventListener("click", function(e){
+    var b = e.target.closest("[data-ir-doc]");
+    if (!b) return;
+    docSeleccion.clear();
+    docCarpetaActiva = null;
+    renderPortalDocs();
+  });
+
+  function renderCarpetas(){
+    $("cargando-docs").hidden = true;
+    $("panel-portal-carpetas").hidden = false;
+    $("panel-portal-espacio").hidden = true;
+    document.querySelectorAll("#filtro-doc-anio .seg").forEach(function(b){
+      b.setAttribute("aria-pressed", String(Number(b.dataset.anio) === docAnioActivo));
+    });
+
+    var lista = carpetas.filter(function(c){ return c.anio === docAnioActivo; })
+      .sort(function(a, b){ return a.nombre.localeCompare(b.nombre, "es"); });
+    $("carpetas-vacio").hidden = lista.length > 0;
+    $("carpetas-vacio-anio").textContent = String(docAnioActivo);
+
+    var cont = $("lista-carpetas");
+    cont.innerHTML = lista.map(function(c){
+      var n = documentos.filter(function(d){ return d.carpeta_id === c.id; }).length;
+      return '<div class="doc-card" data-carpeta="' + c.id + '" tabindex="0" title="' + escapar(c.nombre) + '">' +
+        '<div class="doc-card-icon">' + iconoCarpeta() + '</div>' +
+        '<div class="doc-card-name">' + escapar(c.nombre) + '</div>' +
+        '<div class="doc-card-date">' + (n ? n + (n === 1 ? " documento" : " documentos") : "Vacía") + '</div>' +
+        '</div>';
+    }).join("");
+
+    cont.querySelectorAll("[data-carpeta]").forEach(function(card){
+      card.addEventListener("click", function(){ abrirCarpeta(card.dataset.carpeta); });
+      card.addEventListener("keydown", function(e){ if (e.key === "Enter") abrirCarpeta(card.dataset.carpeta); });
+    });
+  }
+
+  document.querySelectorAll("#filtro-doc-anio .seg").forEach(function(b){
+    b.addEventListener("click", function(){
+      docAnioActivo = Number(b.dataset.anio);
+      renderCarpetas();
+    });
+  });
+
+  function abrirCarpeta(id){
+    docCarpetaActiva = id;
+    docSeleccion.clear();
     renderLista();
   }
 
@@ -394,22 +503,33 @@
     $("btn-descargar-seleccion").hidden = docSeleccion.size === 0;
 
     var btnTodos = $("btn-seleccionar-todos");
-    btnTodos.hidden = documentos.length === 0;
-    var todosSeleccionados = documentos.length > 0 && documentos.every(function(d){ return docSeleccion.has(d.id); });
+    btnTodos.hidden = docListaActual.length === 0;
+    var todosSeleccionados = docListaActual.length > 0 && docListaActual.every(function(d){ return docSeleccion.has(d.id); });
     btnTodos.dataset.modo = todosSeleccionados ? "deseleccionar" : "seleccionar";
     $("seleccionar-todos-label").textContent = todosSeleccionados ? "Deseleccionar todos" : "Seleccionar todos";
   }
 
   $("btn-seleccionar-todos").addEventListener("click", function(){
-    var todosSeleccionados = documentos.length > 0 && documentos.every(function(d){ return docSeleccion.has(d.id); });
-    documentos.forEach(function(d){
+    var todosSeleccionados = docListaActual.length > 0 && docListaActual.every(function(d){ return docSeleccion.has(d.id); });
+    docListaActual.forEach(function(d){
       if (todosSeleccionados) docSeleccion.delete(d.id); else docSeleccion.add(d.id);
     });
     renderLista();
   });
 
   function renderLista(){
-    var lista = documentos;
+    $("panel-portal-carpetas").hidden = true;
+    $("panel-portal-espacio").hidden = false;
+
+    var carpeta = carpetas.filter(function(c){ return c.id === docCarpetaActiva; })[0];
+    $("portal-carpeta-nombre").textContent = carpeta ? carpeta.nombre : "";
+    renderBreadcrumb($("doc-breadcrumb"), [
+      { texto: "Mis documentos", ir: "carpetas" },
+      { texto: carpeta ? carpeta.anio + " · " + carpeta.nombre : "" }
+    ]);
+
+    var lista = documentos.filter(function(d){ return d.carpeta_id === docCarpetaActiva; });
+    docListaActual = lista;
     $("lista-docs").hidden = lista.length === 0;
     $("docs-vacio").hidden = lista.length !== 0;
 
@@ -585,6 +705,7 @@
     $("nombre-cliente").textContent = perfil.data.nombre;
     $("saludo-nombre").textContent = perfil.data.nombre.split(" ")[0];
     cargarDocumentos();
+    cargarCarpetas();
   }
 
   sb.auth.onAuthStateChange(function(event){
