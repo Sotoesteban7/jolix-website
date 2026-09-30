@@ -311,6 +311,29 @@
   .cli-row .datos .nom{font-family:'Poppins',sans-serif; font-weight:600; font-size:14.5px;}
   .cli-row .datos .rut{font-size:12px; color:var(--faint); font-variant-numeric:tabular-nums;}
 
+  .tabla-wrap{overflow-x:auto;}
+  .tabla-clientes{width:100%; border-collapse:collapse; font-size:13.5px;}
+  .tabla-clientes th{
+    text-align:left; font-family:'Poppins',sans-serif; font-size:11px; font-weight:600;
+    text-transform:uppercase; letter-spacing:.07em; color:var(--faint);
+    padding:0 10px 10px; border-bottom:1px solid var(--line); white-space:nowrap;
+  }
+  .tabla-clientes td{padding:11px 10px; border-bottom:1px solid var(--line); vertical-align:middle;}
+  .tabla-clientes tr:last-child td{border-bottom:none;}
+  .tabla-clientes td.nom{font-family:'Poppins',sans-serif; font-weight:600;}
+  .tabla-clientes td.rut{color:var(--faint); font-variant-numeric:tabular-nums; white-space:nowrap;}
+  .tabla-clientes tr.inactivo td{color:var(--faint);}
+  .tabla-clientes tr.inactivo td.nom{color:var(--muted);}
+  .servicios-cell{display:flex; flex-wrap:wrap; gap:5px; max-width:260px;}
+  .srv-badge{
+    display:inline-flex; align-items:center; background:var(--chk-color, var(--mist));
+    color:#fff; border-radius:999px; padding:3px 9px; font-size:11px; font-weight:600;
+    font-family:'Poppins',sans-serif; white-space:nowrap;
+  }
+  .estado-badge{display:inline-flex; align-items:center; border-radius:999px; padding:4px 11px; font-size:11.5px; font-weight:600; font-family:'Poppins',sans-serif;}
+  .estado-badge.activo{background:var(--ok-bg); color:var(--ok);}
+  .estado-badge.inactivo{background:var(--pend-bg); color:var(--pend);}
+
   .doc-grid{display:grid; grid-template-columns:repeat(5, minmax(0,1fr)); gap:14px;}
   @media (max-width:1100px){ .doc-grid{grid-template-columns:repeat(4, minmax(0,1fr));} }
   @media (max-width:820px){ .doc-grid{grid-template-columns:repeat(3, minmax(0,1fr));} }
@@ -390,14 +413,6 @@
   .rubro-chip:hover:not(:disabled){border-color:var(--line);}
   .rubro-chip:focus{background:var(--surface); border-color:var(--purple);}
   .rubro-chip:disabled{opacity:.6;}
-  .email-input{
-    background:var(--surface); border:1px solid var(--line); color:var(--ink);
-    border-radius:10px; padding:7px 11px; font-size:12.5px; width:190px;
-  }
-  .email-input:hover:not(:disabled){border-color:var(--purple-soft);}
-  .email-input:focus{border-color:var(--purple);}
-  .email-input:disabled{opacity:.6; background:var(--mist);}
-  .email-input::placeholder{color:var(--faint);}
   .orden-btns{display:flex; gap:4px;}
   .orden-btns button{width:30px; height:30px; border-radius:8px; border:1px solid var(--line); background:var(--surface); color:var(--muted); font-size:12px; line-height:1; display:flex; align-items:center; justify-content:center;}
   .orden-btns button:hover:not(:disabled){background:var(--mist); color:var(--ink);}
@@ -796,52 +811,25 @@
 
       <div id="sub-clientes">
       <div class="solo-lectura" id="clientes-lectura" hidden>Solo un administrador puede agregar, modificar o eliminar clientes. Puedes consultarlos aquí.</div>
-      <div class="panel" id="panel-nuevo-cliente">
-        <h2>Agregar cliente</h2>
-        <p class="hint">Marca los servicios que tiene contratados. Contabilidad activa el seguimiento de F29 y PPM; Gestión de personas activa Remuneraciones y Previred en Operación mensual.</p>
-        <div class="form-cliente">
-          <div class="g crece">
-            <label for="n-nombre">Nombre o razón social</label>
-            <input id="n-nombre" class="control" placeholder="Comercial Los Robles SpA" autocomplete="off">
-          </div>
-          <div class="g">
-            <label for="n-rut">RUT</label>
-            <input id="n-rut" class="control" placeholder="76.543.210-9" style="width:150px" autocomplete="off">
-          </div>
-          <div class="g">
-            <label for="n-rubro">Rubro</label>
-            <select id="n-rubro" class="control" style="width:170px"></select>
-          </div>
-          <div class="g">
-            <label for="n-email">Correo (portal)</label>
-            <input id="n-email" class="control" type="email" placeholder="cliente@correo.com" style="width:200px" autocomplete="off">
-          </div>
-          <div class="g">
-            <label for="n-telefono">Teléfono</label>
-            <input id="n-telefono" class="control" type="tel" placeholder="+56 9 1234 5678" style="width:160px" autocomplete="off">
-          </div>
-          <div class="g">
-            <label>Servicios</label>
-            <div class="servicios">
-              <button class="chk" data-nuevo-srv="contabilidad" aria-pressed="false" style="--chk-color:#5B32C9">Contabilidad</button>
-              <button class="chk" data-nuevo-srv="facturacion" aria-pressed="false" style="--chk-color:#8253F3">Facturación</button>
-              <button class="chk" data-nuevo-srv="gestion_personas" aria-pressed="false" style="--chk-color:#9A5FBE">Gestión de personas</button>
-              <button class="chk" data-nuevo-srv="formalizacion" aria-pressed="false" style="--chk-color:#D06B7A">Formalización</button>
-              <button class="chk" data-nuevo-srv="renta" aria-pressed="false" style="--chk-color:#FF8585">Operación Renta</button>
-              <button class="chk" data-nuevo-srv="asesoria" aria-pressed="false" style="--chk-color:#E85F5F">Asesoría Contable</button>
-            </div>
-          </div>
-          <button class="btn" id="btn-agregar">Agregar</button>
-        </div>
-      </div>
 
       <div class="panel">
-        <h2 style="display:flex; align-items:center; gap:10px;">Clientes <span id="cli-conteo" style="color:var(--faint); font-weight:500;"></span><button class="btn ghost mini" id="btn-abrir-rubros" type="button" style="margin-left:auto; display:inline-flex; align-items:center; gap:6px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;"><rect x="3.5" y="4.5" width="17" height="15" rx="2"/><path d="M3.5 9.5h17"/></svg>Gestionar rubros</button></h2>
-        <p class="hint" id="cli-hint">Toca un servicio para activarlo o desactivarlo. Los cambios se guardan al instante.</p>
-        <div class="lista-cli" id="lista-cli"></div>
+        <h2 style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+          Clientes <span id="cli-conteo" style="color:var(--faint); font-weight:500;"></span>
+          <div style="margin-left:auto; display:flex; gap:8px;" id="cli-acciones">
+            <button class="btn" id="btn-nuevo-cliente" type="button">+ Nuevo cliente</button>
+            <button class="btn ghost mini" id="btn-abrir-rubros" type="button" style="display:inline-flex; align-items:center; gap:6px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;"><rect x="3.5" y="4.5" width="17" height="15" rx="2"/><path d="M3.5 9.5h17"/></svg>Gestionar rubros</button>
+          </div>
+        </h2>
+        <p class="hint" id="cli-hint">Toca los tres puntos de un cliente para modificarlo.</p>
+        <div class="tabla-wrap">
+          <table class="tabla-clientes">
+            <thead><tr><th>Nombre</th><th>RUT</th><th>Rubro</th><th>Correo</th><th>Servicios</th><th>Estado</th><th></th></tr></thead>
+            <tbody id="lista-cli"></tbody>
+          </table>
+        </div>
         <div class="vacio" id="cli-vacio" hidden>
           <h3>Aún no hay clientes</h3>
-          <p>Agrega el primero con el formulario de arriba.</p>
+          <p>Agrega el primero con "Nuevo cliente".</p>
         </div>
       </div>
       </div>
@@ -894,6 +882,113 @@
     </div>
 
     <button class="btn ghost" id="btn-cerrar-rubros" style="margin-top:18px; width:100%;">Cerrar</button>
+  </div>
+</div>
+
+<!-- MODAL NUEVO CLIENTE -->
+<div class="modal" id="modal-cliente-nuevo" hidden>
+  <div class="modal-card modal-ancho">
+    <h2>Nuevo cliente</h2>
+    <p class="hint">Marca los servicios que tiene contratados. Contabilidad activa el seguimiento de F29 y PPM; Gestión de personas activa Remuneraciones y Previred en Operación mensual.</p>
+    <div class="form-cliente">
+      <div class="g crece">
+        <label for="n-nombre">Nombre o razón social</label>
+        <input id="n-nombre" class="control" placeholder="Comercial Los Robles SpA" autocomplete="off">
+      </div>
+      <div class="g">
+        <label for="n-rut">RUT</label>
+        <input id="n-rut" class="control" placeholder="76.543.210-9" style="width:150px" autocomplete="off">
+      </div>
+      <div class="g">
+        <label for="n-rubro">Rubro</label>
+        <select id="n-rubro" class="control" style="width:170px"></select>
+      </div>
+      <div class="g">
+        <label for="n-email">Correo (portal)</label>
+        <input id="n-email" class="control" type="email" placeholder="cliente@correo.com" style="width:200px" autocomplete="off">
+      </div>
+      <div class="g">
+        <label for="n-telefono">Teléfono</label>
+        <input id="n-telefono" class="control" type="tel" placeholder="+56 9 1234 5678" style="width:160px" autocomplete="off">
+      </div>
+      <div class="g">
+        <label for="n-precio">Precio servicios</label>
+        <input id="n-precio" class="monto" inputmode="numeric" placeholder="$0" style="width:130px" aria-label="Precio mensual de los servicios">
+      </div>
+      <div class="g" style="width:100%;">
+        <label>Servicios</label>
+        <div class="servicios">
+          <button class="chk" data-nuevo-srv="contabilidad" aria-pressed="false" style="--chk-color:#5B32C9">Contabilidad</button>
+          <button class="chk" data-nuevo-srv="facturacion" aria-pressed="false" style="--chk-color:#8253F3">Facturación</button>
+          <button class="chk" data-nuevo-srv="gestion_personas" aria-pressed="false" style="--chk-color:#9A5FBE">Gestión de personas</button>
+          <button class="chk" data-nuevo-srv="formalizacion" aria-pressed="false" style="--chk-color:#D06B7A">Formalización</button>
+          <button class="chk" data-nuevo-srv="renta" aria-pressed="false" style="--chk-color:#FF8585">Operación Renta</button>
+          <button class="chk" data-nuevo-srv="asesoria" aria-pressed="false" style="--chk-color:#E85F5F">Asesoría Contable</button>
+        </div>
+      </div>
+    </div>
+    <p class="interview-status" id="nuevo-cliente-status" style="font-size:13px; color:var(--pend); margin:10px 0 0;"></p>
+    <div style="display:flex; gap:10px; margin-top:18px;">
+      <button class="btn ghost" id="btn-cancelar-cliente-nuevo" style="flex:1;">Cancelar</button>
+      <button class="btn" id="btn-agregar" style="flex:1;">Agregar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL EDITAR CLIENTE -->
+<div class="modal" id="modal-cliente-editar" hidden>
+  <div class="modal-card modal-ancho">
+    <h2>Editar cliente</h2>
+    <div class="form-cliente">
+      <div class="g crece">
+        <label for="e-nombre">Nombre o razón social</label>
+        <input id="e-nombre" class="control" autocomplete="off">
+      </div>
+      <div class="g">
+        <label for="e-rut">RUT</label>
+        <input id="e-rut" class="control" style="width:150px" autocomplete="off">
+      </div>
+      <div class="g">
+        <label for="e-rubro">Rubro</label>
+        <select id="e-rubro" class="control" style="width:170px"></select>
+      </div>
+      <div class="g">
+        <label for="e-email">Correo (portal)</label>
+        <input id="e-email" class="control" type="email" style="width:200px" autocomplete="off">
+      </div>
+      <div class="g">
+        <label for="e-telefono">Teléfono</label>
+        <input id="e-telefono" class="control" type="tel" style="width:160px" autocomplete="off">
+      </div>
+      <div class="g">
+        <label for="e-precio">Precio servicios</label>
+        <input id="e-precio" class="monto" inputmode="numeric" placeholder="$0" style="width:130px" aria-label="Precio mensual de los servicios">
+      </div>
+      <div class="g">
+        <label for="e-estado">Estado</label>
+        <select id="e-estado" class="control" style="width:120px">
+          <option value="true">Activo</option>
+          <option value="false">Inactivo</option>
+        </select>
+      </div>
+      <div class="g" style="width:100%;">
+        <label>Servicios</label>
+        <div class="servicios">
+          <button class="chk" data-editar-srv="contabilidad" aria-pressed="false" style="--chk-color:#5B32C9">Contabilidad</button>
+          <button class="chk" data-editar-srv="facturacion" aria-pressed="false" style="--chk-color:#8253F3">Facturación</button>
+          <button class="chk" data-editar-srv="gestion_personas" aria-pressed="false" style="--chk-color:#9A5FBE">Gestión de personas</button>
+          <button class="chk" data-editar-srv="formalizacion" aria-pressed="false" style="--chk-color:#D06B7A">Formalización</button>
+          <button class="chk" data-editar-srv="renta" aria-pressed="false" style="--chk-color:#FF8585">Operación Renta</button>
+          <button class="chk" data-editar-srv="asesoria" aria-pressed="false" style="--chk-color:#E85F5F">Asesoría Contable</button>
+        </div>
+      </div>
+    </div>
+    <p class="interview-status" id="editar-cliente-status" style="font-size:13px; color:var(--pend); margin:10px 0 0;"></p>
+    <div style="display:flex; gap:10px; margin-top:18px;">
+      <button class="btn ghost" id="btn-eliminar-cliente" style="flex:1;">Eliminar</button>
+      <button class="btn ghost" id="btn-cancelar-cliente-editar" style="flex:1;">Cancelar</button>
+      <button class="btn" id="btn-guardar-cliente" style="flex:1;">Guardar cambios</button>
+    </div>
   </div>
 </div>
 
@@ -1240,19 +1335,19 @@
 
   function aplicarPermisos(){
     var admin = esAdmin();
-    $("panel-nuevo-cliente").hidden = !admin;
+    $("btn-nuevo-cliente").hidden = !admin;
     $("panel-nuevo-rubro").hidden = !admin;
     $("clientes-lectura").hidden = admin;
     $("rubros-lectura").hidden = admin;
     $("cli-hint").textContent = admin
-      ? "Toca un servicio para activarlo o desactivarlo. Los cambios se guardan al instante."
+      ? "Toca los tres puntos de un cliente para modificarlo."
       : "Vista de consulta. Los cambios los realiza un administrador.";
   }
 
   /* -------------------------------------------------------- DATOS */
   async function cargarTodo(){
     var r1 = await sb.from("rubros").select("id, nombre, orden").order("orden");
-    var r2 = await sb.from("clientes").select("id, rut, nombre, rubro_id, email, telefono, servicios, f29, remuneraciones, previred").order("nombre");
+    var r2 = await sb.from("clientes").select("id, rut, nombre, rubro_id, email, telefono, servicios, activo, precio_servicios, f29, remuneraciones, previred").order("nombre");
     var r3 = await sb.from("perfiles").select("id, nombre");
     if (r1.error || r2.error){ mostrarAviso("No se pudieron cargar los datos. Revisa tu conexión."); return; }
     rubros = r1.data || [];
@@ -1335,7 +1430,7 @@
     return String(c.rut || "").replace(/[.\-\s]/g, "").toLowerCase()
       .indexOf(t.replace(/[.\-\s]/g, "")) !== -1;
   }
-  function clientesVisibles(){ return clientes.filter(coincide); }
+  function clientesVisibles(){ return clientes.filter(function(c){ return c.activo !== false; }).filter(coincide); }
 
   function rubrosOrdenados(lista){
     var base = lista || clientes;
@@ -1576,87 +1671,148 @@
     $("cli-conteo").textContent = clientes.length ? "· " + clientes.length : "";
 
     cont.innerHTML = ordenados.map(function(c){
-      return '<div class="cli-row" data-cliente="' + c.id + '">' +
-        '<div class="datos"><div class="nom">' + escapar(c.nombre) + '</div>' +
-        (c.rut ? '<div class="rut">' + escapar(c.rut) + '</div>' : '') + '</div>' +
-        '<select class="rubro-chip" data-rubro-de="' + c.id + '" aria-label="Rubro"' + (admin ? "" : " disabled") + '>' +
-        opcionesRubro(c.rubro_id) + '</select>' +
-        '<input class="email-input" type="email" data-email-de="' + c.id + '" value="' + escapar(c.email || "") + '" placeholder="Correo del portal"' + (admin ? "" : " disabled") + '>' +
-        '<div class="servicios">' +
-          SERVICIOS_CATALOGO.map(function(s){
-            var on = (c.servicios || []).indexOf(s.slug) !== -1;
-            return '<button class="chk" data-srv="' + s.slug + '" aria-pressed="' + on + '" style="--chk-color:' + s.color + '"' + (admin ? "" : " disabled") + '>' + escapar(s.nombre) + '</button>';
-          }).join("") +
-        '</div>' +
-        (admin ? '<button class="btn ghost mini" data-borrar="1">Eliminar</button>' : '') +
-        '</div>';
+      var activo = c.activo !== false;
+      var srvHtml = SERVICIOS_CATALOGO.filter(function(s){
+        return (c.servicios || []).indexOf(s.slug) !== -1;
+      }).map(function(s){
+        return '<span class="srv-badge" style="--chk-color:' + s.color + '">' + escapar(s.nombre) + '</span>';
+      }).join("");
+      return '<tr data-cliente="' + c.id + '"' + (activo ? "" : ' class="inactivo"') + '>' +
+        '<td class="nom">' + escapar(c.nombre) + '</td>' +
+        '<td class="rut">' + escapar(c.rut || "") + '</td>' +
+        '<td>' + escapar(rubroDe(c)) + '</td>' +
+        '<td>' + escapar(c.email || "") + '</td>' +
+        '<td><div class="servicios-cell">' + (srvHtml || '<span style="color:var(--faint);">—</span>') + '</div></td>' +
+        '<td><span class="estado-badge ' + (activo ? "activo" : "inactivo") + '">' + (activo ? "Activo" : "Inactivo") + '</span></td>' +
+        '<td>' + (admin ? '<button class="doc-card-dots" data-editar-cliente="' + c.id + '" aria-label="Editar cliente">⋮</button>' : "") + '</td>' +
+        '</tr>';
     }).join("");
 
     if (!admin) return;
 
-    cont.querySelectorAll("select[data-rubro-de]").forEach(function(sel){
-      sel.addEventListener("change", async function(){
-        var id = sel.dataset.rubroDe;
-        var res = await sb.from("clientes").update({ rubro_id: sel.value || null }).eq("id", id);
-        if (res.error){ mostrarAviso("No se pudo guardar el rubro."); return; }
-        await cargarTodo();
-      });
-    });
-
-    cont.querySelectorAll("input[data-email-de]").forEach(function(inp){
-      inp.addEventListener("blur", async function(){
-        var id = inp.dataset.emailDe;
-        var cli = clientes.filter(function(c){ return c.id === id; })[0];
-        var nuevo = inp.value.trim();
-        if (!cli || nuevo === (cli.email || "")) return;
-        var res = await sb.from("clientes").update({ email: nuevo || null }).eq("id", id);
-        if (res.error){
-          mostrarAviso(res.error.code === "23505" ? "Ese correo ya está en uso por otro cliente." : "No se pudo guardar el correo.");
-          inp.value = cli.email || "";
-          return;
-        }
-        await cargarTodo();
-        mostrarAviso("Correo guardado.", "ok");
-      });
-      inp.addEventListener("keydown", function(e){ if (e.key === "Enter") inp.blur(); });
-    });
-
-    cont.querySelectorAll(".chk[data-srv]").forEach(function(b){
-      b.addEventListener("click", async function(){
-        var id = b.closest(".cli-row").dataset.cliente;
-        var cli = clientes.filter(function(c){ return c.id === id; })[0];
-        var actuales = (cli && cli.servicios) || [];
-        var slug = b.dataset.srv;
-        var on = actuales.indexOf(slug) !== -1;
-        var nuevos = on ? actuales.filter(function(s){ return s !== slug; }) : actuales.concat([slug]);
-        b.setAttribute("aria-pressed", String(!on));
-        var res = await sb.from("clientes").update({ servicios: nuevos }).eq("id", id);
-        if (res.error){ mostrarAviso("No se pudo guardar el cambio de servicios."); }
-        await cargarTodo();
-      });
-    });
-
-    cont.querySelectorAll("[data-borrar]").forEach(function(b){
-      b.addEventListener("click", async function(){
-        var row = b.closest(".cli-row");
-        if (b.dataset.confirmando === "1"){
-          var res = await sb.from("clientes").delete().eq("id", row.dataset.cliente);
-          if (res.error){ mostrarAviso("No se pudo eliminar el cliente."); return; }
-          await cargarTodo();
-          return;
-        }
-        b.dataset.confirmando = "1";
-        b.className = "btn peligro mini";
-        b.textContent = "¿Seguro? Eliminar";
-        setTimeout(function(){
-          if (!b.isConnected) return;
-          b.dataset.confirmando = "";
-          b.className = "btn ghost mini";
-          b.textContent = "Eliminar";
-        }, 4000);
-      });
+    cont.querySelectorAll("[data-editar-cliente]").forEach(function(b){
+      b.addEventListener("click", function(){ abrirModalEditarCliente(b.dataset.editarCliente); });
     });
   }
+
+  /* -------------------------------------------- MODAL NUEVO CLIENTE */
+  function limpiarModalClienteNuevo(){
+    $("n-nombre").value = ""; $("n-rut").value = ""; $("n-email").value = "";
+    $("n-telefono").value = ""; $("n-precio").value = ""; $("n-rubro").value = "";
+    $("nuevo-cliente-status").textContent = "";
+    $("nuevo-cliente-status").style.color = "var(--pend)";
+    document.querySelectorAll("[data-nuevo-srv]").forEach(function(b){
+      nuevoSrv[b.dataset.nuevoSrv] = false;
+      b.setAttribute("aria-pressed", "false");
+    });
+  }
+  $("btn-nuevo-cliente").addEventListener("click", function(){
+    limpiarModalClienteNuevo();
+    $("modal-cliente-nuevo").hidden = false;
+    $("n-nombre").focus();
+  });
+  $("btn-cancelar-cliente-nuevo").addEventListener("click", function(){
+    $("modal-cliente-nuevo").hidden = true;
+    leadEnConversion = null;
+  });
+
+  /* -------------------------------------------- MODAL EDITAR CLIENTE */
+  var editSrv = {};
+  var clienteEditandoId = null;
+
+  function abrirModalEditarCliente(id){
+    var c = clientes.filter(function(x){ return x.id === id; })[0];
+    if (!c) return;
+    clienteEditandoId = id;
+    $("e-nombre").value = c.nombre || "";
+    $("e-rut").value = c.rut || "";
+    $("e-rubro").innerHTML = opcionesRubro(c.rubro_id);
+    $("e-email").value = c.email || "";
+    $("e-telefono").value = c.telefono || "";
+    $("e-precio").value = (c.precio_servicios === null || c.precio_servicios === undefined) ? "" : clp(c.precio_servicios);
+    $("e-estado").value = String(c.activo !== false);
+    $("editar-cliente-status").textContent = "";
+    document.querySelectorAll("[data-editar-srv]").forEach(function(b){
+      var on = (c.servicios || []).indexOf(b.dataset.editarSrv) !== -1;
+      editSrv[b.dataset.editarSrv] = on;
+      b.setAttribute("aria-pressed", String(on));
+    });
+    var btnBorrar = $("btn-eliminar-cliente");
+    btnBorrar.dataset.confirmando = "";
+    btnBorrar.className = "btn ghost";
+    btnBorrar.style.flex = "1";
+    btnBorrar.textContent = "Eliminar";
+    $("modal-cliente-editar").hidden = false;
+  }
+  function cerrarModalEditarCliente(){
+    $("modal-cliente-editar").hidden = true;
+    clienteEditandoId = null;
+  }
+  $("btn-cancelar-cliente-editar").addEventListener("click", cerrarModalEditarCliente);
+
+  document.querySelectorAll("[data-editar-srv]").forEach(function(b){
+    b.addEventListener("click", function(){
+      var k = b.dataset.editarSrv;
+      editSrv[k] = !editSrv[k];
+      b.setAttribute("aria-pressed", String(editSrv[k]));
+    });
+  });
+
+  $("btn-guardar-cliente").addEventListener("click", async function(){
+    if (!clienteEditandoId) return;
+    var nombre = $("e-nombre").value.trim();
+    var rut = $("e-rut").value.trim();
+    if (!nombre || !rut){ $("editar-cliente-status").textContent = "El nombre y el RUT son obligatorios."; return; }
+    var servicios = Object.keys(editSrv).filter(function(k){ return editSrv[k]; });
+    var res = await sb.from("clientes").update({
+      nombre: nombre, rut: rut,
+      rubro_id: $("e-rubro").value || null,
+      email: $("e-email").value.trim() || null,
+      telefono: $("e-telefono").value.trim() || null,
+      precio_servicios: soloDigitos($("e-precio").value),
+      servicios: servicios,
+      activo: $("e-estado").value === "true"
+    }).eq("id", clienteEditandoId);
+    if (res.error){
+      $("editar-cliente-status").textContent = res.error.code === "23505"
+        ? (res.error.message.indexOf("email") !== -1 ? "Ese correo ya está en uso por otro cliente." : "Ya existe un cliente con ese RUT.")
+        : "No se pudo guardar: " + res.error.message;
+      return;
+    }
+    cerrarModalEditarCliente();
+    await cargarTodo();
+    mostrarAviso("Cliente actualizado.", "ok");
+  });
+
+  $("btn-eliminar-cliente").addEventListener("click", async function(){
+    var b = $("btn-eliminar-cliente");
+    if (!clienteEditandoId) return;
+    if (b.dataset.confirmando === "1"){
+      var res = await sb.from("clientes").update({ activo: false }).eq("id", clienteEditandoId);
+      if (res.error){ $("editar-cliente-status").textContent = "No se pudo desactivar el cliente."; return; }
+      cerrarModalEditarCliente();
+      await cargarTodo();
+      mostrarAviso("Cliente desactivado.", "ok");
+      return;
+    }
+    b.dataset.confirmando = "1";
+    b.className = "btn peligro";
+    b.style.flex = "1";
+    b.textContent = "¿Seguro? Se desactivará";
+    setTimeout(function(){
+      if (!b.isConnected || b.dataset.confirmando !== "1") return;
+      b.dataset.confirmando = "";
+      b.className = "btn ghost";
+      b.style.flex = "1";
+      b.textContent = "Eliminar";
+    }, 4000);
+  });
+
+  document.addEventListener("keydown", function(e){
+    if (e.key !== "Escape") return;
+    if (!$("modal-cliente-nuevo").hidden) $("modal-cliente-nuevo").hidden = true;
+    if (!$("modal-cliente-editar").hidden) cerrarModalEditarCliente();
+  });
 
   /* ---------------------------------------------- MANTENEDOR RUBROS */
   function rubrosCatalogo(){
@@ -1842,13 +1998,16 @@
       b.addEventListener("click", function(){
         var lead = leads.filter(function(l){ return l.id === b.dataset.convertirLead; })[0];
         if (!lead) return;
-        leadEnConversion = lead.id;
         cambiarSubVistaClientes("clientes");
+        limpiarModalClienteNuevo();
+        leadEnConversion = lead.id;
         $("n-nombre").value = lead.nombre;
         $("n-email").value = lead.correo || "";
         $("n-telefono").value = lead.telefono || "";
-        $("n-nombre").focus();
-        mostrarAviso('Completa el RUT, rubro y servicios, y presiona "Agregar" para convertir este lead.', "ok");
+        $("nuevo-cliente-status").textContent = 'Completa el RUT, rubro y servicios, y presiona "Agregar" para convertir este lead.';
+        $("nuevo-cliente-status").style.color = "var(--ok)";
+        $("modal-cliente-nuevo").hidden = false;
+        $("n-rut").focus();
       });
     });
   }
@@ -1983,7 +2142,8 @@
 
   /* ------------------------------------------------------- DASHBOARD */
   function renderDashboard(){
-    var conF29 = clientes.filter(function(c){ return c.f29; });
+    var activos = clientes.filter(function(c){ return c.activo !== false; });
+    var conF29 = activos.filter(function(c){ return c.f29; });
     var f29Listos = conF29.filter(function(c){ return reg(c.id).f29; }).length;
     var totalPPM = 0, nPend = 0;
     conF29.forEach(function(c){
@@ -1994,9 +2154,9 @@
     });
     var pendTareas = tareas.filter(function(t){ return !t.completada; }).length;
 
-    $("d-clientes").textContent = clientes.length ? String(clientes.length) : "—";
+    $("d-clientes").textContent = activos.length ? String(activos.length) : "—";
     $("d-f29").textContent = conF29.length ? f29Listos + "/" + conF29.length : "—";
-    $("d-ppm").textContent = clientes.length ? clp(totalPPM) : "—";
+    $("d-ppm").textContent = activos.length ? clp(totalPPM) : "—";
     $("d-ppm-n").textContent = nPend === 0 ? "sin pendientes en SII" : (nPend === 1 ? "1 pendiente en SII" : nPend + " pendientes en SII");
     $("d-tareas").textContent = String(pendTareas);
 
@@ -2006,8 +2166,8 @@
     $("d-leads").textContent = String(leadsNuevos);
     $("d-conversion").textContent = leads.length ? Math.round(convertidos / leads.length * 100) + "%" : "—";
 
-    var filasRubro = rubrosOrdenados().map(function(r){
-      return { nombre: r, n: clientesDe(r).length };
+    var filasRubro = rubrosOrdenados(activos).map(function(r){
+      return { nombre: r, n: clientesDe(r, activos).length };
     });
     $("dash-rubros").innerHTML = filasRubro.length
       ? filasRubro.map(function(r){
@@ -2016,7 +2176,7 @@
       : '<p class="hint" style="margin:0;">Aún no hay rubros.</p>';
 
     var filasServicio = SERVICIOS_CATALOGO.map(function(s){
-      return { nombre: s.nombre, n: clientes.filter(function(c){ return (c.servicios || []).indexOf(s.slug) !== -1; }).length };
+      return { nombre: s.nombre, n: activos.filter(function(c){ return (c.servicios || []).indexOf(s.slug) !== -1; }).length };
     }).filter(function(s){ return s.n > 0; });
     $("dash-servicios").innerHTML = filasServicio.length
       ? filasServicio.map(function(s){
@@ -2929,27 +3089,36 @@
     });
   });
 
+  [["n-precio"], ["e-precio"]].forEach(function(par){
+    var inp = $(par[0]);
+    inp.addEventListener("focus", function(){
+      var v = soloDigitos(inp.value);
+      inp.value = v === null ? "" : String(v);
+    });
+    inp.addEventListener("blur", function(){
+      var v = soloDigitos(inp.value);
+      inp.value = v === null ? "" : clp(v);
+    });
+  });
+
   $("btn-agregar").addEventListener("click", async function(){
     var nombre = $("n-nombre").value.trim();
     var rut = $("n-rut").value.trim();
-    if (!nombre){ $("n-nombre").focus(); return; }
-    if (!rut){ $("n-rut").focus(); return; }
+    if (!nombre){ $("nuevo-cliente-status").textContent = "Ingresa el nombre o razón social."; $("n-nombre").focus(); return; }
+    if (!rut){ $("nuevo-cliente-status").textContent = "Ingresa el RUT."; $("n-rut").focus(); return; }
     var servicios = Object.keys(nuevoSrv).filter(function(k){ return nuevoSrv[k]; });
     var res = await sb.from("clientes").insert({
       nombre: nombre, rut: rut,
       rubro_id: $("n-rubro").value || null,
       email: $("n-email").value.trim() || null,
       telefono: $("n-telefono").value.trim() || null,
+      precio_servicios: soloDigitos($("n-precio").value),
       servicios: servicios
     }).select("id").single();
     if (res.error){
-      if (res.error.code === "23505"){
-        mostrarAviso(res.error.message.indexOf("email") !== -1
-          ? "Ese correo ya está en uso por otro cliente."
-          : "Ya existe un cliente con ese RUT.");
-      } else {
-        mostrarAviso("No se pudo agregar el cliente: " + res.error.message);
-      }
+      $("nuevo-cliente-status").textContent = res.error.code === "23505"
+        ? (res.error.message.indexOf("email") !== -1 ? "Ese correo ya está en uso por otro cliente." : "Ya existe un cliente con ese RUT.")
+        : "No se pudo agregar el cliente: " + res.error.message;
       return;
     }
     if (leadEnConversion){
@@ -2957,13 +3126,10 @@
       leadEnConversion = null;
       await cargarLeads();
     }
-    $("n-nombre").value = ""; $("n-rut").value = ""; $("n-email").value = ""; $("n-telefono").value = "";
-    document.querySelectorAll("[data-nuevo-srv]").forEach(function(b){
-      nuevoSrv[b.dataset.nuevoSrv] = false;
-      b.setAttribute("aria-pressed", "false");
-    });
-    $("n-nombre").focus();
+    $("modal-cliente-nuevo").hidden = true;
+    limpiarModalClienteNuevo();
     await cargarTodo();
+    mostrarAviso("Cliente agregado.", "ok");
   });
 
   $("btn-agregar-rubro").addEventListener("click", async function(){
