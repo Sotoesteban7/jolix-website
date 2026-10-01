@@ -1307,6 +1307,13 @@
   function iniciales(nombre){
     return (nombre || "?").split(" ").map(function(p){ return p[0]; }).slice(0,2).join("").toUpperCase();
   }
+  var AVATAR_COLORES = ["#8253F3", "#2F8FD1", "#2FA38A", "#E0984F", "#D6618C", "#6C63D6"];
+  function colorAvatar(id){
+    var s = String(id || "");
+    var hash = 0;
+    for (var i = 0; i < s.length; i++){ hash = (hash * 31 + s.charCodeAt(i)) | 0; }
+    return AVATAR_COLORES[Math.abs(hash) % AVATAR_COLORES.length];
+  }
   function fechaHoraComentario(iso){
     var d = new Date(iso);
     var dia = d.toLocaleDateString("es-CL", { day:"2-digit", month:"short", year:"numeric" });
@@ -1506,7 +1513,7 @@
     cont.innerHTML = lista.map(function(m){
       var nombre = perfilesPorId[m.creado_por] || "—";
       return '<div class="chat-msg">' +
-        '<div class="avatar">' + escapar(iniciales(nombre)) + '</div>' +
+        '<div class="avatar" style="background:' + colorAvatar(m.creado_por) + ';">' + escapar(iniciales(nombre)) + '</div>' +
         '<div class="cuerpo">' +
           '<div class="meta"><span class="n">' + escapar(nombre) + '</span><span class="t">' + fechaHoraComentario(m.creado) + '</span></div>' +
           '<div class="texto">' + escapar(m.texto) + '</div>' +
