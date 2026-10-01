@@ -244,9 +244,9 @@
     <!-- Nivel 2: documentos de la carpeta elegida -->
     <div id="panel-portal-espacio" hidden>
       <div class="breadcrumb" id="doc-breadcrumb"></div>
-      <h2 id="portal-carpeta-nombre" style="margin:4px 0 16px;"></h2>
-      <div class="doc-toolbar-top">
-        <div class="vista-toggle" role="group" aria-label="Vista de documentos">
+      <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap; margin:4px 0 16px;">
+        <h2 id="portal-carpeta-nombre" style="margin:0;"></h2>
+        <div class="vista-toggle" role="group" aria-label="Vista de documentos" style="margin-left:auto;">
           <button type="button" class="vista-btn" data-vista-doc="grid" aria-pressed="true" aria-label="Vista de cuadrícula">
             <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2.5" y="2.5" width="6" height="6" rx="1.2"/><rect x="11.5" y="2.5" width="6" height="6" rx="1.2"/><rect x="2.5" y="11.5" width="6" height="6" rx="1.2"/><rect x="11.5" y="11.5" width="6" height="6" rx="1.2"/></svg>
           </button>
@@ -254,6 +254,8 @@
             <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="2.5" y="3.5" width="4" height="4" rx="1"/><path d="M9.5 5.5h8"/><rect x="2.5" y="8.5" width="4" height="4" rx="1"/><path d="M9.5 10.5h8"/><rect x="2.5" y="13.5" width="4" height="4" rx="1"/><path d="M9.5 15.5h8"/></svg>
           </button>
         </div>
+      </div>
+      <div class="doc-toolbar-top">
         <button type="button" class="btn-seleccionar-todos" id="btn-seleccionar-todos" data-modo="seleccionar" hidden>
           <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="14" height="14" rx="3"/><path d="m6.5 10 2.5 2.5 5-5"/></svg>
           <span id="seleccionar-todos-label">Seleccionar todos</span>
