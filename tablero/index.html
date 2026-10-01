@@ -181,7 +181,7 @@
   /* -------------------------------------------------------- GRILLA */
   .board{position:relative;}
   .cols{
-    --grid:minmax(180px,1.5fr) 68px 68px 82px 82px 138px 86px 72px 104px;
+    --grid:minmax(180px,1.5fr) 68px 68px 82px 82px 138px 86px 72px 104px 40px;
     display:grid; grid-template-columns:var(--grid); gap:10px; align-items:center;
   }
   .head{
@@ -249,6 +249,20 @@
   .act b{display:block; font-weight:600; color:var(--muted); font-size:12px;}
   .lbl{display:none;}
 
+  .com{display:flex; align-items:center; justify-content:center;}
+  .btn-comentar{
+    position:relative; width:32px; height:32px; flex:none; border-radius:50%;
+    border:1px solid var(--line); background:var(--surface); color:var(--muted);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .btn-comentar:hover{background:var(--mist); color:var(--purple-deep); border-color:var(--mist-line);}
+  .btn-comentar svg{width:16px; height:16px;}
+  .btn-comentar .com-n{
+    position:absolute; top:-5px; right:-5px; min-width:16px; height:16px; padding:0 4px;
+    border-radius:999px; background:var(--coral-deep); color:#fff; font-size:10px; font-weight:700;
+    display:flex; align-items:center; justify-content:center; font-family:'Poppins',sans-serif;
+  }
+
   @media (max-width:1080px){
     .head{display:none;}
     .luz .txt{display:inline;}
@@ -258,8 +272,9 @@
     .cli{grid-column:1 / -1; padding-bottom:4px; border-bottom:1px solid var(--line); margin-bottom:2px;}
     .celda{display:flex; flex-direction:column; gap:5px;}
     .lbl{display:block; font-size:10.5px; text-transform:uppercase; letter-spacing:.07em; color:var(--faint); font-weight:600;}
-    .act{grid-column:1 / -1; text-align:left; padding-top:2px;}
+    .act{grid-column:1 / 2; text-align:left; padding-top:2px;}
     .act b{display:inline;}
+    .com{grid-column:2 / 3; justify-content:flex-end; padding-top:2px;}
   }
   @media (max-width:560px){
     .resumen{grid-template-columns:1fr 1fr;}
@@ -569,6 +584,30 @@
   .visor-cuerpo{background:var(--mist); border-radius:14px; min-height:220px; max-height:65vh; display:flex; align-items:center; justify-content:center; overflow:auto; margin-bottom:14px;}
   .visor-cuerpo iframe{width:100%; height:65vh; border:none; border-radius:14px; display:block;}
   .visor-cuerpo img{max-width:100%; max-height:65vh; display:block; margin:0 auto; border-radius:8px;}
+
+  .modal-card.modal-chat{max-height:88vh; display:flex; flex-direction:column;}
+  .chat-lista{flex:1; overflow-y:auto; display:flex; flex-direction:column; gap:14px; margin:14px 0; min-height:140px; max-height:48vh;}
+  .chat-vacio{text-align:center; color:var(--faint); font-size:13.5px; padding:26px 4px;}
+  .chat-msg{display:flex; gap:10px;}
+  .chat-msg .avatar{
+    width:30px; height:30px; border-radius:50%; background:var(--purple); color:#fff; flex:none;
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Poppins',sans-serif; font-weight:700; font-size:11.5px;
+  }
+  .chat-msg .cuerpo{flex:1; min-width:0;}
+  .chat-msg .meta{display:flex; align-items:baseline; gap:7px; flex-wrap:wrap; margin-bottom:2px;}
+  .chat-msg .meta .n{font-family:'Poppins',sans-serif; font-weight:600; font-size:13px; color:var(--ink);}
+  .chat-msg .meta .t{font-size:11px; color:var(--faint);}
+  .chat-msg .texto{font-size:14px; color:var(--ink); line-height:1.45; white-space:pre-wrap; overflow-wrap:anywhere;}
+  .chat-form{display:flex; gap:8px; border-top:1px solid var(--line); padding-top:14px;}
+  .chat-form input{flex:1;}
+  .btn-enviar-chat{
+    flex:none; width:42px; height:42px; border-radius:50%; border:none;
+    background:var(--purple); color:#fff; display:flex; align-items:center; justify-content:center;
+  }
+  .btn-enviar-chat:hover{background:var(--purple-deep);}
+  .btn-enviar-chat:disabled{opacity:.6;}
+  .btn-enviar-chat svg{width:18px; height:18px;}
   .visor-mensaje{color:var(--muted); font-size:13.5px; text-align:center; padding:30px 24px; max-width:40ch;}
 
   @media (prefers-reduced-motion: reduce){
@@ -711,7 +750,7 @@
       <div class="board">
         <div class="cols head">
           <span>Cliente</span><span>Docs</span><span>F29</span><span>Remun.</span><span>Previred</span>
-          <span>Monto</span><span>Transf.</span><span>SII</span><span>Actualizado</span>
+          <span>Monto</span><span>Transf.</span><span>SII</span><span>Actualizado</span><span></span>
         </div>
         <div class="filas" id="filas"></div>
         <div class="sin-resultados" id="sin-resultados" hidden></div>
@@ -1087,6 +1126,27 @@
   </div>
 </div>
 
+<!-- MODAL COMENTARIOS DEL MES -->
+<div class="modal" id="modal-comentarios" hidden>
+  <div class="modal-card modal-ancho modal-chat">
+    <h2>Comentarios <span id="com-cliente-nombre" style="color:var(--purple-deep);"></span></h2>
+    <p class="hint" id="com-mes-label"></p>
+
+    <div class="chat-lista" id="chat-lista"></div>
+
+    <form id="form-chat" class="chat-form">
+      <input id="chat-input" class="control" placeholder="Escribe un comentario…" autocomplete="off" maxlength="2000">
+      <button type="submit" class="btn-enviar-chat" aria-label="Enviar comentario">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l18-8-8 18-2-8-8-2Z"/></svg>
+      </button>
+    </form>
+
+    <div class="modal-botones">
+      <button type="button" class="btn ghost" id="btn-cerrar-comentarios">Cerrar</button>
+    </div>
+  </div>
+</div>
+
 <!-- MODAL CAMBIAR CLAVE -->
 <div class="modal" id="modal-clave" hidden>
   <div class="modal-card">
@@ -1198,6 +1258,9 @@
   var rubros = [];
   var clientes = [];
   var registros = {};
+  var comentariosConteo = {};
+  var comClienteActivo = null;
+  var comPollInterval = null;
   var mesSel = ymHoy();
   var vista = "dashboard";
   var busqueda = "";
@@ -1240,6 +1303,15 @@
   }
   function normaliza(s){
     return String(s || "").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
+  }
+  function iniciales(nombre){
+    return (nombre || "?").split(" ").map(function(p){ return p[0]; }).slice(0,2).join("").toUpperCase();
+  }
+  function fechaHoraComentario(iso){
+    var d = new Date(iso);
+    var dia = d.toLocaleDateString("es-CL", { day:"2-digit", month:"short", year:"numeric" });
+    var hora = d.toLocaleTimeString("es-CL", { hour:"2-digit", minute:"2-digit" });
+    return dia + " · " + hora;
   }
 
   /* ------------------------------------------------------ AVISOS */
@@ -1414,6 +1486,60 @@
     if (res.error){ mostrarAviso("No se pudo cargar el mes."); return; }
     registros = {};
     (res.data || []).forEach(function(r){ registros[r.cliente_id] = r; });
+    await cargarComentariosConteo();
+  }
+
+  async function cargarComentariosConteo(){
+    var res = await sb.from("comentarios_mes").select("cliente_id").eq("mes", mesSel);
+    comentariosConteo = {};
+    (res.data || []).forEach(function(c){
+      comentariosConteo[c.cliente_id] = (comentariosConteo[c.cliente_id] || 0) + 1;
+    });
+  }
+
+  function renderChat(lista){
+    var cont = $("chat-lista");
+    if (!lista.length){
+      cont.innerHTML = '<p class="chat-vacio">Todavía no hay comentarios este mes.</p>';
+      return;
+    }
+    cont.innerHTML = lista.map(function(m){
+      var nombre = perfilesPorId[m.creado_por] || "—";
+      return '<div class="chat-msg">' +
+        '<div class="avatar">' + escapar(iniciales(nombre)) + '</div>' +
+        '<div class="cuerpo">' +
+          '<div class="meta"><span class="n">' + escapar(nombre) + '</span><span class="t">' + fechaHoraComentario(m.creado) + '</span></div>' +
+          '<div class="texto">' + escapar(m.texto) + '</div>' +
+        '</div>' +
+      '</div>';
+    }).join("");
+    cont.scrollTop = cont.scrollHeight;
+  }
+
+  async function cargarComentarios(clienteId){
+    var res = await sb.from("comentarios_mes").select("id, texto, creado, creado_por")
+      .eq("cliente_id", clienteId).eq("mes", mesSel).order("creado");
+    if (res.error){ mostrarAviso("No se pudieron cargar los comentarios."); return; }
+    if (comClienteActivo === clienteId) renderChat(res.data || []);
+  }
+
+  function abrirComentarios(clienteId){
+    comClienteActivo = clienteId;
+    var c = clientes.filter(function(x){ return x.id === clienteId; })[0];
+    $("com-cliente-nombre").textContent = c ? c.nombre : "";
+    $("com-mes-label").textContent = "Comentarios de " + nombreMes(mesSel);
+    $("chat-input").value = "";
+    $("chat-lista").innerHTML = '<p class="chat-vacio">Cargando…</p>';
+    $("modal-comentarios").hidden = false;
+    cargarComentarios(clienteId);
+    if (comPollInterval) clearInterval(comPollInterval);
+    comPollInterval = setInterval(function(){ cargarComentarios(clienteId); }, 6000);
+  }
+
+  function cerrarComentarios(){
+    $("modal-comentarios").hidden = true;
+    comClienteActivo = null;
+    if (comPollInterval){ clearInterval(comPollInterval); comPollInterval = null; }
   }
 
   async function refrescarSuave(){
@@ -1423,6 +1549,7 @@
     if (res.error) return;
     registros = {};
     (res.data || []).forEach(function(r){ registros[r.cliente_id] = r; });
+    await cargarComentariosConteo();
     if (vista === "mes") renderMes();
     await cargarTareas();
     await cargarLeads();
@@ -1601,6 +1728,9 @@
           html += '<div class="celda"><span class="lbl">SII</span><span class="na">—</span></div>';
         }
         html += '<div class="act"></div>';
+        html += '<div class="com"><button type="button" class="btn-comentar" aria-label="Comentarios">' +
+          '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>' +
+          '<span class="com-n" hidden></span></button></div>';
         fila.innerHTML = html;
         destino.appendChild(fila);
       });
@@ -1615,6 +1745,12 @@
         var patch = {}; patch[campo] = !actual;
         pintarLuz(b, !actual);
         guardarRegistro(id, patch);
+      });
+    });
+
+    cont.querySelectorAll(".btn-comentar").forEach(function(b){
+      b.addEventListener("click", function(){
+        abrirComentarios(b.closest(".fila").dataset.cliente);
       });
     });
 
@@ -1654,6 +1790,10 @@
       } else {
         act.textContent = "";
       }
+      var badge = fila.querySelector(".com-n");
+      var nCom = comentariosConteo[c.id] || 0;
+      if (nCom > 0){ badge.textContent = nCom > 99 ? "99+" : String(nCom); badge.hidden = false; }
+      else { badge.hidden = true; }
     });
 
     var visibles = clientesVisibles();
@@ -3279,6 +3419,28 @@
   $("btn-cerrar-rubros").addEventListener("click", function(){ $("modal-rubros").hidden = true; });
   document.addEventListener("keydown", function(e){
     if (e.key === "Escape" && !$("modal-rubros").hidden) $("modal-rubros").hidden = true;
+  });
+
+  /* ---------------------------------------------- MODAL COMENTARIOS */
+  $("btn-cerrar-comentarios").addEventListener("click", cerrarComentarios);
+  document.addEventListener("keydown", function(e){
+    if (e.key === "Escape" && !$("modal-comentarios").hidden) cerrarComentarios();
+  });
+  $("form-chat").addEventListener("submit", async function(e){
+    e.preventDefault();
+    var texto = $("chat-input").value.trim();
+    if (!texto || !comClienteActivo) return;
+    var clienteId = comClienteActivo;
+    var btnEnviar = $("form-chat").querySelector("button[type=submit]");
+    btnEnviar.disabled = true;
+    var res = await sb.from("comentarios_mes").insert({ cliente_id: clienteId, mes: mesSel, texto: texto });
+    btnEnviar.disabled = false;
+    if (res.error){ mostrarAviso("No se pudo enviar el comentario: " + res.error.message); return; }
+    $("chat-input").value = "";
+    comentariosConteo[clienteId] = (comentariosConteo[clienteId] || 0) + 1;
+    pintarFilas();
+    await cargarComentarios(clienteId);
+    $("chat-input").focus();
   });
 
   $("sel-mes").addEventListener("change", async function(){
