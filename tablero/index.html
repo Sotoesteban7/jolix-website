@@ -19,6 +19,7 @@
     --ok:#12855C; --ok-bg:#E1F4EB; --ok-line:#A9DFC7;
     --pend:#C4413D; --pend-bg:#FBE7E6; --pend-line:#F0BFBD;
     --info:#2E6ADF; --info-bg:#E8F0FE; --info-line:#B9D2FB;
+    --nota-bg:#FCE896; --nota-line:#E6CC5C; --nota-ink:#6B5800;
     --shadow:0 18px 40px -26px rgba(59,25,148,.4);
     --radius:14px;
   }
@@ -31,6 +32,7 @@
       --ok:#5FD9A6; --ok-bg:#14342A; --ok-line:#2C6A52;
       --pend:#FF9490; --pend-bg:#381E1E; --pend-line:#7A3F3C;
       --info:#7EA6FF; --info-bg:#1A2A4A; --info-line:#3A5488;
+      --nota-bg:#3B3316; --nota-line:#6E5F22; --nota-ink:#E8CD6A;
       --shadow:0 18px 40px -26px rgba(0,0,0,.7);
     }
   }
@@ -42,6 +44,7 @@
     --ok:#5FD9A6; --ok-bg:#14342A; --ok-line:#2C6A52;
     --pend:#FF9490; --pend-bg:#381E1E; --pend-line:#7A3F3C;
     --info:#7EA6FF; --info-bg:#1A2A4A; --info-line:#3A5488;
+    --nota-bg:#3B3316; --nota-line:#6E5F22; --nota-ink:#E8CD6A;
     --shadow:0 18px 40px -26px rgba(0,0,0,.7);
   }
 
@@ -188,8 +191,8 @@
   /* -------------------------------------------------------- GRILLA */
   .board{position:relative;}
   .cols{
-    --grid:minmax(180px,1.5fr) 68px 68px 82px 82px 138px 86px 72px 104px 40px;
-    display:grid; grid-template-columns:var(--grid); gap:10px; align-items:center;
+    --grid:minmax(180px,1.5fr) 60px 60px 72px 72px 112px 84px 76px 62px 90px 72px;
+    display:grid; grid-template-columns:var(--grid); gap:8px; align-items:center;
   }
   .head{
     position:sticky; top:var(--topbar-h, 112px); z-index:5;
@@ -256,7 +259,30 @@
   .act b{display:block; font-weight:600; color:var(--muted); font-size:12px;}
   .lbl{display:none;}
 
-  .com{display:flex; align-items:center; justify-content:center;}
+  .com{display:flex; align-items:center; justify-content:center; gap:8px;}
+  .btn-nota{
+    width:32px; height:32px; flex:none; border-radius:50%;
+    border:1px solid var(--line); background:var(--surface); color:var(--muted);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .btn-nota svg{width:16px; height:16px;}
+  .btn-nota:hover{background:var(--mist); color:var(--purple-deep); border-color:var(--line);}
+  .btn-nota.con-nota{background:var(--nota-bg); border-color:var(--nota-line); color:var(--nota-ink);}
+  .btn-nota.con-nota:hover{background:var(--nota-bg); border-color:var(--nota-ink);}
+
+  .nota-tip, .nota-pop{
+    position:fixed; z-index:45; background:var(--nota-bg); color:var(--ink);
+    border:1px solid var(--nota-line); border-radius:12px; box-shadow:var(--shadow);
+    font-size:13.5px; line-height:1.4;
+  }
+  .nota-tip{max-width:280px; padding:9px 12px; white-space:pre-wrap; overflow-wrap:anywhere; pointer-events:none;}
+  .nota-pop{position:absolute; width:300px; padding:10px;}
+  .nota-pop textarea{
+    display:block; width:100%; min-height:56px; resize:none; background:transparent; color:var(--ink);
+    border:none; outline:none; font:inherit; padding:2px 2px 0;
+  }
+  .nota-pop textarea::placeholder{color:var(--nota-ink); opacity:.65;}
+  .nota-pop .nota-pie{display:flex; align-items:center; justify-content:space-between; gap:8px; margin-top:6px; font-size:11.5px; color:var(--nota-ink);}
   .btn-comentar{
     position:relative; width:32px; height:32px; flex:none; border-radius:50%;
     border:1px solid var(--line); background:var(--surface); color:var(--muted);
@@ -282,6 +308,7 @@
     .act{grid-column:1 / 2; text-align:left; padding-top:2px;}
     .act b{display:inline;}
     .com{grid-column:2 / 3; justify-content:flex-end; padding-top:2px;}
+    .nota-pop{width:min(300px, calc(100vw - 24px));}
   }
   @media (max-width:560px){
     .resumen{grid-template-columns:1fr 1fr;}
@@ -770,7 +797,7 @@
       <div class="board">
         <div class="cols head">
           <span>Cliente</span><span>Docs</span><span>F29</span><span>Remun.</span><span>Previred</span>
-          <span>Monto</span><span>Transf.</span><span>SII</span><span>Actualizado</span><span></span>
+          <span>Monto</span><span>Notificado</span><span>Transf.</span><span>SII</span><span>Actualizado</span><span></span>
         </div>
         <div class="filas" id="filas"></div>
         <div class="sin-resultados" id="sin-resultados" hidden></div>
@@ -1154,6 +1181,13 @@
   </div>
 </div>
 
+<!-- NOTA FLOTANTE POR CLIENTE (post-it) -->
+<div class="nota-tip" id="nota-tip" hidden></div>
+<div class="nota-pop" id="nota-pop" hidden>
+  <textarea id="nota-texto" maxlength="500" placeholder="Nota rápida del cliente…" aria-label="Nota del cliente"></textarea>
+  <div class="nota-pie"><span id="nota-origen"></span><span>Enter guarda</span></div>
+</div>
+
 <!-- MODAL COMENTARIOS DEL MES -->
 <div class="modal" id="modal-comentarios" hidden>
   <div class="modal-card modal-ancho modal-chat">
@@ -1284,6 +1318,8 @@
   var clientes = [];
   var registros = {};
   var comentariosConteo = {};
+  var notas = {};
+  var notaAbierta = null;
   var comClienteActivo = null;
   var comPollInterval = null;
   var mesSel = ymHoy();
@@ -1519,7 +1555,94 @@
     registros = {};
     (res.data || []).forEach(function(r){ registros[r.cliente_id] = r; });
     await cargarComentariosConteo();
+    await cargarNotas();
   }
+
+  async function cargarNotas(){
+    var res = await sb.from("notas_cliente").select("cliente_id, mes, texto").lte("mes", mesSel).order("mes");
+    if (res.error) return;
+    notas = {};
+    (res.data || []).forEach(function(n){ notas[n.cliente_id] = { mes: n.mes, texto: n.texto }; });
+  }
+
+  function notaTexto(clienteId){
+    return notas[clienteId] ? notas[clienteId].texto : "";
+  }
+
+  function mostrarTipNota(btn){
+    if (notaAbierta) return;
+    var texto = notaTexto(btn.closest(".fila").dataset.cliente);
+    if (!texto) return;
+    var tip = $("nota-tip");
+    tip.textContent = texto;
+    tip.hidden = false;
+    var r = btn.getBoundingClientRect();
+    var w = tip.offsetWidth, h = tip.offsetHeight;
+    var top = r.top - h - 8;
+    if (top < 8) top = r.bottom + 8;
+    var left = Math.min(Math.max(8, r.right - w), window.innerWidth - w - 8);
+    tip.style.top = top + "px";
+    tip.style.left = left + "px";
+  }
+  function ocultarTipNota(){ $("nota-tip").hidden = true; }
+
+  function abrirNota(btn){
+    if (notaAbierta && notaAbierta.btn === btn){ cerrarNota(true); return; }
+    cerrarNota(true);
+    ocultarTipNota();
+    var id = btn.closest(".fila").dataset.cliente;
+    var n = notas[id];
+    var texto = n ? n.texto : "";
+    notaAbierta = { clienteId: id, mes: mesSel, original: texto, btn: btn };
+    var ta = $("nota-texto");
+    ta.value = texto;
+    $("nota-origen").textContent = (n && n.texto && n.mes !== mesSel)
+      ? "Viene de " + nombreMes(n.mes) + ". Si la cambias, rige desde " + nombreMes(mesSel) + "."
+      : "Rige desde " + nombreMes(mesSel) + " hasta que otro mes la cambie.";
+    var pop = $("nota-pop");
+    pop.hidden = false;
+    var r = btn.getBoundingClientRect();
+    var w = pop.offsetWidth, h = pop.offsetHeight;
+    var top = r.bottom + 8;
+    if (top + h > window.innerHeight - 8) top = Math.max(8, r.top - h - 8);
+    var left = Math.min(Math.max(8, r.right - w), window.innerWidth - w - 8);
+    pop.style.top = (top + window.scrollY) + "px";
+    pop.style.left = (left + window.scrollX) + "px";
+    ta.focus();
+  }
+
+  async function cerrarNota(guardar){
+    if (!notaAbierta) return;
+    var na = notaAbierta;
+    notaAbierta = null;
+    $("nota-pop").hidden = true;
+    if (!guardar) return;
+    var texto = $("nota-texto").value.trim();
+    if (texto === na.original) return;
+    var previa = notas[na.clienteId];
+    if (na.mes === mesSel){
+      notas[na.clienteId] = { mes: na.mes, texto: texto };
+      pintarFilas();
+    }
+    var res = await sb.from("notas_cliente").upsert({ cliente_id: na.clienteId, mes: na.mes, texto: texto }, { onConflict: "cliente_id,mes" });
+    if (res.error){
+      mostrarAviso("No se pudo guardar la nota: " + res.error.message);
+      if (na.mes === mesSel){
+        if (previa) notas[na.clienteId] = previa; else delete notas[na.clienteId];
+        pintarFilas();
+      }
+    }
+  }
+
+  $("nota-texto").addEventListener("keydown", function(e){
+    if (e.key === "Enter" && !e.shiftKey){ e.preventDefault(); cerrarNota(true); }
+    else if (e.key === "Escape"){ e.preventDefault(); cerrarNota(false); }
+  });
+  document.addEventListener("mousedown", function(e){
+    if (!notaAbierta) return;
+    if (e.target.closest("#nota-pop") || e.target.closest(".btn-nota")) return;
+    cerrarNota(true);
+  });
 
   async function cargarComentariosConteo(){
     var res = await sb.from("comentarios_mes").select("cliente_id").eq("mes", mesSel);
@@ -1576,12 +1699,13 @@
 
   async function refrescarSuave(){
     var foco = document.activeElement;
-    if (foco && (foco.tagName === "INPUT" || foco.tagName === "SELECT")) return;
+    if (foco && (foco.tagName === "INPUT" || foco.tagName === "SELECT" || foco.tagName === "TEXTAREA")) return;
     var res = await sb.from("registros").select("*").eq("mes", mesSel);
     if (res.error) return;
     registros = {};
     (res.data || []).forEach(function(r){ registros[r.cliente_id] = r; });
     await cargarComentariosConteo();
+    await cargarNotas();
     if (vista === "mes") renderMes();
     await cargarTareas();
     await cargarLeads();
@@ -1752,15 +1876,22 @@
         if (c.f29){
           html += '<div class="celda"><span class="lbl">Monto</span>' +
             '<input class="monto" data-campo="ppm_monto" inputmode="numeric" placeholder="$0" aria-label="Monto PPM"></div>';
+        } else {
+          html += '<div class="celda"><span class="lbl">Monto</span><span class="na">—</span></div>';
+        }
+        html += celdaLuz("Notificado", "notificado", true);
+        if (c.f29){
           html += celdaLuz("Transf.", "ppm_transferido", true);
           html += celdaLuz("SII", "ppm_pagado", true);
         } else {
-          html += '<div class="celda"><span class="lbl">Monto</span><span class="na">—</span></div>';
           html += '<div class="celda"><span class="lbl">Transf.</span><span class="na">—</span></div>';
           html += '<div class="celda"><span class="lbl">SII</span><span class="na">—</span></div>';
         }
         html += '<div class="act"></div>';
-        html += '<div class="com"><button type="button" class="btn-comentar" aria-label="Comentarios">' +
+        html += '<div class="com">' +
+          '<button type="button" class="btn-nota" aria-label="Nota del cliente">' +
+          '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h14a1 1 0 0 1 1 1v9l-6 6H5a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1Z"/><path d="M14 20v-5a1 1 0 0 1 1-1h5"/></svg></button>' +
+          '<button type="button" class="btn-comentar" aria-label="Comentarios">' +
           '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>' +
           '<span class="com-n" hidden></span></button></div>';
         fila.innerHTML = html;
@@ -1778,6 +1909,14 @@
         pintarLuz(b, !actual);
         guardarRegistro(id, patch);
       });
+    });
+
+    cont.querySelectorAll(".btn-nota").forEach(function(b){
+      b.addEventListener("mouseenter", function(){ mostrarTipNota(b); });
+      b.addEventListener("mouseleave", ocultarTipNota);
+      b.addEventListener("focus", function(){ mostrarTipNota(b); });
+      b.addEventListener("blur", ocultarTipNota);
+      b.addEventListener("click", function(){ abrirNota(b); });
     });
 
     cont.querySelectorAll(".btn-comentar").forEach(function(b){
@@ -1822,6 +1961,10 @@
       } else {
         act.textContent = "";
       }
+      var btnNota = fila.querySelector(".btn-nota");
+      var textoNota = notaTexto(c.id);
+      btnNota.classList.toggle("con-nota", !!textoNota);
+      btnNota.setAttribute("aria-label", textoNota ? "Nota del cliente: " + textoNota : "Agregar nota del cliente");
       var badge = fila.querySelector(".com-n");
       var nCom = comentariosConteo[c.id] || 0;
       if (nCom > 0){ badge.textContent = nCom > 99 ? "99+" : String(nCom); badge.hidden = false; }
