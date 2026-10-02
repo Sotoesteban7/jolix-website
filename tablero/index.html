@@ -282,7 +282,6 @@
     border:none; outline:none; font:inherit; padding:2px 2px 0;
   }
   .nota-pop textarea::placeholder{color:var(--nota-ink); opacity:.65;}
-  .nota-pop .nota-pie{display:flex; align-items:center; justify-content:space-between; gap:8px; margin-top:6px; font-size:11.5px; color:var(--nota-ink);}
   .btn-comentar{
     position:relative; width:32px; height:32px; flex:none; border-radius:50%;
     border:1px solid var(--line); background:var(--surface); color:var(--muted);
@@ -1185,7 +1184,6 @@
 <div class="nota-tip" id="nota-tip" hidden></div>
 <div class="nota-pop" id="nota-pop" hidden>
   <textarea id="nota-texto" maxlength="500" placeholder="Nota rápida del cliente…" aria-label="Nota del cliente"></textarea>
-  <div class="nota-pie"><span id="nota-origen"></span><span>Enter guarda</span></div>
 </div>
 
 <!-- MODAL COMENTARIOS DEL MES -->
@@ -1596,9 +1594,6 @@
     notaAbierta = { clienteId: id, mes: mesSel, original: texto, btn: btn };
     var ta = $("nota-texto");
     ta.value = texto;
-    $("nota-origen").textContent = (n && n.texto && n.mes !== mesSel)
-      ? "Viene de " + nombreMes(n.mes) + ". Si la cambias, rige desde " + nombreMes(mesSel) + "."
-      : "Rige desde " + nombreMes(mesSel) + " hasta que otro mes la cambie.";
     var pop = $("nota-pop");
     pop.hidden = false;
     var r = btn.getBoundingClientRect();
