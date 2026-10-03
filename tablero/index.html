@@ -414,6 +414,8 @@
     border-radius:6px; font-size:13px; font-family:inherit; color:var(--ink); cursor:pointer;
   }
   .doc-card-rename:hover{background:var(--mist);}
+  .cli-menu{position:relative; top:auto; right:auto; display:inline-block;}
+  .cli-menu .doc-card-dropdown{position:fixed; top:auto; right:auto; min-width:176px;}
   .btn-notificar{display:inline-flex; align-items:center; gap:6px;}
   .btn-notificar svg{width:14px; height:14px; flex:none;}
   .btn-notificar .tab-badge{margin-left:0;}
@@ -949,7 +951,7 @@
             <button class="btn ghost mini" id="btn-abrir-rubros" type="button" style="display:inline-flex; align-items:center; gap:6px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;"><rect x="3.5" y="4.5" width="17" height="15" rx="2"/><path d="M3.5 9.5h17"/></svg>Gestionar rubros</button>
           </div>
         </h2>
-        <p class="hint" id="cli-hint">Toca los tres puntos de un cliente para modificarlo.</p>
+        <p class="hint" id="cli-hint">Toca los tres puntos de un cliente para editarlo o enviarle el acceso al portal.</p>
         <div class="buscador" style="margin-bottom:14px">
           <svg class="lupa" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.6-3.6"/></svg>
           <input id="buscar-clientes" class="control" placeholder="Buscar empresa o RUT…" autocomplete="off" aria-label="Buscar cliente">
@@ -1159,6 +1161,22 @@
     <div style="display:flex; gap:10px; margin-top:18px;">
       <button class="btn ghost" id="btn-cancelar-notificar" style="flex:1;">Cancelar</button>
       <button class="btn" id="btn-enviar-notificar" style="flex:1;">Enviar aviso</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL ENVIAR ACCESO AL PORTAL (guía de bienvenida) -->
+<div class="modal" id="modal-acceso-portal" hidden>
+  <div class="modal-card">
+    <h2>Enviar acceso al portal</h2>
+    <p class="hint" id="acceso-resumen"></p>
+    <p style="font-size:13.5px; margin:0 0 4px; color:var(--muted);">Se enviará a</p>
+    <p style="font-family:'Poppins',sans-serif; font-weight:600; font-size:14.5px; margin:0 0 14px; overflow-wrap:anywhere;" id="acceso-destino"></p>
+    <p class="hint" style="margin-bottom:0;">Es una guía de bienvenida: explica qué es el portal, cómo entrar paso a paso, qué verá dentro y por qué es seguro. No lleva ningún enlace de acceso: el cliente entra desde la web con "Acceso clientes".</p>
+    <p class="interview-status" id="acceso-status" style="font-size:13px; color:var(--pend); margin:10px 0 0;"></p>
+    <div style="display:flex; gap:10px; margin-top:18px;">
+      <button class="btn ghost" id="btn-cancelar-acceso" style="flex:1;">Cancelar</button>
+      <button class="btn" id="btn-enviar-acceso" style="flex:1;">Enviar guía</button>
     </div>
   </div>
 </div>
@@ -1556,7 +1574,7 @@
     $("clientes-lectura").hidden = admin;
     $("rubros-lectura").hidden = admin;
     $("cli-hint").textContent = admin
-      ? "Toca los tres puntos de un cliente para modificarlo."
+      ? "Toca los tres puntos de un cliente para editarlo o enviarle el acceso al portal."
       : "Vista de consulta. Los cambios los realiza un administrador.";
   }
 
@@ -2052,6 +2070,32 @@
 
   var busquedaClientes = "";
 
+  /* Menú ⋮ de cada cliente: "Enviar Acceso Portal" solo existe si el cliente tiene un correo registrado */
+  function menuClienteHtml(c){
+    var tieneCorreo = !!(c.email && c.email.trim());
+    return '<div class="doc-card-menu cli-menu">' +
+      '<button class="doc-card-dots" data-cli-menu="' + c.id + '" aria-label="Más opciones" aria-haspopup="true" aria-expanded="false">⋮</button>' +
+      '<div class="doc-card-dropdown" hidden>' +
+        '<button type="button" class="doc-card-rename" data-editar-cliente="' + c.id + '">Editar cliente</button>' +
+        (tieneCorreo ? '<button type="button" class="doc-card-rename" data-enviar-acceso="' + c.id + '">Enviar Acceso Portal</button>' : "") +
+      '</div></div>';
+  }
+  function posicionarMenuCliente(btn, dd){
+    var r = btn.getBoundingClientRect();
+    var ancho = dd.offsetWidth, alto = dd.offsetHeight;
+    var izq = Math.max(8, Math.min(r.right - ancho, window.innerWidth - ancho - 8));
+    var arriba = r.bottom + 4;
+    if (arriba + alto > window.innerHeight - 8) arriba = Math.max(8, r.top - alto - 4);
+    dd.style.left = izq + "px";
+    dd.style.top = arriba + "px";
+  }
+  function cerrarMenusCliente(){
+    document.querySelectorAll(".cli-menu .doc-card-dropdown").forEach(function(dd){ dd.hidden = true; });
+    document.querySelectorAll(".cli-menu .doc-card-dots").forEach(function(b){ b.setAttribute("aria-expanded", "false"); });
+  }
+  window.addEventListener("scroll", cerrarMenusCliente, true);
+  window.addEventListener("resize", cerrarMenusCliente);
+
   function renderClientes(){
     var cont = $("lista-cli");
     var admin = esAdmin();
@@ -2082,14 +2126,29 @@
         '<td>' + escapar(c.email || "") + '</td>' +
         '<td><div class="servicios-cell">' + (srvHtml || '<span style="color:var(--faint);">—</span>') + '</div></td>' +
         '<td><span class="estado-badge ' + (activo ? "activo" : "inactivo") + '">' + (activo ? "Activo" : "Inactivo") + '</span></td>' +
-        '<td>' + (admin ? '<button class="doc-card-dots" data-editar-cliente="' + c.id + '" aria-label="Editar cliente">⋮</button>' : "") + '</td>' +
+        '<td>' + (admin ? menuClienteHtml(c) : "") + '</td>' +
         '</tr>';
     }).join("");
 
     if (!admin) return;
 
+    cont.querySelectorAll("[data-cli-menu]").forEach(function(btn){
+      btn.addEventListener("click", function(e){
+        e.stopPropagation();
+        var yaAbierto = btn.getAttribute("aria-expanded") === "true";
+        cerrarMenusDoc();
+        if (yaAbierto) return;
+        var dd = btn.nextElementSibling;
+        btn.setAttribute("aria-expanded", "true");
+        dd.hidden = false;
+        posicionarMenuCliente(btn, dd);
+      });
+    });
     cont.querySelectorAll("[data-editar-cliente]").forEach(function(b){
       b.addEventListener("click", function(){ abrirModalEditarCliente(b.dataset.editarCliente); });
+    });
+    cont.querySelectorAll("[data-enviar-acceso]").forEach(function(b){
+      b.addEventListener("click", function(){ abrirModalAccesoPortal(b.dataset.enviarAcceso); });
     });
   }
 
@@ -2159,6 +2218,45 @@
     clienteEditandoId = null;
   }
   $("btn-cancelar-cliente-editar").addEventListener("click", cerrarModalEditarCliente);
+
+  /* -------------------------------------------- ENVIAR ACCESO AL PORTAL */
+  var accesoClienteId = null;
+  function abrirModalAccesoPortal(id){
+    var c = clientes.filter(function(x){ return x.id === id; })[0];
+    var correo = c ? (c.email || "").trim() : "";
+    if (!c || !correo) return;
+    accesoClienteId = id;
+    $("acceso-resumen").textContent = "Guía de bienvenida al Portal Jolix para " + c.nombre + ".";
+    $("acceso-destino").textContent = correo;
+    $("acceso-status").textContent = "";
+    $("btn-enviar-acceso").disabled = false;
+    $("btn-enviar-acceso").textContent = "Enviar guía";
+    $("modal-acceso-portal").hidden = false;
+  }
+  function cerrarModalAccesoPortal(){
+    $("modal-acceso-portal").hidden = true;
+    accesoClienteId = null;
+  }
+  $("btn-cancelar-acceso").addEventListener("click", cerrarModalAccesoPortal);
+  document.addEventListener("keydown", function(e){
+    if (e.key === "Escape" && !$("modal-acceso-portal").hidden) cerrarModalAccesoPortal();
+  });
+  $("btn-enviar-acceso").addEventListener("click", async function(){
+    if (!accesoClienteId) return;
+    var btn = $("btn-enviar-acceso");
+    btn.disabled = true; btn.textContent = "Enviando…";
+    $("acceso-status").textContent = "";
+    var res = await sb.functions.invoke("enviar-acceso-portal", { body: { cliente_id: accesoClienteId } });
+    if (res.error){
+      var msg = "No se pudo enviar la guía. Inténtalo de nuevo.";
+      try { var j = await res.error.context.json(); if (j && j.error) msg = j.error; } catch(e){}
+      $("acceso-status").textContent = msg;
+      btn.disabled = false; btn.textContent = "Enviar guía";
+      return;
+    }
+    cerrarModalAccesoPortal();
+    mostrarAviso("Guía de acceso enviada a " + ((res.data && res.data.destinatario) || "el cliente") + ".", "ok");
+  });
 
   document.querySelectorAll("[data-editar-srv]").forEach(function(b){
     b.addEventListener("click", function(){
