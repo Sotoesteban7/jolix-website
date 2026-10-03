@@ -898,12 +898,7 @@
         </div>
         <p class="hint">El cliente ve estos archivos de inmediato en su portal, en jolixasesorias.com/portal.</p>
 
-        <div id="bloque-subcarpetas" hidden>
-          <h3 class="titulo-lista" style="margin-top:20px;">Carpetas <span id="subcarpetas-conteo" style="color:var(--faint); font-weight:500;"></span></h3>
-          <div class="doc-grid" id="lista-subcarpetas"></div>
-        </div>
-
-        <h3 class="titulo-lista" style="margin-top:20px;">Archivos de esta carpeta <span id="doc-conteo" style="color:var(--faint); font-weight:500;"></span></h3>
+        <h3 class="titulo-lista" style="margin-top:20px;">Contenido de esta carpeta <span id="doc-conteo" style="color:var(--faint); font-weight:500;"></span></h3>
         <div class="doc-toolbar">
           <button type="button" class="btn ghost mini" id="btn-seleccionar-todos" data-modo="seleccionar" hidden style="display:inline-flex; align-items:center; gap:6px;">
             <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="14" height="14" rx="3"/><path d="m6.5 10 2.5 2.5 5-5"/></svg>
@@ -925,8 +920,8 @@
         <div class="doc-grid" id="lista-documentos"></div>
         <div class="vacio" id="doc-vacio" hidden>
           <img src="personajes/jo_saludo.png" alt="">
-          <h3>Sin documentos todavía</h3>
-          <p>Sube el primero con el botón "Cargar documentos".</p>
+          <h3>Esta carpeta está vacía</h3>
+          <p>Sube documentos con "Cargar documentos" o crea una carpeta con "+ Nueva carpeta".</p>
         </div>
       </div>
     </section>
@@ -3022,16 +3017,33 @@
     enlazarTarjetasCarpeta(cont, admin);
   }
 
+  function menuCarpetaHtml(c, admin){
+    if (!admin) return "";
+    return '<div class="doc-card-menu"><button class="doc-card-dots" data-carpeta-menu="' + c.id + '" aria-label="Más opciones" aria-haspopup="true" aria-expanded="false">⋮</button>' +
+      '<div class="doc-card-dropdown" hidden>' +
+        '<button class="doc-card-rename" data-renombrar-carpeta="' + c.id + '">Renombrar</button>' +
+        '<button class="doc-card-delete" data-borrar-carpeta="' + c.id + '">Eliminar</button>' +
+      '</div></div>';
+  }
+
   function tarjetaCarpetaHtml(c, admin){
     return '<div class="doc-card" data-carpeta="' + c.id + '" tabindex="0" title="' + escapar(c.nombre) + '">' +
-      (admin ? '<div class="doc-card-menu"><button class="doc-card-dots" data-carpeta-menu="' + c.id + '" aria-label="Más opciones" aria-haspopup="true" aria-expanded="false">⋮</button>' +
-        '<div class="doc-card-dropdown" hidden>' +
-          '<button class="doc-card-rename" data-renombrar-carpeta="' + c.id + '">Renombrar</button>' +
-          '<button class="doc-card-delete" data-borrar-carpeta="' + c.id + '">Eliminar</button>' +
-        '</div></div>' : '') +
+      menuCarpetaHtml(c, admin) +
       '<div class="doc-card-icon">' + iconoCarpeta() + '</div>' +
       '<div class="doc-card-name">' + escapar(c.nombre) + '</div>' +
       '<div class="doc-card-date">' + textoContenidoCarpeta(c) + '</div>' +
+      '</div>';
+  }
+
+  function filaListaCarpeta(c, admin){
+    return '<div class="doc-list-item" data-carpeta="' + c.id + '" tabindex="0" title="' + escapar(c.nombre) + '">' +
+      (admin ? '<div class="doc-list-check" style="width:16px;"></div>' : '') +
+      '<div class="doc-list-icon">' + iconoCarpeta() + '</div>' +
+      '<div class="doc-list-info">' +
+        '<div class="doc-list-name">' + escapar(c.nombre) + '</div>' +
+        '<div class="doc-list-meta">' + textoContenidoCarpeta(c) + '</div>' +
+      '</div>' +
+      menuCarpetaHtml(c, admin) +
       '</div>';
   }
 
@@ -3233,11 +3245,6 @@
 
     $("btn-nueva-subcarpeta").hidden = !admin;
     var subs = carpeta ? subcarpetasDe(carpeta.id) : [];
-    $("bloque-subcarpetas").hidden = subs.length === 0;
-    $("subcarpetas-conteo").textContent = subs.length ? "· " + subs.length : "";
-    var contSubs = $("lista-subcarpetas");
-    contSubs.innerHTML = subs.map(function(c){ return tarjetaCarpetaHtml(c, admin); }).join("");
-    enlazarTarjetasCarpeta(contSubs, admin);
 
     var lista = documentos.filter(function(d){ return d.carpeta_id === docCarpetaActiva; });
     lista.sort(function(a, b){
@@ -3249,15 +3256,19 @@
       var tb = new Date(b.subido_en).getTime();
       return docOrden === "antiguos" ? ta - tb : tb - ta;
     });
-    $("doc-conteo").textContent = lista.length ? "· " + lista.length : "";
-    $("doc-vacio").hidden = lista.length > 0;
+    var total = subs.length + lista.length;
+    $("doc-conteo").textContent = total ? "· " + total : "";
+    $("doc-vacio").hidden = total > 0;
     docListaActual = lista;
 
     var cont = $("lista-documentos");
     cont.className = docVista === "lista" ? "doc-list" : "doc-grid";
-    cont.innerHTML = lista.map(function(d){
+    cont.innerHTML = subs.map(function(c){
+      return docVista === "lista" ? filaListaCarpeta(c, admin) : tarjetaCarpetaHtml(c, admin);
+    }).join("") + lista.map(function(d){
       return docVista === "lista" ? filaListaDoc(d, admin) : tarjetaDoc(d, admin);
     }).join("");
+    enlazarTarjetasCarpeta(cont, admin);
 
     cont.querySelectorAll("[data-doc]").forEach(function(card){
       card.addEventListener("dblclick", function(){ abrirVisorDoc(card.dataset.doc); });

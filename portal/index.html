@@ -264,9 +264,6 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5v12"/><path d="m7 11 5 5 5-5"/><path d="M4.5 18.5v1a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2v-1"/></svg>
         </button>
       </div>
-      <div id="bloque-subcarpetas" hidden style="margin-bottom:22px;">
-        <div class="doc-grid" id="lista-subcarpetas"></div>
-      </div>
       <div class="doc-grid" id="lista-docs" hidden></div>
       <div class="vacio" id="docs-vacio" hidden>
         <h3>Aún no hay documentos aquí</h3>
@@ -465,6 +462,16 @@
       '<div class="doc-card-date">' + textoContenidoCarpeta(c) + '</div>' +
       '</div>';
   }
+  function filaListaCarpeta(c){
+    return '<div class="doc-list-item" data-carpeta="' + c.id + '" tabindex="0" title="' + escapar(c.nombre) + '">' +
+      '<div class="doc-list-check" style="width:16px;"></div>' +
+      '<div class="doc-list-icon">' + iconoCarpeta() + '</div>' +
+      '<div class="doc-list-info">' +
+        '<div class="doc-list-name">' + escapar(c.nombre) + '</div>' +
+        '<div class="doc-list-meta">' + textoContenidoCarpeta(c) + '</div>' +
+      '</div>' +
+      '</div>';
+  }
   function enlazarTarjetasCarpeta(cont){
     cont.querySelectorAll("[data-carpeta]").forEach(function(card){
       card.addEventListener("click", function(){ abrirCarpeta(card.dataset.carpeta); });
@@ -563,21 +570,20 @@
     renderBreadcrumb($("doc-breadcrumb"), migas);
 
     var subs = carpeta ? subcarpetasDe(carpeta.id) : [];
-    $("bloque-subcarpetas").hidden = subs.length === 0;
-    var contSubs = $("lista-subcarpetas");
-    contSubs.innerHTML = subs.map(tarjetaCarpetaHtml).join("");
-    enlazarTarjetasCarpeta(contSubs);
-
     var lista = documentos.filter(function(d){ return d.carpeta_id === docCarpetaActiva; });
     docListaActual = lista;
-    $("lista-docs").hidden = lista.length === 0;
-    $("docs-vacio").hidden = lista.length !== 0 || subs.length !== 0;
+    var total = subs.length + lista.length;
+    $("lista-docs").hidden = total === 0;
+    $("docs-vacio").hidden = total !== 0;
 
     var cont = $("lista-docs");
     cont.className = docVista === "lista" ? "doc-list" : "doc-grid";
-    cont.innerHTML = lista.map(function(d){
+    cont.innerHTML = subs.map(function(c){
+      return docVista === "lista" ? filaListaCarpeta(c) : tarjetaCarpetaHtml(c);
+    }).join("") + lista.map(function(d){
       return docVista === "lista" ? filaListaDoc(d) : tarjetaDoc(d);
     }).join("");
+    enlazarTarjetasCarpeta(cont);
 
     cont.querySelectorAll("[data-doc]").forEach(function(card){
       card.addEventListener("dblclick", function(){ verDocumento(card.dataset.doc); });
