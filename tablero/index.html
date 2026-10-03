@@ -409,6 +409,11 @@
     border-radius:6px; font-size:13px; font-family:inherit; color:var(--pend); cursor:pointer;
   }
   .doc-card-delete:hover{background:var(--pend-bg);}
+  .doc-card-rename{
+    display:block; width:100%; text-align:left; padding:8px 10px; border:none; background:none;
+    border-radius:6px; font-size:13px; font-family:inherit; color:var(--ink); cursor:pointer;
+  }
+  .doc-card-rename:hover{background:var(--mist);}
   .doc-card-icon{width:40px; height:50px; margin-top:2px;}
   .doc-card-icon svg{width:100%; height:100%; display:block;}
   .doc-card-name{
@@ -888,9 +893,15 @@
               <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="2.5" y="3.5" width="4" height="4" rx="1"/><path d="M9.5 5.5h8"/><rect x="2.5" y="8.5" width="4" height="4" rx="1"/><path d="M9.5 10.5h8"/><rect x="2.5" y="13.5" width="4" height="4" rx="1"/><path d="M9.5 15.5h8"/></svg>
             </button>
           </div>
+          <button class="btn ghost mini" id="btn-nueva-subcarpeta">+ Nueva carpeta</button>
           <button class="btn mini" id="btn-abrir-carga">Cargar documentos</button>
         </div>
         <p class="hint">El cliente ve estos archivos de inmediato en su portal, en jolixasesorias.com/portal.</p>
+
+        <div id="bloque-subcarpetas" hidden>
+          <h3 class="titulo-lista" style="margin-top:20px;">Carpetas <span id="subcarpetas-conteo" style="color:var(--faint); font-weight:500;"></span></h3>
+          <div class="doc-grid" id="lista-subcarpetas"></div>
+        </div>
 
         <h3 class="titulo-lista" style="margin-top:20px;">Archivos de esta carpeta <span id="doc-conteo" style="color:var(--faint); font-weight:500;"></span></h3>
         <div class="doc-toolbar">
@@ -904,10 +915,12 @@
           <button type="button" class="btn-icono-peligro" id="btn-eliminar-seleccion" hidden aria-label="Eliminar seleccionados">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M9 7V4.5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1V7"/><path d="M6 7l1 12.5a2 2 0 0 0 2 1.8h6a2 2 0 0 0 2-1.8L18 7"/><path d="M10 11v6M14 11v6"/></svg>
           </button>
-          <button type="button" class="btn ghost mini" id="btn-orden-docs" data-orden="desc" style="display:inline-flex; align-items:center; gap:6px;">
-            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4v12M6 16l-3-3M6 16l3-3"/><path d="M14 16V4M14 4l-3 3M14 4l3 3"/></svg>
-            <span id="orden-docs-label">Más nuevos primero</span>
-          </button>
+          <select id="orden-docs" class="control" aria-label="Ordenar archivos" style="padding:6px 10px; font-size:13px;">
+            <option value="az">Nombre (A → Z)</option>
+            <option value="za">Nombre (Z → A)</option>
+            <option value="nuevos">Más nuevos primero</option>
+            <option value="antiguos">Más antiguos primero</option>
+          </select>
         </div>
         <div class="doc-grid" id="lista-documentos"></div>
         <div class="vacio" id="doc-vacio" hidden>
@@ -1120,8 +1133,8 @@
 <!-- MODAL NUEVA CARPETA -->
 <div class="modal" id="modal-carpeta" hidden>
   <div class="modal-card">
-    <h2>Nueva carpeta</h2>
-    <p class="hint">Se creará en <strong id="carpeta-modal-anio"></strong> para <strong id="carpeta-modal-cliente"></strong>.</p>
+    <h2 id="carpeta-modal-titulo">Nueva carpeta</h2>
+    <p class="hint" id="carpeta-modal-hint"></p>
     <div class="g">
       <label for="carpeta-nombre">Nombre</label>
       <input id="carpeta-nombre" class="control" placeholder="Contabilidad" style="width:100%;" autocomplete="off">
@@ -2858,7 +2871,8 @@
   var docAnioActivo = 2026;
   var busquedaDocCli = "";
   var docVista = localStorage.getItem("jolix_doc_vista") || "grid";
-  var docOrden = localStorage.getItem("jolix_doc_orden") || "desc";
+  var docOrden = localStorage.getItem("jolix_doc_orden_v2") || "az";
+  if (["az", "za", "nuevos", "antiguos"].indexOf(docOrden) === -1) docOrden = "az";
   var docSeleccion = new Set();
   var docListaActual = [];
 
@@ -2894,6 +2908,30 @@
       '</svg>';
   }
 
+  function compararNombres(a, b){
+    return String(a).localeCompare(String(b), "es", { numeric: true, sensitivity: "base" });
+  }
+  function carpetaPorId(id){
+    return carpetas.filter(function(c){ return c.id === id; })[0];
+  }
+  function rutaCarpeta(id){
+    var ruta = [], c = carpetaPorId(id), guardia = 0;
+    while (c && guardia++ < 50){ ruta.unshift(c); c = c.parent_id ? carpetaPorId(c.parent_id) : null; }
+    return ruta;
+  }
+  function subcarpetasDe(id){
+    return carpetas.filter(function(c){ return c.parent_id === id; })
+      .sort(function(a, b){ return compararNombres(a.nombre, b.nombre); });
+  }
+  function textoContenidoCarpeta(c){
+    var nc = carpetas.filter(function(x){ return x.parent_id === c.id; }).length;
+    var nd = documentos.filter(function(d){ return d.carpeta_id === c.id; }).length;
+    var partes = [];
+    if (nc) partes.push(nc + (nc === 1 ? " carpeta" : " carpetas"));
+    if (nd) partes.push(nd + (nd === 1 ? " documento" : " documentos"));
+    return partes.length ? partes.join(" · ") : "Vacía";
+  }
+
   function renderBreadcrumb(el, segmentos){
     el.innerHTML = segmentos.map(function(s, i){
       var sep = i > 0 ? '<span class="sep">/</span>' : '';
@@ -2905,8 +2943,10 @@
     var b = e.target.closest("[data-ir-doc]");
     if (!b) return;
     docSeleccion.clear();
-    if (b.dataset.irDoc === "clientes"){ docClienteActivo = null; docCarpetaActiva = null; }
-    if (b.dataset.irDoc === "carpetas"){ docCarpetaActiva = null; }
+    var destino = b.dataset.irDoc;
+    if (destino === "clientes"){ docClienteActivo = null; docCarpetaActiva = null; }
+    else if (destino === "carpetas"){ docCarpetaActiva = null; }
+    else if (destino.indexOf("carpeta:") === 0){ docCarpetaActiva = destino.slice(8); }
     renderDocumentos();
   });
 
@@ -2970,25 +3010,32 @@
       b.setAttribute("aria-pressed", String(Number(b.dataset.anio) === docAnioActivo));
     });
 
-    var lista = carpetas.filter(function(c){ return c.cliente_id === docClienteActivo && c.anio === docAnioActivo; })
-      .sort(function(a, b){ return a.nombre.localeCompare(b.nombre, "es"); });
+    var lista = carpetas.filter(function(c){ return c.cliente_id === docClienteActivo && c.anio === docAnioActivo && !c.parent_id; })
+      .sort(function(a, b){ return compararNombres(a.nombre, b.nombre); });
     $("carpetas-conteo").textContent = lista.length ? "· " + lista.length : "";
     $("carpetas-vacio").hidden = lista.length > 0;
     $("carpetas-vacio-anio").textContent = String(docAnioActivo);
 
     var cont = $("lista-carpetas");
     cont.className = "doc-grid";
-    cont.innerHTML = lista.map(function(c){
-      var n = documentos.filter(function(d){ return d.carpeta_id === c.id; }).length;
-      return '<div class="doc-card" data-carpeta="' + c.id + '" tabindex="0" title="' + escapar(c.nombre) + '">' +
-        (admin ? '<div class="doc-card-menu"><button class="doc-card-dots" data-carpeta-menu="' + c.id + '" aria-label="Más opciones" aria-haspopup="true" aria-expanded="false">⋮</button>' +
-          '<div class="doc-card-dropdown" hidden><button class="doc-card-delete" data-borrar-carpeta="' + c.id + '">Eliminar</button></div></div>' : '') +
-        '<div class="doc-card-icon">' + iconoCarpeta() + '</div>' +
-        '<div class="doc-card-name">' + escapar(c.nombre) + '</div>' +
-        '<div class="doc-card-date">' + (n ? n + (n === 1 ? " documento" : " documentos") : "Vacía") + '</div>' +
-        '</div>';
-    }).join("");
+    cont.innerHTML = lista.map(function(c){ return tarjetaCarpetaHtml(c, admin); }).join("");
+    enlazarTarjetasCarpeta(cont, admin);
+  }
 
+  function tarjetaCarpetaHtml(c, admin){
+    return '<div class="doc-card" data-carpeta="' + c.id + '" tabindex="0" title="' + escapar(c.nombre) + '">' +
+      (admin ? '<div class="doc-card-menu"><button class="doc-card-dots" data-carpeta-menu="' + c.id + '" aria-label="Más opciones" aria-haspopup="true" aria-expanded="false">⋮</button>' +
+        '<div class="doc-card-dropdown" hidden>' +
+          '<button class="doc-card-rename" data-renombrar-carpeta="' + c.id + '">Renombrar</button>' +
+          '<button class="doc-card-delete" data-borrar-carpeta="' + c.id + '">Eliminar</button>' +
+        '</div></div>' : '') +
+      '<div class="doc-card-icon">' + iconoCarpeta() + '</div>' +
+      '<div class="doc-card-name">' + escapar(c.nombre) + '</div>' +
+      '<div class="doc-card-date">' + textoContenidoCarpeta(c) + '</div>' +
+      '</div>';
+  }
+
+  function enlazarTarjetasCarpeta(cont, admin){
     cont.querySelectorAll("[data-carpeta]").forEach(function(card){
       card.addEventListener("click", function(e){
         if (e.target.closest(".doc-card-menu")) return;
@@ -3008,12 +3055,20 @@
         if (!yaAbierto){ btn.setAttribute("aria-expanded", "true"); btn.nextElementSibling.hidden = false; }
       });
     });
+    cont.querySelectorAll("[data-renombrar-carpeta]").forEach(function(b){
+      b.addEventListener("click", function(e){
+        e.stopPropagation();
+        cerrarMenusDoc();
+        abrirModalCarpeta({ modo: "renombrar", id: b.dataset.renombrarCarpeta });
+      });
+    });
     cont.querySelectorAll("[data-borrar-carpeta]").forEach(function(b){
       b.addEventListener("click", async function(e){
         e.stopPropagation();
-        var n = documentos.filter(function(d){ return d.carpeta_id === b.dataset.borrarCarpeta; }).length;
-        if (n > 0){
-          mostrarAviso("Solo se pueden eliminar carpetas vacías. Esta tiene " + n + (n === 1 ? " documento." : " documentos."));
+        var carpeta = carpetaPorId(b.dataset.borrarCarpeta);
+        var contenido = carpeta ? textoContenidoCarpeta(carpeta) : "Vacía";
+        if (contenido !== "Vacía"){
+          mostrarAviso("Solo se pueden eliminar carpetas vacías. Esta tiene " + contenido + ".");
           cerrarMenusDoc();
           return;
         }
@@ -3037,28 +3092,61 @@
     });
   });
 
-  $("btn-nueva-carpeta").addEventListener("click", function(){
-    $("carpeta-nombre").value = "";
+  var carpetaModal = { modo: "nueva", parentId: null, id: null };
+  function abrirModalCarpeta(cfg){
+    carpetaModal = cfg;
+    var cliente = nombreCliente(docClienteActivo);
+    if (cfg.modo === "renombrar"){
+      var actual = carpetaPorId(cfg.id);
+      $("carpeta-modal-titulo").textContent = "Renombrar carpeta";
+      $("carpeta-modal-hint").textContent = "Solo cambia el nombre: los documentos de adentro se quedan donde están.";
+      $("btn-crear-carpeta").textContent = "Guardar";
+      $("carpeta-nombre").value = actual ? actual.nombre : "";
+    } else {
+      var madre = cfg.parentId ? carpetaPorId(cfg.parentId) : null;
+      $("carpeta-modal-titulo").textContent = "Nueva carpeta";
+      $("carpeta-modal-hint").textContent = madre
+        ? "Se creará dentro de «" + madre.nombre + "» (" + madre.anio + ") para " + cliente + "."
+        : "Se creará en " + docAnioActivo + " para " + cliente + ".";
+      $("btn-crear-carpeta").textContent = "Crear";
+      $("carpeta-nombre").value = "";
+    }
     $("carpeta-status").textContent = "";
-    $("carpeta-modal-anio").textContent = String(docAnioActivo);
-    $("carpeta-modal-cliente").textContent = nombreCliente(docClienteActivo);
     $("modal-carpeta").hidden = false;
     $("carpeta-nombre").focus();
-  });
+    $("carpeta-nombre").select();
+  }
+  $("btn-nueva-carpeta").addEventListener("click", function(){ abrirModalCarpeta({ modo: "nueva", parentId: null }); });
+  $("btn-nueva-subcarpeta").addEventListener("click", function(){ abrirModalCarpeta({ modo: "nueva", parentId: docCarpetaActiva }); });
   $("btn-cancelar-carpeta").addEventListener("click", function(){ $("modal-carpeta").hidden = true; });
+  $("carpeta-nombre").addEventListener("keydown", function(e){
+    if (e.key === "Enter"){ e.preventDefault(); $("btn-crear-carpeta").click(); }
+  });
   $("btn-crear-carpeta").addEventListener("click", async function(){
     var nombre = $("carpeta-nombre").value.trim();
     if (!nombre){ $("carpeta-status").textContent = "Ingresa un nombre."; return; }
-    var res = await sb.from("carpetas").insert({ cliente_id: docClienteActivo, nombre: nombre, anio: docAnioActivo });
+    var renombrando = carpetaModal.modo === "renombrar";
+    var res;
+    if (renombrando){
+      var actual = carpetaPorId(carpetaModal.id);
+      if (actual && actual.nombre === nombre){ $("modal-carpeta").hidden = true; return; }
+      res = await sb.from("carpetas").update({ nombre: nombre }).eq("id", carpetaModal.id);
+    } else {
+      var madre = carpetaModal.parentId ? carpetaPorId(carpetaModal.parentId) : null;
+      res = await sb.from("carpetas").insert({
+        cliente_id: docClienteActivo, nombre: nombre,
+        anio: madre ? madre.anio : docAnioActivo, parent_id: carpetaModal.parentId || null
+      });
+    }
     if (res.error){
       $("carpeta-status").textContent = res.error.code === "23505"
-        ? "Ya existe una carpeta con ese nombre en ese año."
-        : "No se pudo crear la carpeta.";
+        ? "Ya existe una carpeta con ese nombre en este lugar."
+        : (renombrando ? "No se pudo renombrar la carpeta." : "No se pudo crear la carpeta.");
       return;
     }
     $("modal-carpeta").hidden = true;
     await cargarCarpetas();
-    mostrarAviso("Carpeta creada.", "ok");
+    mostrarAviso(renombrando ? "Carpeta renombrada." : "Carpeta creada.", "ok");
   });
   document.addEventListener("keydown", function(e){
     if (e.key === "Escape" && !$("modal-carpeta").hidden) $("modal-carpeta").hidden = true;
@@ -3066,6 +3154,8 @@
 
   function abrirCarpeta(id){
     docCarpetaActiva = id;
+    var c = carpetaPorId(id);
+    if (c) docAnioActivo = c.anio;
     docSeleccion.clear();
     renderEspacioDoc();
   }
@@ -3128,19 +3218,36 @@
     $("btn-abrir-carga").hidden = !admin;
     $("documentos-lectura").hidden = admin;
 
-    var carpeta = carpetas.filter(function(c){ return c.id === docCarpetaActiva; })[0];
+    var carpeta = carpetaPorId(docCarpetaActiva);
     $("doc-espacio-nombre").textContent = carpeta ? carpeta.nombre : "";
-    renderBreadcrumb($("doc-breadcrumb-espacio"), [
+    var ruta = rutaCarpeta(docCarpetaActiva);
+    var migas = [
       { texto: "Todos los clientes", ir: "clientes" },
-      { texto: nombreCliente(docClienteActivo), ir: "carpetas" },
-      { texto: (carpeta ? carpeta.anio + " · " + carpeta.nombre : "") }
-    ]);
+      { texto: nombreCliente(docClienteActivo), ir: "carpetas" }
+    ];
+    ruta.forEach(function(c, i){
+      var texto = i === 0 ? c.anio + " · " + c.nombre : c.nombre;
+      migas.push(i < ruta.length - 1 ? { texto: texto, ir: "carpeta:" + c.id } : { texto: texto });
+    });
+    renderBreadcrumb($("doc-breadcrumb-espacio"), migas);
+
+    $("btn-nueva-subcarpeta").hidden = !admin;
+    var subs = carpeta ? subcarpetasDe(carpeta.id) : [];
+    $("bloque-subcarpetas").hidden = subs.length === 0;
+    $("subcarpetas-conteo").textContent = subs.length ? "· " + subs.length : "";
+    var contSubs = $("lista-subcarpetas");
+    contSubs.innerHTML = subs.map(function(c){ return tarjetaCarpetaHtml(c, admin); }).join("");
+    enlazarTarjetasCarpeta(contSubs, admin);
 
     var lista = documentos.filter(function(d){ return d.carpeta_id === docCarpetaActiva; });
     lista.sort(function(a, b){
+      if (docOrden === "az" || docOrden === "za"){
+        var r = compararNombres(a.nombre_archivo, b.nombre_archivo);
+        return docOrden === "az" ? r : -r;
+      }
       var ta = new Date(a.subido_en).getTime();
       var tb = new Date(b.subido_en).getTime();
-      return docOrden === "asc" ? ta - tb : tb - ta;
+      return docOrden === "antiguos" ? ta - tb : tb - ta;
     });
     $("doc-conteo").textContent = lista.length ? "· " + lista.length : "";
     $("doc-vacio").hidden = lista.length > 0;
@@ -3216,14 +3323,11 @@
   });
 
   (function(){
-    var b = $("btn-orden-docs");
-    b.dataset.orden = docOrden;
-    $("orden-docs-label").textContent = docOrden === "desc" ? "Más nuevos primero" : "Más antiguos primero";
-    b.addEventListener("click", function(){
-      docOrden = docOrden === "desc" ? "asc" : "desc";
-      localStorage.setItem("jolix_doc_orden", docOrden);
-      b.dataset.orden = docOrden;
-      $("orden-docs-label").textContent = docOrden === "desc" ? "Más nuevos primero" : "Más antiguos primero";
+    var s = $("orden-docs");
+    s.value = docOrden;
+    s.addEventListener("change", function(){
+      docOrden = s.value;
+      localStorage.setItem("jolix_doc_orden_v2", docOrden);
       renderEspacioDoc();
     });
   })();
@@ -3370,8 +3474,8 @@
 
   function abrirModalCarga(){
     if (!docClienteActivo || !docCarpetaActiva) return;
-    var carpeta = carpetas.filter(function(c){ return c.id === docCarpetaActiva; })[0];
-    $("cd-cliente-nombre").textContent = "— " + nombreCliente(docClienteActivo) + (carpeta ? " / " + carpeta.nombre : "");
+    var rutaNombres = rutaCarpeta(docCarpetaActiva).map(function(c){ return c.nombre; });
+    $("cd-cliente-nombre").textContent = "— " + nombreCliente(docClienteActivo) + (rutaNombres.length ? " / " + rutaNombres.join(" / ") : "");
     cargaDocsArchivos = [];
     renderListaCarga();
     $("modal-carga-docs").hidden = false;

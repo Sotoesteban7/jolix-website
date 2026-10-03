@@ -264,6 +264,9 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5v12"/><path d="m7 11 5 5 5-5"/><path d="M4.5 18.5v1a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2v-1"/></svg>
         </button>
       </div>
+      <div id="bloque-subcarpetas" hidden style="margin-bottom:22px;">
+        <div class="doc-grid" id="lista-subcarpetas"></div>
+      </div>
       <div class="doc-grid" id="lista-docs" hidden></div>
       <div class="vacio" id="docs-vacio" hidden>
         <h3>Aún no hay documentos aquí</h3>
@@ -430,9 +433,44 @@
     var b = e.target.closest("[data-ir-doc]");
     if (!b) return;
     docSeleccion.clear();
-    docCarpetaActiva = null;
+    var destino = b.dataset.irDoc;
+    docCarpetaActiva = destino.indexOf("carpeta:") === 0 ? destino.slice(8) : null;
     renderPortalDocs();
   });
+
+  function carpetaPorId(id){
+    return carpetas.filter(function(c){ return c.id === id; })[0];
+  }
+  function rutaCarpeta(id){
+    var ruta = [], c = carpetaPorId(id), guardia = 0;
+    while (c && guardia++ < 50){ ruta.unshift(c); c = c.parent_id ? carpetaPorId(c.parent_id) : null; }
+    return ruta;
+  }
+  function subcarpetasDe(id){
+    return carpetas.filter(function(c){ return c.parent_id === id; })
+      .sort(function(a, b){ return a.nombre.localeCompare(b.nombre, "es", { numeric: true, sensitivity: "base" }); });
+  }
+  function textoContenidoCarpeta(c){
+    var nc = carpetas.filter(function(x){ return x.parent_id === c.id; }).length;
+    var nd = documentos.filter(function(d){ return d.carpeta_id === c.id; }).length;
+    var partes = [];
+    if (nc) partes.push(nc + (nc === 1 ? " carpeta" : " carpetas"));
+    if (nd) partes.push(nd + (nd === 1 ? " documento" : " documentos"));
+    return partes.length ? partes.join(" · ") : "Vacía";
+  }
+  function tarjetaCarpetaHtml(c){
+    return '<div class="doc-card" data-carpeta="' + c.id + '" tabindex="0" title="' + escapar(c.nombre) + '">' +
+      '<div class="doc-card-icon">' + iconoCarpeta() + '</div>' +
+      '<div class="doc-card-name">' + escapar(c.nombre) + '</div>' +
+      '<div class="doc-card-date">' + textoContenidoCarpeta(c) + '</div>' +
+      '</div>';
+  }
+  function enlazarTarjetasCarpeta(cont){
+    cont.querySelectorAll("[data-carpeta]").forEach(function(card){
+      card.addEventListener("click", function(){ abrirCarpeta(card.dataset.carpeta); });
+      card.addEventListener("keydown", function(e){ if (e.key === "Enter") abrirCarpeta(card.dataset.carpeta); });
+    });
+  }
 
   function renderCarpetas(){
     $("cargando-docs").hidden = true;
@@ -442,25 +480,14 @@
       b.setAttribute("aria-pressed", String(Number(b.dataset.anio) === docAnioActivo));
     });
 
-    var lista = carpetas.filter(function(c){ return c.anio === docAnioActivo; })
-      .sort(function(a, b){ return a.nombre.localeCompare(b.nombre, "es"); });
+    var lista = carpetas.filter(function(c){ return c.anio === docAnioActivo && !c.parent_id; })
+      .sort(function(a, b){ return a.nombre.localeCompare(b.nombre, "es", { numeric: true, sensitivity: "base" }); });
     $("carpetas-vacio").hidden = lista.length > 0;
     $("carpetas-vacio-anio").textContent = String(docAnioActivo);
 
     var cont = $("lista-carpetas");
-    cont.innerHTML = lista.map(function(c){
-      var n = documentos.filter(function(d){ return d.carpeta_id === c.id; }).length;
-      return '<div class="doc-card" data-carpeta="' + c.id + '" tabindex="0" title="' + escapar(c.nombre) + '">' +
-        '<div class="doc-card-icon">' + iconoCarpeta() + '</div>' +
-        '<div class="doc-card-name">' + escapar(c.nombre) + '</div>' +
-        '<div class="doc-card-date">' + (n ? n + (n === 1 ? " documento" : " documentos") : "Vacía") + '</div>' +
-        '</div>';
-    }).join("");
-
-    cont.querySelectorAll("[data-carpeta]").forEach(function(card){
-      card.addEventListener("click", function(){ abrirCarpeta(card.dataset.carpeta); });
-      card.addEventListener("keydown", function(e){ if (e.key === "Enter") abrirCarpeta(card.dataset.carpeta); });
-    });
+    cont.innerHTML = lista.map(tarjetaCarpetaHtml).join("");
+    enlazarTarjetasCarpeta(cont);
   }
 
   document.querySelectorAll("#filtro-doc-anio .seg").forEach(function(b){
@@ -472,6 +499,8 @@
 
   function abrirCarpeta(id){
     docCarpetaActiva = id;
+    var c = carpetaPorId(id);
+    if (c) docAnioActivo = c.anio;
     docSeleccion.clear();
     renderLista();
   }
@@ -523,17 +552,26 @@
     $("panel-portal-carpetas").hidden = true;
     $("panel-portal-espacio").hidden = false;
 
-    var carpeta = carpetas.filter(function(c){ return c.id === docCarpetaActiva; })[0];
+    var carpeta = carpetaPorId(docCarpetaActiva);
     $("portal-carpeta-nombre").textContent = carpeta ? carpeta.nombre : "";
-    renderBreadcrumb($("doc-breadcrumb"), [
-      { texto: "Mis documentos", ir: "carpetas" },
-      { texto: carpeta ? carpeta.anio + " · " + carpeta.nombre : "" }
-    ]);
+    var ruta = rutaCarpeta(docCarpetaActiva);
+    var migas = [{ texto: "Mis documentos", ir: "carpetas" }];
+    ruta.forEach(function(c, i){
+      var texto = i === 0 ? c.anio + " · " + c.nombre : c.nombre;
+      migas.push(i < ruta.length - 1 ? { texto: texto, ir: "carpeta:" + c.id } : { texto: texto });
+    });
+    renderBreadcrumb($("doc-breadcrumb"), migas);
+
+    var subs = carpeta ? subcarpetasDe(carpeta.id) : [];
+    $("bloque-subcarpetas").hidden = subs.length === 0;
+    var contSubs = $("lista-subcarpetas");
+    contSubs.innerHTML = subs.map(tarjetaCarpetaHtml).join("");
+    enlazarTarjetasCarpeta(contSubs);
 
     var lista = documentos.filter(function(d){ return d.carpeta_id === docCarpetaActiva; });
     docListaActual = lista;
     $("lista-docs").hidden = lista.length === 0;
-    $("docs-vacio").hidden = lista.length !== 0;
+    $("docs-vacio").hidden = lista.length !== 0 || subs.length !== 0;
 
     var cont = $("lista-docs");
     cont.className = docVista === "lista" ? "doc-list" : "doc-grid";
