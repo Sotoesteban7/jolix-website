@@ -71,6 +71,7 @@
   .aviso{border-radius:11px;padding:11px 14px;font-size:13.5px;margin-bottom:16px;}
   .aviso.err{background:#FBE7E6;border:1px solid #F0BFBD;color:#C4413D;}
   .aviso.ok{background:var(--ok-bg);border:1px solid var(--ok);color:var(--ok);}
+  .aviso.info{background:var(--mist);border:1px solid var(--line);color:var(--muted);}
   .pie{margin-top:20px;font-size:12.5px;color:var(--faint);text-align:center;line-height:1.6;}
   .icono-correo{width:52px;height:52px;border-radius:50%;background:var(--mist);display:flex;align-items:center;justify-content:center;margin:0 auto 18px;color:var(--purple);}
 
@@ -340,6 +341,13 @@
 
   function mostrarError(msg){
     var el = $("login-error");
+    el.className = "aviso err";
+    el.textContent = msg;
+    el.hidden = false;
+  }
+  function mostrarInfo(msg){
+    var el = $("login-error");
+    el.className = "aviso info";
     el.textContent = msg;
     el.hidden = false;
   }
@@ -388,6 +396,7 @@
   });
 
   $("btn-salir").addEventListener("click", async function(){
+    borrarVigencia();
     await sb.auth.signOut();
     location.href = window.location.pathname;
   });
@@ -730,6 +739,80 @@
     if (e.key === "Escape" && !$("modal-visor-doc").hidden) cerrarVisorDoc();
   });
 
+  /* ---------------- vigencia de la sesión ----------------
+     La sesión de Supabase se renueva sola y no vence. Como el portal guarda documentos contables,
+     se suma un límite propio: se cierra a los 7 días sin usarlo, o a los 30 días de haber entrado
+     con el enlace, y hay que pedir uno nuevo. Vive en el navegador: frena el uso casual de un
+     equipo compartido o perdido; los datos siguen protegidos por las políticas de la base de datos. */
+  var DIAS_SIN_USO = 7, DIAS_TOPE = 30, MS_DIA = 86400000;
+  var CLAVE_VIGENCIA = "jolix_portal_vigencia";
+  var llegoPorEnlace = /[#?&](access_token|code)=/.test(location.hash + location.search);
+  var ultimoRegistro = 0;
+
+  function leerVigencia(){
+    try { return JSON.parse(localStorage.getItem(CLAVE_VIGENCIA) || "null") || {}; } catch(e){ return {}; }
+  }
+  function guardarVigencia(v){ try { localStorage.setItem(CLAVE_VIGENCIA, JSON.stringify(v)); } catch(e){} }
+  function borrarVigencia(){ try { localStorage.removeItem(CLAVE_VIGENCIA); } catch(e){} }
+  function vencida(v, ahora){
+    return ahora - v.ultima > DIAS_SIN_USO * MS_DIA || ahora - v.inicio > DIAS_TOPE * MS_DIA;
+  }
+
+  async function cerrarPorVigencia(){
+    borrarVigencia();
+    try { await sb.auth.signOut({ scope: "local" }); } catch(e){}
+    documentos = []; carpetas = []; docSeleccion.clear();
+    $("lista-carpetas").innerHTML = ""; $("lista-docs").innerHTML = "";
+    cerrarVisorDoc();
+    $("app").hidden = true;
+    $("pantalla-login").hidden = false;
+    $("paso-enviado").hidden = true; $("paso-correo").hidden = false;
+    mostrarInfo("Por tu seguridad, tu sesión se cerró. Pide un nuevo enlace para volver a entrar.");
+  }
+
+  /* true si la sesión sigue vigente; si no, la cierra. Nada de lo asíncrono ocurre antes de leer el estado. */
+  async function validarSesion(session, comoActividad){
+    var ahora = Date.now();
+    var v = leerVigencia();
+    if (llegoPorEnlace){
+      llegoPorEnlace = false;
+      v = { inicio: ahora, ultima: ahora };
+    } else if (typeof v.inicio !== "number"){
+      var ult = Date.parse(session.user && session.user.last_sign_in_at);
+      v = { inicio: isNaN(ult) ? ahora : ult, ultima: ahora };
+    }
+    if (typeof v.ultima !== "number") v.ultima = ahora;
+    if (vencida(v, ahora)){ await cerrarPorVigencia(); return false; }
+    if (comoActividad) v.ultima = ahora;
+    guardarVigencia(v);
+    return true;
+  }
+
+  async function verificarVigencia(comoActividad){
+    if ($("app").hidden) return;
+    var ses = await sb.auth.getSession();
+    if (ses.data.session) await validarSesion(ses.data.session, comoActividad);
+  }
+
+  /* Usar el portal cuenta como actividad (como máximo una vez por minuto), pero nunca revive una sesión ya vencida. */
+  function registrarActividad(){
+    var ahora = Date.now();
+    if (ahora - ultimoRegistro < 60000) return;
+    ultimoRegistro = ahora;
+    var v = leerVigencia();
+    if (typeof v.inicio !== "number" || typeof v.ultima !== "number") return;
+    if (vencida(v, ahora)){ verificarVigencia(false); return; }
+    v.ultima = ahora;
+    guardarVigencia(v);
+  }
+  ["click", "keydown", "touchstart", "scroll"].forEach(function(ev){
+    document.addEventListener(ev, registrarActividad, { passive: true, capture: true });
+  });
+  document.addEventListener("visibilitychange", function(){
+    if (document.visibilityState === "visible") verificarVigencia(true);
+  });
+  setInterval(function(){ verificarVigencia(false); }, 30 * 60 * 1000);
+
   /* ---------------- sesión ---------------- */
   async function iniciar(){
     var ses = await sb.auth.getSession();
@@ -738,6 +821,7 @@
       $("app").hidden = true;
       return;
     }
+    if (!(await validarSesion(ses.data.session, true))) return;
     var perfil = await sb.from("clientes").select("nombre").eq("auth_user_id", ses.data.session.user.id).single();
     if (perfil.error || !perfil.data){
       mostrarError("Tu correo no está asociado a ningún cliente de Jolix. Si crees que es un error, contáctanos.");
