@@ -175,6 +175,73 @@
   .btn-descargar-modal{background:var(--purple);color:#fff;}
   .btn-descargar-modal:hover{background:var(--purple-deep);}
   .btn-descargar-modal:disabled{opacity:.6;cursor:default;}
+
+  /* ---------- movimiento ----------
+     Solo se animan posición, escala y transparencia (liviano). Con "reducir movimiento" todo queda quieto. */
+  :root{--mv-ease:cubic-bezier(.2,.8,.2,1);--mv-spring:cubic-bezier(.34,1.56,.64,1);}
+  @keyframes mv-dibujar{from{stroke-dashoffset:1;}}
+  @keyframes mv-giro{to{transform:rotate(360deg);}}
+  .mv-sp,.mv-ck{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;}
+  .mv-sp circle{stroke-dasharray:30 20;transform-origin:center;animation:mv-giro .8s linear infinite;}
+  .mv-ck path{stroke-dasharray:1;animation:mv-dibujar .35s var(--mv-ease) backwards;}
+
+  /* Entrar con el correo */
+  .btn-full.mv-cargando{opacity:1;cursor:progress;display:inline-flex;align-items:center;justify-content:center;}
+  .icono-correo{position:relative;}
+  .icono-correo .ok{position:absolute;right:-3px;top:-3px;width:20px;height:20px;border-radius:50%;background:var(--ok);color:#fff;display:flex;align-items:center;justify-content:center;border:2px solid var(--surface);}
+  .icono-correo .ok svg{width:11px;height:11px;fill:none;stroke:currentColor;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;}
+  .icono-correo .ok path{stroke-dasharray:1;animation:mv-dibujar .35s .35s var(--mv-ease) backwards;}
+
+  /* Carpetas: se levantan al pasar el mouse; el panel entra deslizando */
+  .doc-card[data-carpeta]{transition:transform .18s var(--mv-ease),box-shadow .18s,background .15s ease,border-color .15s ease;}
+  .doc-card[data-carpeta]:hover,.doc-card[data-carpeta]:focus-visible{transform:translateY(-3px);box-shadow:var(--shadow);}
+  #panel-portal-espacio:not([hidden]){animation:mv-panel-der .24s var(--mv-ease);}
+  #panel-portal-carpetas.mv-vuelta{animation:mv-panel-izq .24s var(--mv-ease);}
+  @keyframes mv-panel-der{from{opacity:0;transform:translateX(28px);}}
+  @keyframes mv-panel-izq{from{opacity:0;transform:translateX(-28px);}}
+
+  /* Año: la píldora se desliza */
+  .segmento{position:relative;}
+  .segmento .seg{position:relative;z-index:1;}
+  .seg-pill{position:absolute;z-index:0;top:3px;bottom:3px;left:0;width:0;border-radius:999px;background:var(--surface);box-shadow:0 1px 3px rgba(0,0,0,.08);pointer-events:none;opacity:0;}
+  .seg-pill.lista{opacity:1;transition:transform .28s var(--mv-ease),width .28s var(--mv-ease);}
+  .segmento.con-pill .seg[aria-pressed="true"]{background:transparent;box-shadow:none;}
+
+  /* Selección: la tarjeta se marca, el botón de descarga entra con su contador */
+  .doc-card:has(input:checked),.doc-list-item:has(input:checked){border-color:var(--purple);background:var(--mist);}
+  .btn-icono-info{position:relative;}
+  .btn-icono-info:not([hidden]){animation:mv-entra .26s var(--mv-ease);}
+  @keyframes mv-entra{from{opacity:0;transform:translateX(10px);}}
+  .btn-icono-info .sp,.btn-icono-info .ck{display:none;}
+  .btn-icono-info.mv-cargando .dwn{display:none;}
+  .btn-icono-info.mv-cargando .sp{display:block;}
+  .btn-icono-info.mv-ok{background:var(--ok);border-color:var(--ok);color:#fff;}
+  .btn-icono-info.mv-ok .dwn{display:none;}
+  .btn-icono-info.mv-ok .ck{display:block;}
+  .btn-icono-info .sp circle{stroke-dasharray:30 20;transform-origin:center;animation:mv-giro .8s linear infinite;}
+  .btn-icono-info .ck path{stroke-dasharray:1;animation:mv-dibujar .35s var(--mv-ease) backwards;}
+  .dl-n{position:absolute;top:-7px;right:-7px;min-width:17px;height:17px;padding:0 4px;border-radius:9px;background:var(--purple);color:#fff;font:600 10.5px/17px 'Poppins',sans-serif;text-align:center;pointer-events:none;}
+  .btn-icono-info.mv-ok .dl-n{display:none;}
+
+  /* Avance del ZIP */
+  .zip-prog{display:grid;gap:6px;margin:-6px 0 18px;padding:12px 14px;background:var(--surface);border:1px solid var(--line);border-radius:12px;font-size:12.5px;}
+  .zip-prog:not([hidden]){animation:mv-bajar .22s var(--mv-ease);}
+  @keyframes mv-bajar{from{opacity:0;transform:translateY(-6px);}}
+  .zip-prog .fila{display:flex;justify-content:space-between;gap:10px;color:var(--muted);}
+  .zip-prog .fila em{font-style:normal;font-variant-numeric:tabular-nums;color:var(--ink);font-weight:600;white-space:nowrap;}
+  .zip-prog .pista{height:6px;border-radius:3px;background:var(--mist);overflow:hidden;}
+  .zip-prog .pista i{display:block;height:100%;border-radius:3px;background:var(--purple);transform-origin:left;transform:scaleX(0);transition:transform .35s var(--mv-ease);}
+  .zip-prog.listo .pista i{background:var(--ok);}
+
+  /* Visor de documentos */
+  .modal:not([hidden]){animation:mv-fondo .18s ease;}
+  .modal:not([hidden]) .modal-card{animation:mv-modal .26s var(--mv-ease);}
+  @keyframes mv-fondo{from{opacity:0;}}
+  @keyframes mv-modal{from{opacity:0;transform:scale(.95) translateY(6px);}}
+
+  @media (prefers-reduced-motion: reduce){
+    *,*::before,*::after{transition:none !important;animation:none !important;}
+  }
 </style>
 </head>
 <body>
@@ -201,6 +268,7 @@
     <div id="paso-enviado" hidden>
       <div class="icono-correo">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M3.5 6.5h17v11h-17v-11Z" stroke="currentColor" stroke-width="1.8"/><path d="m4 7 8 6 8-6" stroke="currentColor" stroke-width="1.8"/></svg>
+        <span class="ok" aria-hidden="true"><svg viewBox="0 0 20 20"><path d="M4.5 10.5l3.6 3.6L15.5 6" pathLength="1"/></svg></span>
       </div>
       <p style="text-align:center;font-family:'Poppins',sans-serif;font-weight:600;font-size:17px;margin-bottom:8px;">Revisa tu bandeja de entrada</p>
       <p style="text-align:center;font-size:14.5px;line-height:1.6;color:var(--muted);margin-bottom:18px;">Si <strong style="font-family:'Poppins',sans-serif;font-weight:600;color:var(--ink);overflow-wrap:anywhere;" id="correo-enviado-a"></strong> pertenece a una de nuestras empresas, ahí vas a encontrar el enlace de acceso a Portal Jolix.</p>
@@ -232,6 +300,7 @@
     <!-- Nivel 1: carpetas, por año -->
     <div id="panel-portal-carpetas" hidden>
       <div class="segmento" id="filtro-doc-anio" style="margin-bottom:18px;">
+        <span class="seg-pill" id="seg-pill" aria-hidden="true"></span>
         <button class="seg" data-anio="2025" aria-pressed="false">2025</button>
         <button class="seg" data-anio="2026" aria-pressed="true">2026</button>
       </div>
@@ -262,8 +331,15 @@
           <span id="seleccionar-todos-label">Seleccionar todos</span>
         </button>
         <button type="button" class="btn-icono-info" id="btn-descargar-seleccion" hidden aria-label="Descargar seleccionados">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5v12"/><path d="m7 11 5 5 5-5"/><path d="M4.5 18.5v1a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2v-1"/></svg>
+          <svg class="dwn" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5v12"/><path d="m7 11 5 5 5-5"/><path d="M4.5 18.5v1a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2v-1"/></svg>
+          <svg class="sp" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="10" cy="10" r="7.5"/></svg>
+          <svg class="ck" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 10.5l3.6 3.6L15.5 6" pathLength="1"/></svg>
+          <span class="dl-n" id="dl-n" hidden></span>
         </button>
+      </div>
+      <div class="zip-prog" id="zip-prog" hidden role="status" aria-live="polite">
+        <div class="fila"><span id="zip-prog-txt">Preparando mis_documentos_jolix.zip</span><em id="zip-prog-n"></em></div>
+        <div class="pista"><i id="zip-prog-bar"></i></div>
       </div>
       <div class="doc-grid" id="lista-docs" hidden></div>
       <div class="vacio" id="docs-vacio" hidden>
@@ -303,6 +379,58 @@
     auth: { storageKey: "sb-jolix-portal-auth" }
   });
   var $ = function(id){ return document.getElementById(id); };
+
+  /* ---------------- movimiento ---------------- */
+  var RM = !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+  var MV_EASE = "cubic-bezier(.2,.8,.2,1)";
+  function esperar(ms){ return new Promise(function(r){ setTimeout(r, ms); }); }
+  var MV_SPIN = '<svg class="mv-sp" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="7.5"/></svg>';
+  var docAnimar = true;   // cascada de tarjetas solo al navegar (abrir carpeta, volver, cambiar año, primera carga)
+  var docPop = null;      // tarjetas recién seleccionadas con "Seleccionar todos"
+
+  function cascada(cont){
+    if (RM) return;
+    Array.prototype.forEach.call(cont.children, function(c, i){
+      c.animate([{ opacity: 0, transform: "translateY(10px)" }, { opacity: 1, transform: "none" }],
+        { duration: 240, delay: 100 + Math.min(i, 12) * 35, easing: MV_EASE, fill: "backwards" });
+    });
+  }
+  function popSeleccion(card, retraso){
+    if (RM || !card) return;
+    var chk = card.querySelector("input[type=checkbox]");
+    card.animate([{ transform: "scale(1)" }, { transform: "scale(1.035)" }, { transform: "scale(1)" }], { duration: 260, delay: retraso || 0, easing: MV_EASE });
+    if (chk) chk.animate([{ transform: "scale(.6)" }, { transform: "scale(1.3)", offset: .6 }, { transform: "scale(1)" }], { duration: 300, delay: retraso || 0, easing: MV_EASE });
+  }
+  function rectsDe(cont){
+    var m = {};
+    cont.querySelectorAll("[data-doc],[data-carpeta]").forEach(function(el){
+      m[el.dataset.doc ? "d" + el.dataset.doc : "c" + el.dataset.carpeta] = el.getBoundingClientRect();
+    });
+    return m;
+  }
+  /* Al cambiar entre cuadrícula y lista, cada tarjeta se desliza desde donde estaba */
+  function reubicar(cont, antes){
+    if (RM) return;
+    cont.querySelectorAll("[data-doc],[data-carpeta]").forEach(function(el){
+      var a = antes[el.dataset.doc ? "d" + el.dataset.doc : "c" + el.dataset.carpeta]; if (!a) return;
+      var d = el.getBoundingClientRect(), dx = a.left - d.left, dy = a.top - d.top;
+      if (!dx && !dy) return;
+      el.animate([{ transform: "translate(" + dx + "px," + dy + "px)", opacity: .55 }, { transform: "none", opacity: 1 }], { duration: 340, easing: MV_EASE });
+    });
+  }
+  /* Año: la píldora se desliza hasta el año activo */
+  function colocarSegPill(){
+    var seg = $("filtro-doc-anio"), pill = $("seg-pill");
+    var on = seg && seg.querySelector('.seg[aria-pressed="true"]');
+    if (!on || !seg.offsetParent) return;
+    var primera = !pill.classList.contains("lista");
+    if (primera) pill.style.transition = "none";
+    pill.style.width = on.offsetWidth + "px";
+    pill.style.transform = "translateX(" + on.offsetLeft + "px)";
+    if (primera){ void pill.offsetWidth; pill.style.transition = ""; pill.classList.add("lista"); seg.classList.add("con-pill"); }
+  }
+  window.addEventListener("resize", colocarSegPill);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(colocarSegPill);
 
   var TIPO_ARCHIVO_COLOR = {
     pdf: "#E5484D",
@@ -375,24 +503,41 @@
     var correo = $("in-correo").value.trim();
     if (!correo) return;
     $("login-error").hidden = true;
-    $("btn-enviar").disabled = true;
-    $("btn-enviar").textContent = "Enviando…";
+    var be = $("btn-enviar");
+    be.style.minWidth = be.offsetWidth + "px";
+    be.disabled = true; be.classList.add("mv-cargando");
+    be.setAttribute("aria-label", "Enviando");
+    be.innerHTML = MV_SPIN;
 
     var res = await sb.auth.signInWithOtp({
       email: correo,
       options: { emailRedirectTo: window.location.origin + window.location.pathname }
     });
 
-    $("btn-enviar").disabled = false;
-    $("btn-enviar").textContent = "Enviar enlace de acceso";
-
+    function reponerBoton(){
+      be.disabled = false; be.classList.remove("mv-cargando"); be.style.minWidth = "";
+      be.removeAttribute("aria-label"); be.textContent = "Enviar enlace de acceso";
+    }
     if (res.error){
+      reponerBoton();
       mostrarError("No se pudo enviar el enlace. Inténtalo de nuevo en unos minutos.");
       return;
     }
     $("correo-enviado-a").textContent = correo;
-    $("paso-correo").hidden = true;
-    $("paso-enviado").hidden = false;
+    var paso1 = $("paso-correo"), paso2 = $("paso-enviado");
+    if (!RM){
+      paso1.animate([{ opacity: 1, transform: "none" }, { opacity: 0, transform: "translateX(-24px)" }], { duration: 200, easing: "ease-in", fill: "forwards" });
+      await esperar(210);
+    }
+    paso1.hidden = true;
+    paso1.getAnimations().forEach(function(a){ a.cancel(); });
+    reponerBoton();
+    paso2.hidden = false;
+    if (!RM){
+      paso2.animate([{ opacity: 0, transform: "translateX(28px)" }, { opacity: 1, transform: "none" }], { duration: 280, easing: MV_EASE });
+      var ic = paso2.querySelector(".icono-correo");
+      ic.animate([{ transform: "scale(.6)", opacity: 0 }, { transform: "scale(1.12)", opacity: 1, offset: .7 }, { transform: "scale(1)", opacity: 1 }], { duration: 440, delay: 120, easing: MV_EASE, fill: "backwards" });
+    }
   });
 
   $("btn-salir").addEventListener("click", async function(){
@@ -438,6 +583,7 @@
   document.addEventListener("click", function(e){
     var b = e.target.closest("[data-ir-doc]");
     if (!b) return;
+    docAnimar = true;
     docSeleccion.clear();
     var destino = b.dataset.irDoc;
     docCarpetaActiva = destino.indexOf("carpeta:") === 0 ? destino.slice(8) : null;
@@ -489,9 +635,15 @@
   }
 
   function renderCarpetas(){
+    var venia = !$("panel-portal-espacio").hidden;
     $("cargando-docs").hidden = true;
     $("panel-portal-carpetas").hidden = false;
     $("panel-portal-espacio").hidden = true;
+    if (venia && !RM){
+      var pc = $("panel-portal-carpetas");
+      pc.classList.add("mv-vuelta");
+      pc.addEventListener("animationend", function(){ pc.classList.remove("mv-vuelta"); }, { once: true });
+    }
     document.querySelectorAll("#filtro-doc-anio .seg").forEach(function(b){
       b.setAttribute("aria-pressed", String(Number(b.dataset.anio) === docAnioActivo));
     });
@@ -504,16 +656,20 @@
     var cont = $("lista-carpetas");
     cont.innerHTML = lista.map(tarjetaCarpetaHtml).join("");
     enlazarTarjetasCarpeta(cont);
+    colocarSegPill();
+    if (docAnimar && cont.children.length){ docAnimar = false; cascada(cont); }
   }
 
   document.querySelectorAll("#filtro-doc-anio .seg").forEach(function(b){
     b.addEventListener("click", function(){
       docAnioActivo = Number(b.dataset.anio);
+      docAnimar = true;
       renderCarpetas();
     });
   });
 
   function abrirCarpeta(id){
+    docAnimar = true;
     docCarpetaActiva = id;
     var c = carpetaPorId(id);
     if (c) docAnioActivo = c.anio;
@@ -547,7 +703,12 @@
   }
 
   function actualizarBarraSeleccionDoc(){
-    $("btn-descargar-seleccion").hidden = docSeleccion.size === 0;
+    var n = docSeleccion.size, dl = $("btn-descargar-seleccion"), badge = $("dl-n");
+    var previo = Number(badge.dataset.n || 0);
+    dl.hidden = n === 0;
+    badge.hidden = n === 0;
+    badge.textContent = String(n); badge.dataset.n = String(n);
+    if (n && n !== previo && !RM && previo) badge.animate([{ transform: "scale(1)" }, { transform: "scale(1.4)" }, { transform: "scale(1)" }], { duration: 260 });
 
     var btnTodos = $("btn-seleccionar-todos");
     btnTodos.hidden = docListaActual.length === 0;
@@ -558,8 +719,10 @@
 
   $("btn-seleccionar-todos").addEventListener("click", function(){
     var todosSeleccionados = docListaActual.length > 0 && docListaActual.every(function(d){ return docSeleccion.has(d.id); });
+    docPop = new Set();
     docListaActual.forEach(function(d){
-      if (todosSeleccionados) docSeleccion.delete(d.id); else docSeleccion.add(d.id);
+      if (todosSeleccionados) docSeleccion.delete(d.id);
+      else { if (!docSeleccion.has(d.id)) docPop.add(d.id); docSeleccion.add(d.id); }
     });
     renderLista();
   });
@@ -593,6 +756,12 @@
       return docVista === "lista" ? filaListaDoc(d) : tarjetaDoc(d);
     }).join("");
     enlazarTarjetasCarpeta(cont);
+    if (docAnimar && cont.children.length){ docAnimar = false; cascada(cont); }
+    if (docPop){
+      var idx = 0;
+      cont.querySelectorAll("[data-doc]").forEach(function(card){ if (docPop.has(card.dataset.doc)) popSeleccion(card, (idx++) * 50); });
+      docPop = null;
+    }
 
     cont.querySelectorAll("[data-doc]").forEach(function(card){
       card.addEventListener("dblclick", function(){ verDocumento(card.dataset.doc); });
@@ -603,6 +772,7 @@
       chk.addEventListener("change", function(){
         if (chk.checked) docSeleccion.add(chk.dataset.docCheck); else docSeleccion.delete(chk.dataset.docCheck);
         actualizarBarraSeleccionDoc();
+        if (chk.checked) popSeleccion(chk.closest("[data-doc]"));
       });
     });
     actualizarBarraSeleccionDoc();
@@ -611,10 +781,12 @@
   document.querySelectorAll("[data-vista-doc]").forEach(function(btn){
     btn.setAttribute("aria-pressed", String(btn.dataset.vistaDoc === docVista));
     btn.addEventListener("click", function(){
+      var antes = rectsDe($("lista-docs"));
       docVista = btn.dataset.vistaDoc;
       localStorage.setItem("jolix_portal_vista", docVista);
       document.querySelectorAll("[data-vista-doc]").forEach(function(b){ b.setAttribute("aria-pressed", String(b === btn)); });
       renderLista();
+      reubicar($("lista-docs"), antes);
     });
   });
 
@@ -637,13 +809,19 @@
     if (!ids.length) return;
     var items = documentos.filter(function(d){ return ids.indexOf(d.id) !== -1; });
     var btn = this;
-    btn.disabled = true;
+    btn.disabled = true; btn.classList.add("mv-cargando");
+    var exito = false, prog = $("zip-prog"), barra = $("zip-prog-bar");
+    function avance(txt, n, frac){
+      $("zip-prog-txt").textContent = txt; $("zip-prog-n").textContent = n || "";
+      barra.style.transform = "scaleX(" + Math.max(0, Math.min(1, frac)) + ")";
+    }
 
     try {
       if (items.length === 1){
         var blob = await descargarBlob(items[0]);
         if (!blob){ alert("No se pudo descargar el archivo. Inténtalo de nuevo."); return; }
         descargarBlobComoArchivo(blob, items[0].nombre_archivo);
+        exito = true;
         return;
       }
 
@@ -655,9 +833,13 @@
       var zip = new JSZip();
       var contador = {};
       var errores = [];
+      prog.classList.remove("listo"); barra.style.transition = "none"; barra.style.transform = "scaleX(0)"; void barra.offsetWidth; barra.style.transition = "";
+      prog.hidden = false;
+      avance("Preparando mis_documentos_jolix.zip", "0 de " + items.length, 0);
       for (var i = 0; i < items.length; i++){
         var d = items[i];
         var blobItem = await descargarBlob(d);
+        avance("Preparando mis_documentos_jolix.zip", (i + 1) + " de " + items.length, (i + 1) / items.length * 0.9);
         if (!blobItem){ errores.push(d.nombre_archivo); continue; }
 
         var nombre = d.nombre_archivo;
@@ -678,10 +860,21 @@
         return;
       }
 
-      var contenido = await zip.generateAsync({ type: "blob" });
+      avance("Armando el ZIP…", items.length + " de " + items.length, 0.9);
+      var contenido = await zip.generateAsync({ type: "blob" }, function(m){ barra.style.transform = "scaleX(" + (0.9 + 0.1 * m.percent / 100) + ")"; });
       descargarBlobComoArchivo(contenido, "mis_documentos_jolix.zip");
+      exito = true;
+      prog.classList.add("listo");
+      avance("Listo: mis_documentos_jolix.zip descargado", "", 1);
       if (errores.length) alert("No se pudieron incluir: " + errores.join(", "));
     } finally {
+      btn.classList.remove("mv-cargando");
+      if (exito){
+        btn.classList.add("mv-ok");
+        await esperar(RM ? 0 : 1400);
+        btn.classList.remove("mv-ok");
+      }
+      prog.hidden = true;
       btn.disabled = false;
     }
   });

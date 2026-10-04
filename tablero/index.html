@@ -661,6 +661,79 @@
   .btn-enviar-chat svg{width:18px; height:18px;}
   .visor-mensaje{color:var(--muted); font-size:13.5px; text-align:center; padding:30px 24px; max-width:40ch;}
 
+  /* ------------------------------------------------------ MOVIMIENTO
+     Solo se animan posición, escala y transparencia (liviano). Con "reducir movimiento" todo queda quieto. */
+  :root{ --mv-ease:cubic-bezier(.2,.8,.2,1); --mv-spring:cubic-bezier(.34,1.56,.64,1); }
+  @keyframes mv-dibujar{from{stroke-dashoffset:1;}}
+  @keyframes mv-giro{to{transform:rotate(360deg);}}
+
+  /* Menú lateral: una píldora se desliza hasta la sección activa */
+  .sidebar-nav{position:relative;}
+  .snav{position:relative; z-index:1;}
+  .snav-pill{position:absolute; z-index:0; left:0; right:0; top:0; height:0; border-radius:11px; background:var(--mist); pointer-events:none; opacity:0;}
+  .snav-pill.lista{opacity:1; transition:transform .28s var(--mv-ease), height .28s var(--mv-ease);}
+  .sidebar-nav.con-pill .snav[aria-selected="true"], .sidebar-nav.con-pill .snav[aria-selected="true"]:hover{background:transparent;}
+
+  /* Cambio de pantalla: sube 8 px mientras aparece */
+  main.wrap > section:not([hidden]){animation:mv-vista .22s var(--mv-ease);}
+  @keyframes mv-vista{from{opacity:0; transform:translateY(8px);}}
+
+  /* Avisos: flotan sobre el contenido, con check que se dibuja y una barra que marca cuánto falta */
+  #aviso{
+    position:fixed; top:16px; left:50%; transform:translateX(-50%); z-index:70; margin:0;
+    width:max-content; max-width:min(540px, calc(100vw - 32px));
+    display:flex; align-items:center; gap:10px; padding:12px 18px 14px 14px;
+    overflow:hidden; box-shadow:var(--shadow); cursor:pointer;
+  }
+  #aviso:not([hidden]){animation:mv-aviso-in .42s var(--mv-spring);}
+  #aviso.saliendo{animation:mv-aviso-out .2s ease forwards;}
+  @keyframes mv-aviso-in{from{opacity:0; transform:translate(-50%,-16px) scale(.95);}}
+  @keyframes mv-aviso-out{to{opacity:0; transform:translate(-50%,-8px);}}
+  #aviso .ai{width:18px; height:18px; flex:none; fill:none; stroke:currentColor; stroke-width:1.9; stroke-linecap:round; stroke-linejoin:round;}
+  #aviso .ai path{stroke-dasharray:1; animation:mv-dibujar .45s .12s var(--mv-ease) backwards;}
+  #aviso .prog{position:absolute; left:0; right:0; bottom:0; height:3px; background:currentColor; opacity:.5; transform-origin:left; animation:mv-prog var(--dur, 4500ms) linear forwards;}
+  @keyframes mv-prog{to{transform:scaleX(0);}}
+
+  /* Casillas de la operación mensual */
+  .celda{position:relative;}
+  .luz .chk-ic path{stroke-dasharray:1;}
+  .fila.mv-flash{animation:mv-flash .9s ease-out;}
+  @keyframes mv-flash{from{background:var(--ok-bg);}}
+  .mv-cf{position:absolute; left:50%; top:50%; width:6px; height:9px; border-radius:2px; pointer-events:none; z-index:6;}
+
+  /* Completar una tarea: se tacha el texto y la fila se pliega hacia el historial */
+  .tarea .tx{background:linear-gradient(currentColor,currentColor) no-repeat 0 58%/0% 2px;}
+  .tarea.mv-tachando .marca{background:var(--ok); border-color:var(--ok);}
+  .tarea.mv-tachando .marca svg{opacity:1;}
+  .tarea.mv-tachando .desc{color:var(--faint);}
+  .tarea.mv-tachando .tx{animation:mv-tachar .45s var(--mv-ease) forwards;}
+  @keyframes mv-tachar{to{background-size:100% 2px;}}
+
+  /* Ventanas y menús ⋮: entran con escala suave (la salida es inmediata para no hacer esperar) */
+  .modal:not([hidden]){animation:mv-fondo .18s ease;}
+  .modal:not([hidden]) .modal-card{animation:mv-modal .26s var(--mv-ease);}
+  @keyframes mv-fondo{from{opacity:0;}}
+  @keyframes mv-modal{from{opacity:0; transform:scale(.95) translateY(6px);}}
+  .doc-card-dropdown{transform-origin:top right;}
+  .doc-card-dropdown:not([hidden]){animation:mv-menu .16s var(--mv-ease);}
+  .doc-card-dropdown:not([hidden]) > *{animation:mv-item .22s var(--mv-ease) both;}
+  .doc-card-dropdown:not([hidden]) > :nth-child(1){animation-delay:40ms;}
+  .doc-card-dropdown:not([hidden]) > :nth-child(2){animation-delay:80ms;}
+  .doc-card-dropdown:not([hidden]) > :nth-child(3){animation-delay:120ms;}
+  .doc-card-dropdown:not([hidden]) > :nth-child(4){animation-delay:160ms;}
+  @keyframes mv-menu{from{opacity:0; transform:scale(.92);}}
+  @keyframes mv-item{from{opacity:0; transform:translateY(-4px);}}
+
+  /* Botones de envío: spinner mientras trabaja y check verde al terminar */
+  .btn.mv-envio{display:inline-flex; align-items:center; justify-content:center; gap:8px; transition:background .2s, transform .1s;}
+  .btn.mv-envio:active:not(:disabled){transform:scale(.97);}
+  .btn.mv-envio.cargando, .btn.mv-envio.ok{opacity:1;}
+  .btn.mv-envio.cargando{cursor:progress;}
+  .btn.mv-envio.ok{background:var(--ok); color:#fff;}
+  .mv-sp, .mv-ck{width:16px; height:16px; fill:none; stroke:currentColor; stroke-width:2.2; stroke-linecap:round; stroke-linejoin:round;}
+  .mv-sp circle{stroke-dasharray:30 20; transform-origin:center; animation:mv-giro .8s linear infinite;}
+  .mv-ck path{stroke-dasharray:1; animation:mv-dibujar .35s var(--mv-ease) backwards;}
+
   @media (prefers-reduced-motion: reduce){
     *{transition:none !important; animation:none !important;}
   }
@@ -721,6 +794,7 @@
     </div>
 
     <nav class="sidebar-nav" role="tablist">
+      <span class="snav-pill" id="snav-pill" aria-hidden="true"></span>
       <button class="snav" role="tab" aria-selected="true" data-vista="dashboard"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="7.5" height="7.5" rx="1.6"/><rect x="13" y="3.5" width="7.5" height="4.5" rx="1.6"/><rect x="13" y="10" width="7.5" height="10.5" rx="1.6"/><rect x="3.5" y="13" width="7.5" height="7.5" rx="1.6"/></svg>Dashboard</button>
       <button class="snav" role="tab" aria-selected="false" data-vista="clientes"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8.2" r="3.1"/><path d="M3.3 20c0-3.4 2.6-6.1 5.7-6.1s5.7 2.7 5.7 6.1"/><circle cx="17.1" cy="9" r="2.4"/><path d="M15.8 14.1c2.4.5 4.2 2.7 4.2 5.4"/></svg>Clientes</button>
       <button class="snav" role="tab" aria-selected="false" data-vista="mes"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 9.5h16M8 3v4M16 3v4"/><path d="M9 14.2l2 2 4-4.4"/></svg>Operación mensual</button>
@@ -747,7 +821,7 @@
     </header>
 
     <main class="wrap">
-      <div id="aviso" class="aviso err" hidden></div>
+      <div id="aviso" class="aviso err" role="status" aria-live="polite" title="Cerrar" hidden></div>
 
       <!-- VISTA DASHBOARD -->
       <section id="v-dashboard">
@@ -1427,16 +1501,113 @@
     return dia + " · " + hora;
   }
 
-  /* ------------------------------------------------------ AVISOS */
-  var avisoTimer = null;
-  function mostrarAviso(txt, tipo){
-    var el = $("aviso");
-    el.textContent = txt;
-    el.className = "aviso " + (tipo === "ok" ? "ok" : "err");
-    el.hidden = false;
-    clearTimeout(avisoTimer);
-    avisoTimer = setTimeout(function(){ el.hidden = true; }, 7000);
+  /* ------------------------------------------------------ MOVIMIENTO */
+  var RM = !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+  var MV_EASE = "cubic-bezier(.2,.8,.2,1)", MV_SPRING = "cubic-bezier(.34,1.56,.64,1)";
+  function esperar(ms){ return new Promise(function(r){ setTimeout(r, ms); }); }
+
+  /* Menú lateral: la píldora se desliza hasta la sección activa */
+  function colocarPill(){
+    var nav = document.querySelector(".sidebar-nav"), pill = $("snav-pill");
+    var on = nav && nav.querySelector('.snav[aria-selected="true"]');
+    if (!on || !nav.offsetParent) return;
+    var primera = !pill.classList.contains("lista");
+    if (primera) pill.style.transition = "none";
+    pill.style.height = on.offsetHeight + "px";
+    pill.style.transform = "translateY(" + on.offsetTop + "px)";
+    if (primera){ void pill.offsetWidth; pill.style.transition = ""; pill.classList.add("lista"); nav.classList.add("con-pill"); }
   }
+  window.addEventListener("resize", colocarPill);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(colocarPill);
+
+  /* Casilla marcada: late, el check se dibuja y la fila destella. Desmarcar es silencioso. */
+  function animarMarca(b, campo){
+    if (RM) return;
+    var ic = b.querySelector(".chk-ic"), p = ic && ic.querySelector("path");
+    b.animate([{ transform: "scale(.93)" }, { transform: "scale(1.05)", offset: .55 }, { transform: "scale(1)" }], { duration: 320, easing: MV_EASE });
+    if (ic) ic.animate([{ transform: "scale(.5)" }, { transform: "scale(1.3)", offset: .6 }, { transform: "scale(1)" }], { duration: 340, easing: MV_EASE });
+    if (p) p.animate([{ strokeDashoffset: 1 }, { strokeDashoffset: 0 }], { duration: 300, easing: MV_EASE, fill: "backwards" });
+    var fila = b.closest(".fila");
+    if (fila){ fila.classList.remove("mv-flash"); void fila.offsetWidth; fila.classList.add("mv-flash"); }
+    if (campo === "ppm_pagado") confeti(b.closest(".celda") || b);
+  }
+  /* Solo al marcar «SII» (pagado en el SII): el cierre del flujo del PPM */
+  function confeti(host){
+    if (RM) return;
+    var colores = ["#8253F3", "#FF8585", "#FCE896", "#12855C", "#A88CFA"];
+    for (var i = 0; i < 16; i++){
+      (function(i){
+        var p = document.createElement("i"); p.className = "mv-cf"; p.style.background = colores[i % colores.length];
+        host.appendChild(p);
+        var ang = Math.PI * 2 * i / 16 + Math.random() * .4, d = 26 + Math.random() * 30;
+        p.animate([
+          { transform: "translate(-50%,-50%) scale(1)", opacity: 1 },
+          { transform: "translate(calc(-50% + " + (Math.cos(ang) * d) + "px), calc(-50% + " + (Math.sin(ang) * d + 12) + "px)) rotate(" + (Math.random() * 360) + "deg) scale(.6)", opacity: 0 }
+        ], { duration: 650 + Math.random() * 300, easing: "cubic-bezier(.1,.7,.3,1)" }).onfinish = function(){ p.remove(); };
+      })(i);
+    }
+  }
+  /* Tarea completada: el check late, se tacha el texto y la fila se pliega */
+  async function animarCompletar(el){
+    el.dataset.animando = "1";
+    el.classList.add("mv-tachando");
+    var marca = el.querySelector(".marca");
+    if (marca) marca.animate([{ transform: "scale(.8)" }, { transform: "scale(1.22)", offset: .6 }, { transform: "scale(1)" }], { duration: 320, easing: MV_EASE });
+    await esperar(650);
+    var cs = getComputedStyle(el), h = el.offsetHeight;
+    el.style.overflow = "hidden";
+    var a = el.animate([
+      { height: h + "px", opacity: 1, paddingTop: cs.paddingTop, paddingBottom: cs.paddingBottom, borderTopWidth: cs.borderTopWidth, borderBottomWidth: cs.borderBottomWidth, marginBottom: "0px" },
+      { height: "0px", opacity: 0, paddingTop: "0px", paddingBottom: "0px", borderTopWidth: "0px", borderBottomWidth: "0px", marginBottom: "-8px" }
+    ], { duration: 240, easing: MV_EASE, fill: "forwards" });
+    await esperar(260);
+  }
+
+  /* Botones de envío: spinner mientras trabaja y check verde al terminar */
+  var MV_SPIN = '<svg class="mv-sp" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="7.5"/></svg>';
+  var MV_CHECK = '<svg class="mv-ck" viewBox="0 0 20 20" aria-hidden="true"><path d="M4.5 10.5l3.6 3.6L15.5 6" pathLength="1"/></svg>';
+  function envioReiniciar(btn, texto){
+    btn.classList.remove("mv-envio", "cargando", "ok");
+    btn.style.minWidth = ""; btn.removeAttribute("aria-label");
+    btn.textContent = texto;
+  }
+  function envioCargando(btn){
+    btn.style.minWidth = btn.offsetWidth + "px";
+    btn.classList.add("mv-envio", "cargando");
+    btn.disabled = true;
+    btn.setAttribute("aria-label", "Enviando");
+    btn.innerHTML = MV_SPIN;
+  }
+  async function envioListo(btn, texto){
+    btn.classList.remove("cargando"); btn.classList.add("ok");
+    btn.removeAttribute("aria-label");
+    btn.innerHTML = MV_CHECK + "<span>" + texto + "</span>";
+    await esperar(RM ? 0 : 900);
+  }
+
+  /* ------------------------------------------------------ AVISOS */
+  var avisoTimer = null, avisoSalida = null;
+  function ocultarAviso(){
+    var el = $("aviso");
+    clearTimeout(avisoTimer); clearTimeout(avisoSalida);
+    if (el.hidden) return;
+    el.classList.add("saliendo");
+    avisoSalida = setTimeout(function(){ el.hidden = true; el.classList.remove("saliendo"); }, RM ? 0 : 220);
+  }
+  function mostrarAviso(txt, tipo){
+    var el = $("aviso"), ok = tipo === "ok", dur = ok ? 4500 : 7000;
+    clearTimeout(avisoTimer); clearTimeout(avisoSalida);
+    el.hidden = true; void el.offsetWidth;
+    el.className = "aviso " + (ok ? "ok" : "err");
+    el.style.setProperty("--dur", dur + "ms");
+    el.innerHTML = '<svg class="ai" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="8.5"/>' +
+      (ok ? '<path d="M6 10.4l2.7 2.7L14 7.6" pathLength="1"/>' : '<path d="M10 5.8v5M10 13.6v.1" pathLength="1"/>') +
+      '</svg><span class="at"></span><i class="prog"></i>';
+    el.querySelector(".at").textContent = txt;
+    el.hidden = false;
+    avisoTimer = setTimeout(ocultarAviso, dur);
+  }
+  $("aviso").addEventListener("click", ocultarAviso);
 
   /* ------------------------------------------------------- LOGIN */
   $("form-login").addEventListener("submit", async function(e){
@@ -1553,6 +1724,7 @@
 
     $("pantalla-login").hidden = true;
     $("app").hidden = false;
+    requestAnimationFrame(colocarPill);
     $("yo-nombre").textContent = perfil.nombre;
     $("yo-rol").textContent = perfil.rol;
     $("yo-avatar").textContent = perfil.nombre.split(" ").map(function(p){ return p[0]; }).slice(0,2).join("").toUpperCase();
@@ -1863,7 +2035,7 @@
       '<button class="luz rojo" data-campo="' + campo + '" data-label="' + label + '"' + bloqueado + '>' +
       '<span class="punto"></span>' +
       '<svg class="chk-ic" viewBox="0 0 24 24" fill="none" aria-hidden="true">' +
-      '<path d="M4 12.5l5 5L20 6.5" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
+      '<path d="M4 12.5l5 5L20 6.5" pathLength="1" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
       '<span class="txt">Pendiente</span></button></div>';
   }
 
@@ -1949,6 +2121,7 @@
         var actual = !!reg(id)[campo];
         var patch = {}; patch[campo] = !actual;
         pintarLuz(b, !actual);
+        if (!actual) animarMarca(b, campo);
         guardarRegistro(id, patch);
       });
     });
@@ -2229,8 +2402,8 @@
     $("acceso-resumen").textContent = "Guía de bienvenida al Portal Jolix para " + c.nombre + ".";
     $("acceso-destino").textContent = correo;
     $("acceso-status").textContent = "";
+    envioReiniciar($("btn-enviar-acceso"), "Enviar guía");
     $("btn-enviar-acceso").disabled = false;
-    $("btn-enviar-acceso").textContent = "Enviar guía";
     $("modal-acceso-portal").hidden = false;
   }
   function cerrarModalAccesoPortal(){
@@ -2244,16 +2417,17 @@
   $("btn-enviar-acceso").addEventListener("click", async function(){
     if (!accesoClienteId) return;
     var btn = $("btn-enviar-acceso");
-    btn.disabled = true; btn.textContent = "Enviando…";
+    envioCargando(btn);
     $("acceso-status").textContent = "";
     var res = await sb.functions.invoke("enviar-acceso-portal", { body: { cliente_id: accesoClienteId } });
     if (res.error){
       var msg = "No se pudo enviar la guía. Inténtalo de nuevo.";
       try { var j = await res.error.context.json(); if (j && j.error) msg = j.error; } catch(e){}
       $("acceso-status").textContent = msg;
-      btn.disabled = false; btn.textContent = "Enviar guía";
+      envioReiniciar(btn, "Enviar guía"); btn.disabled = false;
       return;
     }
+    await envioListo(btn, "Enviada");
     cerrarModalAccesoPortal();
     mostrarAviso("Guía de acceso enviada a " + ((res.data && res.data.destinatario) || "el cliente") + ".", "ok");
   });
@@ -2591,7 +2765,7 @@
     }
     return '<div class="tarea' + (t.completada ? " hecha" : "") + '" data-tarea="' + t.id + '" role="button" tabindex="0">' +
       '<span class="marca"><svg viewBox="0 0 24 24" fill="none"><path d="M4 12.5l5 5L20 6.5" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>' +
-      '<div class="cuerpo"><div class="desc">' + escapar(t.descripcion) + '</div>' +
+      '<div class="cuerpo"><div class="desc"><span class="tx">' + escapar(t.descripcion) + '</span></div>' +
       '<div class="meta">' + meta + '</div></div>' +
       '<button class="borrar" data-borrar-tarea="' + t.id + '" aria-label="Eliminar tarea">×</button></div>';
   }
@@ -2621,10 +2795,10 @@
     document.querySelectorAll("#v-tareas .tarea").forEach(function(el){
       el.addEventListener("click", function(e){
         if (e.target.closest("[data-borrar-tarea]")) return;
-        alternarTarea(el.dataset.tarea);
+        alternarTarea(el.dataset.tarea, el);
       });
       el.addEventListener("keydown", function(e){
-        if (e.key === "Enter" || e.key === " "){ e.preventDefault(); alternarTarea(el.dataset.tarea); }
+        if (e.key === "Enter" || e.key === " "){ e.preventDefault(); alternarTarea(el.dataset.tarea, el); }
       });
     });
     document.querySelectorAll("#v-tareas [data-borrar-tarea]").forEach(function(b){
@@ -2645,6 +2819,14 @@
         await cargarTareas();
       });
     });
+    if (tareaReciente){
+      var nueva = document.querySelector('#tareas-hechas [data-tarea="' + tareaReciente + '"]');
+      tareaReciente = null;
+      if (nueva && !RM){
+        nueva.animate([{ opacity: 0, transform: "translateY(-10px)" }, { opacity: 1, transform: "none" }], { duration: 300, easing: MV_EASE });
+        $("conteo-tareas").animate([{ transform: "scale(1)" }, { transform: "scale(1.25)" }, { transform: "scale(1)" }], { duration: 320 });
+      }
+    }
     renderDashboard();
   }
 
@@ -2704,11 +2886,17 @@
     }).join("");
   }
 
-  async function alternarTarea(id){
+  var tareaReciente = null;
+  async function alternarTarea(id, el){
     var t = tareas.filter(function(x){ return x.id === id; })[0];
     if (!t) return;
+    if (el && el.dataset.animando) return;
+    var completando = !t.completada;
+    var anim = (completando && el && !RM) ? animarCompletar(el) : Promise.resolve();
     var res = await sb.from("tareas").update({ completada: !t.completada }).eq("id", id);
-    if (res.error){ mostrarAviso("No se pudo actualizar la tarea."); return; }
+    if (res.error){ mostrarAviso("No se pudo actualizar la tarea."); await cargarTareas(); return; }
+    await anim;
+    if (completando) tareaReciente = id;
     await cargarTareas();
   }
 
@@ -3178,8 +3366,8 @@
       " de " + cli.nombre + (lista.length ? ", en: " + lista.join(" · ") : "") + ".";
     var correo = (cli.email || "").trim();
     $("notificar-destino").textContent = correo || "Este cliente no tiene un correo registrado";
+    envioReiniciar($("btn-enviar-notificar"), "Enviar aviso");
     $("btn-enviar-notificar").disabled = !correo;
-    $("btn-enviar-notificar").textContent = "Enviar aviso";
     $("notificar-status").textContent = correo ? "" : "Agrega su correo en Clientes para poder avisarle.";
     $("modal-notificar").hidden = false;
   }
@@ -3190,16 +3378,17 @@
   });
   $("btn-enviar-notificar").addEventListener("click", async function(){
     var btn = $("btn-enviar-notificar");
-    btn.disabled = true; btn.textContent = "Enviando…";
+    envioCargando(btn);
     $("notificar-status").textContent = "";
     var res = await sb.functions.invoke("notificar-documentos", { body: { cliente_id: docClienteActivo } });
     if (res.error){
       var msg = "No se pudo enviar el aviso. Inténtalo de nuevo.";
       try { var j = await res.error.context.json(); if (j && j.error) msg = j.error; } catch(e){}
       $("notificar-status").textContent = msg;
-      btn.disabled = false; btn.textContent = "Enviar aviso";
+      envioReiniciar(btn, "Enviar aviso"); btn.disabled = false;
       return;
     }
+    await envioListo(btn, "Enviado");
     $("modal-notificar").hidden = true;
     await cargarDocumentos();
     mostrarAviso("Aviso enviado a " + ((res.data && res.data.destinatario) || "el cliente") + ".", "ok");
@@ -3844,6 +4033,7 @@
     document.querySelectorAll(".snav").forEach(function(t){
       t.setAttribute("aria-selected", String(t.dataset.vista === v));
     });
+    colocarPill();
     $("v-dashboard").hidden = v !== "dashboard";
     $("v-mes").hidden = v !== "mes";
     $("v-tareas").hidden = v !== "tareas";
