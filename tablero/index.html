@@ -734,6 +734,64 @@
   .mv-sp circle{stroke-dasharray:30 20; transform-origin:center; animation:mv-giro .8s linear infinite;}
   .mv-ck path{stroke-dasharray:1; animation:mv-dibujar .35s var(--mv-ease) backwards;}
 
+  /* ------------------------------------------------------ HONORARIOS */
+  .hon-barra{display:flex; align-items:center; gap:10px 22px; flex-wrap:wrap; margin-bottom:14px;}
+  .hon-barra .field-inline{flex:none;}
+  .hon-barra .hint{margin:0; flex:1 1 320px; max-width:70ch;}
+  .tabla-hon{width:100%; min-width:840px; border-collapse:collapse; font-size:13.5px;}
+  .tabla-hon th{
+    text-align:left; font-family:'Poppins',sans-serif; font-size:11px; font-weight:600;
+    text-transform:uppercase; letter-spacing:.07em; color:var(--faint);
+    padding:0 10px 10px; border-bottom:1px solid var(--line); white-space:nowrap;
+  }
+  .tabla-hon th.num, .tabla-hon td.num{text-align:right;}
+  .tabla-hon td{padding:6px 10px; border-bottom:1px solid var(--line); vertical-align:middle;}
+  .tabla-hon td.rut{color:var(--faint); font-variant-numeric:tabular-nums; white-space:nowrap; width:1%;}
+  .tabla-hon td.nom{font-family:'Poppins',sans-serif; font-weight:600; min-width:200px;}
+  .tabla-hon td.num{width:150px;}
+  .tabla-hon td.est{min-width:260px; width:36%;}
+  .tabla-hon td.acc{width:1%; text-align:center; white-space:nowrap;}
+  .tabla-hon tr.hon-rubro td{padding:18px 2px 8px; border-bottom:1px solid var(--line);}
+  .tabla-hon tbody:first-of-type tr.hon-rubro td{padding-top:12px;}
+  .tabla-hon tbody[data-cerrado="1"] tr:not(.hon-rubro){display:none;}
+  .hon-tog .chev{transform:rotate(90deg);}
+  .hon-tog[aria-expanded="false"] .chev{transform:rotate(0deg);}
+  .hon-adic{
+    display:inline-block; margin-right:8px; padding:2px 8px; border-radius:999px;
+    background:var(--mist); color:var(--purple-deep); vertical-align:1px;
+    font-family:'Poppins',sans-serif; font-weight:600; font-size:10.5px; letter-spacing:.06em; text-transform:uppercase;
+  }
+  .tabla-hon tr.adicional td.nom, .tabla-hon tr.adicional td.rut{color:var(--muted);}
+  .hon-in{
+    width:100%; background:transparent; border:1px solid transparent; color:var(--ink);
+    border-radius:9px; padding:7px 9px; font-size:13.5px; font-family:inherit;
+  }
+  .hon-in:hover{border-color:var(--line);}
+  .hon-in:focus{background:var(--surface); border-color:var(--purple); outline:none;}
+  .hon-in::placeholder{color:var(--faint); font-weight:400;}
+  .hon-in.hon-monto{
+    text-align:right; font-weight:600; font-family:'Poppins',sans-serif;
+    font-variant-numeric:tabular-nums; background:var(--mist);
+  }
+  .hon-in.hon-monto:focus{background:var(--surface);}
+  .hon-in.hon-monto.cero{color:var(--faint); font-weight:500;}
+  select.hon-in{cursor:pointer; min-width:140px;}
+  .hon-btn{
+    width:28px; height:28px; border-radius:50%; border:1px solid var(--line); background:transparent;
+    color:var(--muted); font-size:16px; line-height:1; padding:0; cursor:pointer;
+    display:inline-flex; align-items:center; justify-content:center;
+  }
+  .hon-btn:hover{background:var(--mist); color:var(--ink);}
+  .hon-btn.del:hover{background:var(--pend-bg); color:var(--pend); border-color:var(--pend-line);}
+  .hon-btn.confirmar{width:auto; padding:0 11px; border-radius:999px; font-size:12px; font-weight:600; background:var(--pend); border-color:var(--pend); color:#fff;}
+  .hon-btn:disabled{opacity:.5; cursor:default;}
+  .hon-fila.mv-flash{animation:mv-flash .9s ease-out;}
+  .tabla-hon tfoot td{
+    padding:14px 10px 4px; border-bottom:none; border-top:2px solid var(--line);
+    font-family:'Poppins',sans-serif; font-weight:700; font-size:15px;
+  }
+  .tabla-hon tfoot td.num{padding-right:18px; font-variant-numeric:tabular-nums; color:var(--purple-deep);}
+
   @media (prefers-reduced-motion: reduce){
     *{transition:none !important; animation:none !important;}
   }
@@ -800,6 +858,7 @@
       <button class="snav" role="tab" aria-selected="false" data-vista="mes"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 9.5h16M8 3v4M16 3v4"/><path d="M9 14.2l2 2 4-4.4"/></svg>Operación mensual</button>
       <button class="snav" role="tab" aria-selected="false" data-vista="tareas"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="18" rx="2.2"/><path d="M9 8h6"/><path d="M9 12h6"/><path d="M9 16h3.5"/></svg>Tareas <span class="tab-badge" id="tab-badge" hidden></span></button>
       <button class="snav" role="tab" aria-selected="false" data-vista="documentos"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6.5a2 2 0 0 1 2-2h4l2 2.2h6a2 2 0 0 1 2 2V17a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6.5Z"/></svg>Documentos</button>
+      <button class="snav" role="tab" aria-selected="false" data-vista="honorarios" id="nav-honorarios" hidden><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6.5" width="18" height="11" rx="2"/><circle cx="12" cy="12" r="2.6"/><path d="M6.5 9.6v.01M17.5 14.4v.01"/></svg>Honorarios</button>
     </nav>
 
     <div class="sidebar-foot">
@@ -1003,6 +1062,28 @@
           <img src="personajes/jo_saludo.png" alt="">
           <h3>Esta carpeta está vacía</h3>
           <p>Sube documentos con "Cargar documentos" o crea una carpeta con "+ Nueva carpeta".</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- VISTA HONORARIOS (solo administradores; la base de datos también lo exige) -->
+    <section id="v-honorarios" hidden>
+      <div class="hon-barra">
+        <div class="field-inline">
+          <label for="sel-mes-hon">Mes</label>
+          <select id="sel-mes-hon" class="control"></select>
+        </div>
+        <p class="hint">Cada mes parte con el honorario y el banco del mes anterior. El estado se escribe a mano cada mes. Los honorarios adicionales (botón +) valen solo para ese mes.</p>
+      </div>
+      <div class="panel">
+        <p class="hint" id="hon-cargando" style="margin:0;">Cargando honorarios…</p>
+        <div class="tabla-wrap" id="hon-wrap" hidden>
+          <table class="tabla-hon" id="hon-tabla"></table>
+        </div>
+        <div class="vacio" id="hon-vacio" hidden>
+          <img src="personajes/jo_saludo.png" alt="">
+          <h3>No hay clientes para este mes</h3>
+          <p>Cuando haya clientes activos, van a aparecer aquí con su honorario.</p>
         </div>
       </div>
     </section>
@@ -1741,6 +1822,7 @@
 
   function aplicarPermisos(){
     var admin = esAdmin();
+    $("nav-honorarios").hidden = !admin;
     $("btn-nuevo-cliente").hidden = !admin;
     $("panel-nuevo-rubro").hidden = !admin;
     $("clientes-lectura").hidden = admin;
@@ -1923,6 +2005,7 @@
     if (vista === "mes") renderMes();
     await cargarTareas();
     await cargarLeads();
+    if (vista === "honorarios") await cargarHonorarios(true);
   }
 
   function reg(clienteId){ return registros[clienteId] || {}; }
@@ -4023,12 +4106,252 @@
     if (e.key === "Escape" && !$("modal-visor-doc").hidden) cerrarVisorDoc();
   });
 
+  /* ------------------------------------------------------ HONORARIOS
+     Pago mensual de los honorarios de cada cliente a Jolix. Solo administradores:
+     la base de datos también lo exige (tabla "honorarios", migración 13).
+     Al abrir un mes, la base de datos crea la fila de cada cliente copiando el honorario
+     y el banco del mes anterior (el estado no se copia). Las filas adicionales son solo de su mes. */
+  var BANCOS = ["Banco Chile", "Scotiabank", "Santander", "Banco Estado"];
+  var MAX_HONORARIO = 9999999999;
+  var honMes = ymHoy();
+  var honorarios = [];
+  var honSeq = 0;
+  var honFirma = "";
+  var honCerrados = {};
+  try { honCerrados = JSON.parse(localStorage.getItem("jolix_hon_grupos_cerrados") || "{}"); } catch(e){ honCerrados = {}; }
+
+  function armarSelectorHon(){
+    var sel = $("sel-mes-hon");
+    var hoy = new Date();
+    var opciones = [];
+    for (var i = 0; i < 24; i++){
+      var d = new Date(hoy.getFullYear(), hoy.getMonth() - i, 1);
+      opciones.push(d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0"));
+    }
+    sel.innerHTML = opciones.map(function(ym){
+      return '<option value="' + ym + '">' + capital(nombreMes(ym)) + '</option>';
+    }).join("");
+    if (opciones.indexOf(honMes) === -1) honMes = opciones[0];
+    sel.value = honMes;
+  }
+
+  function honError(err){
+    var msg = (err && err.message) || "";
+    $("hon-cargando").hidden = true;
+    if (/honorarios/i.test(msg) && /not find|does not exist|schema cache|no existe/i.test(msg)){
+      mostrarAviso("Falta ejecutar el SQL de Honorarios (migración 13) en Supabase.");
+    } else {
+      mostrarAviso("No se pudieron cargar los honorarios: " + msg);
+    }
+  }
+
+  async function cargarHonorarios(silencioso){
+    if (!esAdmin()) return;
+    var mes = honMes, mi = ++honSeq;
+    if (!silencioso){
+      $("hon-cargando").hidden = false;
+      $("hon-wrap").hidden = true;
+      $("hon-vacio").hidden = true;
+    }
+    var pre = await sb.rpc("asegurar_mes_honorarios", { p_mes: mes });
+    if (mi !== honSeq) return;
+    if (pre.error){ honError(pre.error); return; }
+    var res = await sb.from("honorarios").select("*").eq("mes", mes);
+    if (mi !== honSeq) return;
+    if (res.error){ honError(res.error); return; }
+    var filas = res.data || [];
+    var firma = JSON.stringify(filas.map(function(h){ return [h.id, h.honorario, h.estado, h.banco]; }).sort());
+    if (silencioso && firma === honFirma) return;
+    honFirma = firma;
+    honorarios = filas;
+    renderHonorarios();
+  }
+
+  function honPorId(id){
+    for (var i = 0; i < honorarios.length; i++){ if (honorarios[i].id === id) return honorarios[i]; }
+    return null;
+  }
+  function totalHon(){
+    return honorarios.reduce(function(s, h){ return s + Number(h.honorario || 0); }, 0);
+  }
+  function pintarTotalHon(){
+    var el = $("hon-total");
+    if (el) el.textContent = clp(totalHon());
+  }
+
+  function filaHonorario(c, h){
+    var nombre = escapar(c.nombre);
+    var etiqueta = nombre + (h.adicional ? " (adicional)" : "");
+    var bancos = '<option value="">—</option>' + BANCOS.map(function(b){
+      return '<option' + (h.banco === b ? ' selected' : '') + '>' + b + '</option>';
+    }).join("");
+    return '<tr class="hon-fila' + (h.adicional ? ' adicional' : '') + '" data-id="' + h.id + '">' +
+      '<td class="rut">' + escapar(c.rut || "") + '</td>' +
+      '<td class="nom">' + (h.adicional ? '<span class="hon-adic">Adicional</span>' : '') + nombre + '</td>' +
+      '<td class="num"><input class="hon-in hon-monto' + (Number(h.honorario) === 0 ? ' cero' : '') + '" inputmode="numeric" value="' + clp(h.honorario) + '" aria-label="Honorario de ' + etiqueta + '"></td>' +
+      '<td class="est"><input class="hon-in hon-estado" maxlength="200" value="' + escapar(h.estado || "") + '" placeholder="Ej.: OK, falta comprobante" aria-label="Estado de ' + etiqueta + '"></td>' +
+      '<td><select class="hon-in hon-banco" aria-label="Banco de ' + etiqueta + '">' + bancos + '</select></td>' +
+      '<td class="acc">' + (h.adicional
+        ? '<button type="button" class="hon-btn del" title="Eliminar este honorario adicional" aria-label="Eliminar honorario adicional de ' + nombre + '">×</button>'
+        : '<button type="button" class="hon-btn add" title="Agregar otro honorario a esta empresa" aria-label="Agregar otro honorario a ' + nombre + '">+</button>') +
+      '</td></tr>';
+  }
+
+  function renderHonorarios(){
+    $("hon-cargando").hidden = true;
+    var porCliente = {};
+    honorarios.forEach(function(h){ (porCliente[h.cliente_id] = porCliente[h.cliente_id] || []).push(h); });
+    var conFila = clientes.filter(function(c){ return porCliente[c.id]; });
+    $("hon-vacio").hidden = conFila.length > 0;
+    $("hon-wrap").hidden = conFila.length === 0;
+    if (!conFila.length) return;
+
+    var html = '<thead><tr><th>RUT</th><th>Nombre empresa</th><th class="num">Honorario</th><th>Estado</th><th>Banco</th><th></th></tr></thead>';
+    rubrosOrdenados(conFila).forEach(function(rubro){
+      var lista = clientesDe(rubro, conFila);
+      var cerrado = !!honCerrados[rubro];
+      html += '<tbody data-rubro="' + escapar(rubro) + '"' + (cerrado ? ' data-cerrado="1"' : '') + '>' +
+        '<tr class="hon-rubro"><td colspan="6"><button type="button" class="grupo-tog hon-tog" aria-expanded="' + (cerrado ? "false" : "true") + '">' +
+        '<span class="chev">▶</span><span>' + escapar(rubro) + '</span><span class="grupo-cont">' + lista.length + '</span></button></td></tr>';
+      lista.forEach(function(c){
+        porCliente[c.id].slice().sort(function(a, b){
+          if (a.adicional !== b.adicional) return a.adicional ? 1 : -1;
+          return String(a.creado).localeCompare(String(b.creado));
+        }).forEach(function(h){ html += filaHonorario(c, h); });
+      });
+      html += '</tbody>';
+    });
+    html += '<tfoot><tr><td colspan="2">Total general</td><td class="num" id="hon-total">' + clp(totalHon()) + '</td><td colspan="3"></td></tr></tfoot>';
+    $("hon-tabla").innerHTML = html;
+  }
+
+  async function guardarHonorario(id, patch){
+    var h = honPorId(id);
+    if (!h) return;
+    var previo = {};
+    Object.keys(patch).forEach(function(k){ previo[k] = h[k]; h[k] = patch[k]; });
+    pintarTotalHon();
+    var res = await sb.from("honorarios").update(patch).eq("id", id).select().single();
+    if (res.error){
+      Object.keys(previo).forEach(function(k){ h[k] = previo[k]; });
+      mostrarAviso("No se pudo guardar el cambio: " + res.error.message);
+      renderHonorarios();
+      return;
+    }
+    if (res.data){ Object.keys(patch).forEach(function(k){ h[k] = res.data[k]; }); }
+    var tr = document.querySelector('#hon-tabla tr[data-id="' + id + '"]');
+    if (!tr) return;
+    tr.classList.remove("mv-flash"); void tr.offsetWidth; tr.classList.add("mv-flash");
+    var ei = tr.querySelector(".hon-estado");
+    if (ei && document.activeElement !== ei) ei.value = h.estado || "";
+  }
+
+  function confirmarMontoHon(inp){
+    var tr = inp.closest(".hon-fila");
+    var h = tr && honPorId(tr.dataset.id);
+    if (!h) return;
+    var v = soloDigitos(inp.value);
+    if (v === null && inp.value.trim() !== ""){ mostrarAviso("Escribe el honorario solo con números."); v = Number(h.honorario); }
+    if (v === null) v = 0;
+    if (v > MAX_HONORARIO){ mostrarAviso("Ese monto es demasiado grande."); v = Number(h.honorario); }
+    inp.value = clp(v);
+    inp.classList.toggle("cero", v === 0);
+    if (v !== Number(h.honorario)) guardarHonorario(h.id, { honorario: v });
+  }
+
+  async function agregarAdicionalHon(btn){
+    var tr = btn.closest(".hon-fila");
+    var base = tr && honPorId(tr.dataset.id);
+    if (!base) return;
+    var mes = honMes;
+    btn.disabled = true;
+    var res = await sb.from("honorarios").insert({ cliente_id: base.cliente_id, mes: mes, adicional: true, honorario: 0 }).select().single();
+    if (res.error || !res.data){
+      btn.disabled = false;
+      mostrarAviso("No se pudo agregar el honorario: " + (res.error ? res.error.message : "sin respuesta"));
+      return;
+    }
+    if (mes !== honMes) return;
+    honorarios.push(res.data);
+    renderHonorarios();
+    var inp = document.querySelector('#hon-tabla tr[data-id="' + res.data.id + '"] .hon-monto');
+    if (inp) inp.focus();
+  }
+
+  async function borrarAdicionalHon(btn){
+    if (btn.dataset.confirmando !== "1"){
+      btn.dataset.confirmando = "1"; btn.classList.add("confirmar"); btn.textContent = "¿Eliminar?";
+      setTimeout(function(){
+        if (btn.isConnected && btn.dataset.confirmando === "1"){
+          btn.dataset.confirmando = ""; btn.classList.remove("confirmar"); btn.textContent = "×";
+        }
+      }, 4000);
+      return;
+    }
+    var id = btn.closest(".hon-fila").dataset.id;
+    btn.disabled = true;
+    var res = await sb.from("honorarios").delete().eq("id", id);
+    if (res.error){ btn.disabled = false; mostrarAviso("No se pudo eliminar el honorario: " + res.error.message); return; }
+    honorarios = honorarios.filter(function(h){ return h.id !== id; });
+    renderHonorarios();
+  }
+
+  (function(){
+    var tabla = $("hon-tabla");
+    $("sel-mes-hon").addEventListener("change", function(){
+      honMes = $("sel-mes-hon").value;
+      cargarHonorarios();
+    });
+    tabla.addEventListener("focusin", function(e){
+      var inp = e.target;
+      if (!inp.classList || !inp.classList.contains("hon-monto")) return;
+      var v = soloDigitos(inp.value);
+      inp.value = v ? String(v) : "";
+    });
+    tabla.addEventListener("focusout", function(e){
+      if (e.target.classList && e.target.classList.contains("hon-monto")) confirmarMontoHon(e.target);
+    });
+    tabla.addEventListener("keydown", function(e){
+      if (e.key === "Enter" && e.target.tagName === "INPUT") e.target.blur();
+    });
+    tabla.addEventListener("change", function(e){
+      var el = e.target;
+      var tr = el.closest(".hon-fila");
+      var h = tr && honPorId(tr.dataset.id);
+      if (!h) return;
+      if (el.classList.contains("hon-estado")){
+        var texto = el.value.trim();
+        if (texto !== (h.estado || "")) guardarHonorario(h.id, { estado: texto || null });
+      } else if (el.classList.contains("hon-banco")){
+        if ((el.value || null) !== (h.banco || null)) guardarHonorario(h.id, { banco: el.value || null });
+      }
+    });
+    tabla.addEventListener("click", function(e){
+      var tog = e.target.closest(".hon-tog");
+      if (tog){
+        var tb = tog.closest("tbody");
+        var rubro = tb.getAttribute("data-rubro");
+        var cerrado = tb.dataset.cerrado === "1";
+        if (cerrado){ delete tb.dataset.cerrado; honCerrados[rubro] = false; }
+        else { tb.dataset.cerrado = "1"; honCerrados[rubro] = true; }
+        tog.setAttribute("aria-expanded", String(cerrado));
+        try { localStorage.setItem("jolix_hon_grupos_cerrados", JSON.stringify(honCerrados)); } catch(err){}
+        return;
+      }
+      var add = e.target.closest(".hon-btn.add");
+      if (add){ agregarAdicionalHon(add); return; }
+      var del = e.target.closest(".hon-btn.del");
+      if (del) borrarAdicionalHon(del);
+    });
+  })();
+
   /* ----------------------------------------------------- NAVEGACIÓN */
   var TITULOS_VISTA = {
     dashboard: "Dashboard", clientes: "Clientes", mes: "Operación mensual",
-    tareas: "Tareas", documentos: "Documentos"
+    tareas: "Tareas", documentos: "Documentos", honorarios: "Honorarios"
   };
   function cambiarVista(v){
+    if (v === "honorarios" && !esAdmin()) v = "dashboard";
     vista = v;
     document.querySelectorAll(".snav").forEach(function(t){
       t.setAttribute("aria-selected", String(t.dataset.vista === v));
@@ -4039,8 +4362,10 @@
     $("v-tareas").hidden = v !== "tareas";
     $("v-documentos").hidden = v !== "documentos";
     $("v-clientes").hidden = v !== "clientes";
+    $("v-honorarios").hidden = v !== "honorarios";
     $("topbar-titulo").textContent = TITULOS_VISTA[v] || "";
     if (v === "tareas") cargarTareas();
+    if (v === "honorarios"){ honMes = ymHoy(); armarSelectorHon(); cargarHonorarios(); }
     if (v === "documentos"){ cargarDocumentos(); cargarCarpetas(); }
     if (v !== "clientes") leadEnConversion = null;
     cerrarSidebar();
