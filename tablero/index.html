@@ -835,6 +835,116 @@
   }
   .tabla-res tfoot td.num{color:var(--purple-deep);}
 
+  /* ------------------------------------------------------ MAESTRO DE CLIENTES */
+  .cli-barra{display:flex; align-items:center; justify-content:space-between; gap:10px 16px; flex-wrap:wrap; margin-bottom:16px;}
+  .cli-barra .segmento{margin:0;}
+  .btn-maestro{display:inline-flex; align-items:center; gap:8px; transition:transform .15s var(--mv-ease), background .2s;}
+  .btn-maestro svg{width:16px; height:16px; flex:none; fill:none; stroke:currentColor; stroke-width:1.9; stroke-linecap:round; stroke-linejoin:round;}
+  .btn-maestro:hover{transform:translateY(-1px);}
+  .btn-maestro:active{transform:scale(.97);}
+  .btn-maestro:not([hidden]){animation:mv-vista .25s var(--mv-ease);}
+
+  /* La ventana usa casi toda la pantalla */
+  .modal.modal-maestro-fondo{padding:18px;}
+  .modal-card.modal-maestro{
+    max-width:none; width:min(1860px, 100%); height:100%; padding:0;
+    display:flex; flex-direction:column; overflow:hidden; position:relative;
+  }
+  .mae-cab{display:flex; align-items:center; gap:10px 20px; flex-wrap:wrap; padding:18px 64px 14px 24px; flex:none;}
+  .mae-cab h2{font-size:18px; margin:0;}
+  .mae-cab .cuenta{color:var(--faint); font-weight:500; font-size:14px;}
+  .mae-cab .buscador{flex:1 1 280px; max-width:440px; margin-left:auto;}
+  .mae-cuerpo{flex:1 1 auto; min-height:0; overflow:auto; border-top:1px solid var(--line); overscroll-behavior:contain;}
+  .mae-pie{
+    flex:none; display:flex; align-items:center; gap:8px; padding:10px 24px;
+    border-top:1px solid var(--line); font-size:12.5px; color:var(--faint);
+  }
+  .mae-pie svg{width:14px; height:14px; flex:none; fill:none; stroke:currentColor; stroke-width:1.9; stroke-linecap:round; stroke-linejoin:round;}
+  .mae-msg{padding:70px 24px; text-align:center; color:var(--muted); font-size:14.5px;}
+  .mae-msg p{margin:0 0 14px;}
+  .mae-cargando{display:inline-flex; align-items:center; gap:10px; color:var(--purple-deep); font-weight:600;}
+
+  .tabla-mae{table-layout:fixed; width:100%; min-width:3089px; border-collapse:separate; border-spacing:0; font-size:13.5px;}
+  .tabla-mae th{
+    position:sticky; top:0; z-index:3; background:var(--surface); text-align:left;
+    font-family:'Poppins',sans-serif; font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.07em;
+    color:var(--faint); padding:13px 12px 10px; border-bottom:1px solid var(--line); white-space:nowrap;
+  }
+  .tabla-mae th.nuevo{color:var(--purple-deep); background:color-mix(in srgb, var(--purple) 8%, var(--surface));}
+  .tabla-mae td{padding:7px 8px; border-bottom:1px solid var(--line); vertical-align:middle; background:var(--surface);}
+  .tabla-mae td.nuevo{background:color-mix(in srgb, var(--purple) 3.5%, var(--surface));}
+  .tabla-mae th.ini, .tabla-mae td.ini{border-left:2px solid color-mix(in srgb, var(--purple) 32%, var(--line));}
+  .tabla-mae th.fija, .tabla-mae td.fija{position:sticky; left:0;}
+  .tabla-mae th.fija{z-index:5;}
+  .tabla-mae td.fija{z-index:2;}
+  .mae-cuerpo.desplazado .fija{box-shadow:10px 0 14px -12px rgba(30,15,70,.4);}
+  .tabla-mae tr:hover td{background:color-mix(in srgb, var(--purple) 5%, var(--surface));}
+  .tabla-mae tr:hover td.nuevo{background:color-mix(in srgb, var(--purple) 9%, var(--surface));}
+  .tabla-mae .mae-fila.inactivo td{background:color-mix(in srgb, var(--mist) 55%, var(--surface));}
+  .tabla-mae td.mv-flash{animation:mv-flash .9s ease-out;}
+  .mae-fila{transition:opacity .25s;}
+
+  .mae-in{
+    width:100%; background:transparent; border:1px solid transparent; color:var(--ink);
+    border-radius:9px; padding:7px 9px; font-size:13.5px; font-family:inherit;
+    transition:border-color .15s, background .2s, color .2s, box-shadow .15s;
+  }
+  .mae-in:hover{border-color:var(--line);}
+  .mae-in:focus{background:var(--surface); border-color:var(--purple); outline:none; box-shadow:0 0 0 3px color-mix(in srgb, var(--purple) 16%, transparent);}
+  .mae-in::placeholder{color:var(--faint); font-weight:400;}
+  .mae-in option{color:var(--ink); background:var(--surface); font-weight:400;}
+  td.nom .mae-in{font-family:'Poppins',sans-serif; font-weight:600;}
+  .mae-in.rut{font-variant-numeric:tabular-nums;}
+  .mae-in.monto{text-align:right; font-weight:600; font-family:'Poppins',sans-serif; font-variant-numeric:tabular-nums; background:var(--mist);}
+  .mae-in.monto:focus{background:var(--surface);}
+  select.mae-in{cursor:pointer;}
+  select.mae-in.est{font-family:'Poppins',sans-serif; font-weight:600; font-size:12.5px; border-radius:999px; padding:7px 12px;}
+  select.mae-in.est[data-v="1"]{background:var(--ok-bg); color:var(--ok);}
+  select.mae-in.est[data-v="0"]{background:var(--pend-bg); color:var(--pend);}
+  textarea.mae-in{display:block; resize:vertical; min-height:48px; line-height:1.4;}
+  .mae-fila.inactivo .mae-in:not(.est){color:var(--faint);}
+  .mae-fila.inactivo td.nom .mae-in{color:var(--muted);}
+
+  .mae-srvs{display:flex; flex-wrap:wrap; gap:5px; padding:2px 0;}
+  .mae-srv{
+    display:inline-flex; align-items:center; background:var(--mist); border:1px solid transparent; color:var(--muted);
+    border-radius:999px; padding:3px 9px; font-size:11px; font-weight:600; font-family:'Poppins',sans-serif; white-space:nowrap;
+    transition:background .18s, color .18s, border-color .18s, transform .12s;
+  }
+  .mae-srv:hover{border-color:var(--line);}
+  .mae-srv[aria-pressed="true"]{background:var(--chk-color, var(--purple)); border-color:var(--chk-color, var(--purple)); color:#fff;}
+  .mae-srv:active{transform:scale(.94);}
+
+  /* Claves: ocultas por defecto, con ojito para mostrarlas y botón para copiarlas */
+  .mae-cl{display:flex; align-items:center; gap:2px;}
+  .mae-cl .mae-in{flex:1 1 auto; min-width:0;}
+  .mae-clave-in.oculta{-webkit-text-security:disc; text-security:disc; letter-spacing:.06em;}
+  .mae-clave-in.oculta::placeholder{-webkit-text-security:none; letter-spacing:normal;}
+  .mae-ic{
+    flex:none; width:30px; height:30px; display:inline-flex; align-items:center; justify-content:center;
+    background:none; border:none; border-radius:8px; color:var(--faint); padding:0;
+    transition:background .15s, color .15s, transform .12s;
+  }
+  .mae-ic:hover:not(:disabled){background:var(--mist); color:var(--purple-deep);}
+  .mae-ic:active:not(:disabled){transform:scale(.9);}
+  .mae-ic:disabled{opacity:.3; cursor:default;}
+  .mae-ic svg{width:17px; height:17px; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round;}
+  .mae-ic.ok{color:var(--ok);}
+  .mae-ic.ok svg path{stroke-dasharray:1; animation:mv-dibujar .3s var(--mv-ease) backwards;}
+  .mae-ojo .tacha{stroke-dasharray:1; stroke-dashoffset:1; transition:stroke-dashoffset .25s var(--mv-ease);}
+  .mae-ojo[aria-pressed="true"]{color:var(--purple-deep);}
+  .mae-ojo[aria-pressed="true"] .tacha{stroke-dashoffset:0;}
+
+  @media (max-width:700px){
+    .modal.modal-maestro-fondo{padding:0;}
+    .modal-card.modal-maestro{border-radius:0; border:none;}
+    .mae-cab{padding:16px 56px 12px 16px;}
+    .mae-cab .buscador{max-width:none; flex-basis:100%; margin-left:0;}
+    .mae-pie{padding:10px 16px; font-size:12px;}
+    .tabla-mae th.fija{left:auto;}
+    .tabla-mae td.fija{position:static;}   /* en el celular la columna Nombre no queda fija: taparía media pantalla */
+  }
+
   @media (prefers-reduced-motion: reduce){
     *{transition:none !important; animation:none !important;}
   }
@@ -1141,9 +1251,12 @@
 
     <!-- VISTA CLIENTES -->
     <section id="v-clientes" hidden>
-      <div class="segmento" id="seg-clientes-leads" style="margin-bottom:16px;">
-        <button class="seg" data-sub="clientes" aria-pressed="true">Clientes</button>
-        <button class="seg" data-sub="leads" aria-pressed="false">Leads <span class="tab-badge" id="leads-badge" hidden></span></button>
+      <div class="cli-barra">
+        <div class="segmento" id="seg-clientes-leads">
+          <button class="seg" data-sub="clientes" aria-pressed="true">Clientes</button>
+          <button class="seg" data-sub="leads" aria-pressed="false">Leads <span class="tab-badge" id="leads-badge" hidden></span></button>
+        </div>
+        <button class="btn btn-maestro" id="btn-maestro-clientes" type="button" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="4.5" width="17" height="15" rx="2"/><path d="M3.5 9.5h17M9.5 9.5v10"/></svg>Maestro Clientes</button>
       </div>
 
       <div id="sub-clientes">
@@ -1228,6 +1341,54 @@
     </div>
 
     <button class="btn ghost" id="btn-cerrar-rubros" style="margin-top:18px; width:100%;">Cerrar</button>
+  </div>
+</div>
+
+<!-- MODAL MAESTRO DE CLIENTES -->
+<div class="modal modal-maestro-fondo" id="modal-maestro" hidden>
+  <div class="modal-card modal-maestro" role="dialog" aria-modal="true" aria-labelledby="mae-titulo">
+    <div class="mae-cab">
+      <h2 id="mae-titulo">Maestro de clientes <span class="cuenta" id="mae-cuenta"></span></h2>
+      <div class="buscador">
+        <svg class="lupa" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.6-3.6"/></svg>
+        <input id="buscar-maestro" class="control" placeholder="Buscar empresa, RUT o correo…" autocomplete="off" aria-label="Buscar en el maestro de clientes">
+        <button class="limpiar" id="limpiar-buscar-maestro" hidden aria-label="Limpiar búsqueda">×</button>
+      </div>
+    </div>
+    <button class="modal-cerrar-x" id="btn-cerrar-maestro" type="button" aria-label="Cerrar el maestro de clientes">×</button>
+    <div class="mae-cuerpo" id="mae-cuerpo">
+      <table class="tabla-mae" id="mae-tabla" hidden>
+        <colgroup>
+          <col style="width:270px"><col style="width:130px"><col style="width:235px"><col style="width:230px"><col style="width:160px">
+          <col style="width:140px"><col style="width:124px"><col style="width:400px">
+          <col style="width:150px"><col style="width:200px"><col style="width:200px"><col style="width:350px"><col style="width:160px"><col style="width:340px">
+        </colgroup>
+        <thead>
+          <tr>
+            <th scope="col" class="fija">Nombre</th>
+            <th scope="col">RUT</th>
+            <th scope="col">Rubro</th>
+            <th scope="col">Correo</th>
+            <th scope="col">Teléfono</th>
+            <th scope="col">Precio servicios</th>
+            <th scope="col">Estado</th>
+            <th scope="col">Servicios</th>
+            <th scope="col" class="nuevo ini">Rut Rep. Legal</th>
+            <th scope="col" class="nuevo">Clave Firma</th>
+            <th scope="col" class="nuevo">Clave Tributaria</th>
+            <th scope="col" class="nuevo">Régimen tributario</th>
+            <th scope="col" class="nuevo">Tipo Contabilidad</th>
+            <th scope="col" class="nuevo">Detalles</th>
+          </tr>
+        </thead>
+        <tbody id="mae-tbody"></tbody>
+      </table>
+      <div class="mae-msg" id="mae-msg" hidden></div>
+    </div>
+    <div class="mae-pie">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4.5" y="10.5" width="15" height="10" rx="2.2"/><path d="M8 10.5V7.8a4 4 0 0 1 8 0v2.7"/></svg>
+      <span>Los cambios se guardan solos al salir de cada casilla (Esc deshace lo que estás escribiendo). Las claves, el RUT del representante y los detalles solo los ven los administradores.</span>
+    </div>
   </div>
 </div>
 
@@ -1567,6 +1728,7 @@
   var perfilesPorId = {};
   var rubros = [];
   var clientes = [];
+  var COLUMNAS_CLIENTE = "id, rut, nombre, rubro_id, email, telefono, servicios, activo, precio_servicios, f29, remuneraciones, previred";
   var registros = {};
   var comentariosConteo = {};
   var notas = {};
@@ -1878,6 +2040,7 @@
     $("panel-nuevo-rubro").hidden = !admin;
     $("clientes-lectura").hidden = admin;
     $("rubros-lectura").hidden = admin;
+    actualizarBotonMaestro();
     $("cli-hint").textContent = admin
       ? "Toca los tres puntos de un cliente para editarlo o enviarle el acceso al portal."
       : "Vista de consulta. Los cambios los realiza un administrador.";
@@ -1886,7 +2049,7 @@
   /* -------------------------------------------------------- DATOS */
   async function cargarTodo(){
     var r1 = await sb.from("rubros").select("id, nombre, orden").order("orden");
-    var r2 = await sb.from("clientes").select("id, rut, nombre, rubro_id, email, telefono, servicios, activo, precio_servicios, f29, remuneraciones, previred").order("nombre");
+    var r2 = await sb.from("clientes").select(COLUMNAS_CLIENTE).order("nombre");
     var r3 = await sb.from("perfiles").select("id, nombre");
     if (r1.error || r2.error){ mostrarAviso("No se pudieron cargar los datos. Revisa tu conexión."); return; }
     rubros = r1.data || [];
@@ -2057,6 +2220,10 @@
     await cargarTareas();
     await cargarLeads();
     if (vista === "honorarios") await cargarHonorarios(true);
+    if (maestroAbierto){
+      var rm = await cargarMaestro(true);
+      if (rm === "nuevo" && maestroAbierto && !$("mae-tbody").contains(document.activeElement)) renderMaestro({ suave: true });
+    }
   }
 
   function reg(clienteId){ return registros[clienteId] || {}; }
@@ -2648,6 +2815,480 @@
     if (!$("modal-cliente-editar").hidden) cerrarModalEditarCliente();
   });
 
+  /* ------------------------------------------------ MAESTRO DE CLIENTES
+     Una sola tabla para ver y corregir todo lo de cada cliente. Los datos de siempre viven en `clientes`;
+     lo nuevo (RUT del representante, claves, régimen, tipo de contabilidad y detalles) vive aparte, en
+     `clientes_maestro`, que solo leen y escriben los administradores (lo exige la base de datos).
+     Cada casilla se guarda sola al salir de ella: el cambio se ve al tiro y, si falla, vuelve atrás. */
+  var REGIMENES = [
+    { v: "pro_pyme_general",      t: "Pro Pyme General (Artículo 14 D N°3)" },
+    { v: "pro_pyme_transparente", t: "Pro Pyme Transparente (Artículo 14 D N°8)" },
+    { v: "renta_presunta",        t: "Renta Presunta" }
+  ];
+  var TIPOS_CONTABILIDAD = [
+    { v: "completa",    t: "Completa" },
+    { v: "simplificada", t: "Simplificada" }
+  ];
+  var ETIQUETA_CLAVE = { clave_firma: "Clave de firma", clave_tributaria: "Clave tributaria" };
+  var COLUMNAS_MAESTRO = "cliente_id, rut_rep_legal, clave_firma, clave_tributaria, detalles, regimen_tributario, tipo_contabilidad";
+  var COLS_CLI = COLUMNAS_CLIENTE.split(", ");
+  var COLS_MAE = COLUMNAS_MAESTRO.split(", ").slice(1);
+  /* Las claves se tapan con puntos por CSS (así el navegador no ofrece guardarlas ni autocompletarlas como
+     contraseñas). Si el navegador no sabe hacerlo, se usa un campo de contraseña de verdad. */
+  var MASCARA_CSS = !!(window.CSS && CSS.supports && (CSS.supports("-webkit-text-security", "disc") || CSS.supports("text-security", "disc")));
+  var SVG_OJO = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="2.8"/><path class="tacha" d="M4 4l16 16" pathLength="1"/></svg>';
+  var SVG_COPIAR = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8.5" y="8.5" width="11" height="11" rx="2"/><path d="M15.5 8.5v-2a2 2 0 0 0-2-2h-7a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h2"/></svg>';
+  var SVG_COPIADO = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" pathLength="1"/></svg>';
+
+  var maestro = {};            // cliente_id -> fila de clientes_maestro
+  var maestroAbierto = false;
+  var maestroListo = false;    // ya cargó y se puede mostrar la tabla
+  var maestroBusq = "";
+  var maestroCambios = false;  // ¿cambió algo que las otras pantallas deban volver a leer?
+  var maestroSeq = {};         // para ignorar respuestas viejas si se edita la misma casilla dos veces seguidas
+  var maestroVuelo = [];       // guardados en curso
+  var maestroError = "";
+  var clavesTimers = [];
+
+  function maeCliente(id){ return clientes.filter(function(x){ return x.id === id; })[0]; }
+  function maeFila(id){ return maestro[id] || (maestro[id] = { cliente_id: id }); }
+  function filaDomMae(id){ return $("mae-tbody").querySelector('tr[data-id="' + id + '"]'); }
+  function zonaMae(id, campo){ var tr = filaDomMae(id); return tr && tr.querySelector('[data-campo="' + campo + '"]'); }
+  function seguirMae(p){
+    maestroVuelo.push(p);
+    var quitar = function(){ var i = maestroVuelo.indexOf(p); if (i !== -1) maestroVuelo.splice(i, 1); };
+    p.then(quitar, quitar);
+    return p;
+  }
+
+  function formatearRut(s){
+    var t = String(s || "").trim();
+    var m = t.replace(/[.\s]/g, "").toUpperCase().match(/^(\d{1,2})(\d{3})(\d{3})-?([\dK])$/);
+    return m ? m[1] + "." + m[2] + "." + m[3] + "-" + m[4] : t;
+  }
+  function opcionesFijas(lista, actual, vacio){
+    return '<option value="">' + vacio + '</option>' + lista.map(function(o){
+      return '<option value="' + o.v + '"' + (o.v === actual ? " selected" : "") + '>' + escapar(o.t) + '</option>';
+    }).join("");
+  }
+  /* Lo que debe mostrar cada casilla según los datos en memoria */
+  function valorMae(id, campo){
+    var c = maeCliente(id), m = maestro[id] || {};
+    if (!c) return "";
+    if (campo === "activo") return String(c.activo !== false);
+    if (campo === "precio_servicios") return (c.precio_servicios === null || c.precio_servicios === undefined) ? "" : clp(c.precio_servicios);
+    if (campo === "rubro_id") return c.rubro_id || "";
+    if (COLS_CLI.indexOf(campo) !== -1) return c[campo] == null ? "" : String(c[campo]);
+    return m[campo] == null ? "" : String(m[campo]);
+  }
+
+  function filaMaestroHtml(c){
+    var id = c.id, activo = c.activo !== false, m = maestro[id] || {};
+    var v = function(campo){ return escapar(valorMae(id, campo)); };
+    var et = function(txt){ return escapar(txt + " de " + c.nombre); };
+    var srv = SERVICIOS_CATALOGO.map(function(s){
+      return '<button type="button" class="mae-srv" data-srv="' + s.slug + '" aria-pressed="' + ((c.servicios || []).indexOf(s.slug) !== -1) +
+        '" style="--chk-color:' + s.color + '">' + escapar(s.nombre) + '</button>';
+    }).join("");
+    function clave(campo, nombre){
+      var etiqueta = nombre.toLowerCase() + " de " + c.nombre;
+      return '<td class="nuevo"><div class="mae-cl">' +
+        '<input class="mae-in mae-clave-in oculta" type="' + (MASCARA_CSS ? "text" : "password") + '" data-campo="' + campo + '" value="' + v(campo) + '" maxlength="200" placeholder="Sin registrar"' +
+          ' autocomplete="' + (MASCARA_CSS ? "off" : "new-password") + '" autocapitalize="off" spellcheck="false" data-lpignore="true" data-1p-ignore data-bwignore aria-label="' + escapar(nombre + " de " + c.nombre) + '">' +
+        '<button type="button" class="mae-ic mae-ojo" aria-pressed="false" data-nombre="' + escapar(etiqueta) + '" aria-label="Mostrar ' + escapar(etiqueta) + '" title="Mostrar"' + (m[campo] ? "" : " disabled") + '>' + SVG_OJO + '</button>' +
+        '<button type="button" class="mae-ic mae-copiar" data-campo-copia="' + campo + '" aria-label="Copiar ' + escapar(etiqueta) + '" title="Copiar"' + (m[campo] ? "" : " disabled") + '>' + SVG_COPIAR + '</button>' +
+        '</div></td>';
+    }
+    return '<tr class="mae-fila' + (activo ? "" : " inactivo") + '" data-id="' + id + '">' +
+      '<td class="fija nom"><input class="mae-in" data-campo="nombre" value="' + v("nombre") + '" autocomplete="off" aria-label="' + et("Nombre") + '"></td>' +
+      '<td><input class="mae-in rut" data-campo="rut" value="' + v("rut") + '" autocomplete="off" aria-label="' + et("RUT") + '"></td>' +
+      '<td><select class="mae-in" data-campo="rubro_id" aria-label="' + et("Rubro") + '">' + opcionesRubro(c.rubro_id) + '</select></td>' +
+      '<td><input class="mae-in" type="email" data-campo="email" value="' + v("email") + '" autocomplete="off" aria-label="' + et("Correo") + '"></td>' +
+      '<td><input class="mae-in" type="tel" data-campo="telefono" value="' + v("telefono") + '" autocomplete="off" aria-label="' + et("Teléfono") + '"></td>' +
+      '<td><input class="mae-in monto" data-campo="precio_servicios" inputmode="numeric" placeholder="$0" value="' + v("precio_servicios") + '" autocomplete="off" aria-label="' + et("Precio servicios") + '"></td>' +
+      '<td><select class="mae-in est" data-campo="activo" data-v="' + (activo ? "1" : "0") + '" aria-label="' + et("Estado") + '">' +
+        '<option value="true"' + (activo ? " selected" : "") + '>Activo</option><option value="false"' + (activo ? "" : " selected") + '>Inactivo</option></select></td>' +
+      '<td><div class="mae-srvs" data-campo="servicios" role="group" aria-label="' + et("Servicios") + '">' + srv + '</div></td>' +
+      '<td class="nuevo ini"><input class="mae-in rut" data-campo="rut_rep_legal" value="' + v("rut_rep_legal") + '" maxlength="20" placeholder="Sin registrar" autocomplete="off" aria-label="' + et("Rut representante legal") + '"></td>' +
+      clave("clave_firma", "Clave firma") +
+      clave("clave_tributaria", "Clave tributaria") +
+      '<td class="nuevo"><select class="mae-in" data-campo="regimen_tributario" aria-label="' + et("Régimen tributario") + '">' + opcionesFijas(REGIMENES, m.regimen_tributario, "Sin definir") + '</select></td>' +
+      '<td class="nuevo"><select class="mae-in" data-campo="tipo_contabilidad" aria-label="' + et("Tipo de contabilidad") + '">' + opcionesFijas(TIPOS_CONTABILIDAD, m.tipo_contabilidad, "Sin definir") + '</select></td>' +
+      '<td class="nuevo"><textarea class="mae-in" data-campo="detalles" rows="2" maxlength="5000" placeholder="Notas internas de este cliente" aria-label="' + et("Detalles") + '">' + v("detalles") + '</textarea></td>' +
+      '</tr>';
+  }
+
+  function listaMaestro(){
+    var orden = [];
+    rubrosOrdenados().forEach(function(r){ orden = orden.concat(clientesDe(r)); });
+    var q = normaliza(maestroBusq);
+    if (!q) return orden;
+    var qRut = q.replace(/[.\-\s]/g, "");
+    return orden.filter(function(c){
+      var m = maestro[c.id] || {};
+      var texto = normaliza([c.nombre, c.rut, c.email, c.telefono, rubroDe(c), m.rut_rep_legal, m.detalles].join(" "));
+      if (texto.indexOf(q) !== -1) return true;
+      if (!qRut) return false;
+      return (String(c.rut || "") + " " + String(m.rut_rep_legal || "")).replace(/[.\-]/g, "").toLowerCase().indexOf(qRut) !== -1;
+    });
+  }
+
+  function mostrarMensajeMae(tipo){
+    var msg = $("mae-msg"), tabla = $("mae-tabla");
+    if (!tipo){ msg.hidden = true; tabla.hidden = false; return; }
+    tabla.hidden = true; msg.hidden = false;
+    var html;
+    if (tipo === "cargando") html = '<span class="mae-cargando">' + MV_SPIN + 'Cargando el maestro…</span>';
+    else if (tipo === "error") html = '<p>No se pudo cargar el maestro. Revisa tu conexión e inténtalo de nuevo.' +
+      (/clientes_maestro/.test(maestroError) ? '<br><small>Falta crear la tabla del maestro en la base de datos (migración 15).</small>' : '') +
+      '</p><button type="button" class="btn ghost mini" id="btn-reintentar-maestro">Reintentar</button>';
+    else if (tipo === "vacio") html = '<p>Aún no hay clientes. Agrégalos con “Nuevo cliente” y aparecerán aquí.</p>';
+    else html = '<p>Ningún cliente coincide con “' + escapar(maestroBusq) + '”.</p>';
+    msg.innerHTML = html;
+    if (!RM) msg.animate([{ opacity: 0, transform: "translateY(6px)" }, { opacity: 1, transform: "none" }], { duration: 240, easing: MV_EASE });
+  }
+
+  /* Al abrir, las filas entran en cascada */
+  function cascadaMae(tb){
+    if (RM) return;
+    Array.prototype.slice.call(tb.rows, 0, 16).forEach(function(tr, i){
+      tr.animate([{ opacity: 0, transform: "translateY(10px)" }, { opacity: 1, transform: "none" }],
+        { duration: 320, delay: 70 + i * 30, easing: MV_EASE, fill: "backwards" });
+    });
+  }
+
+  function renderMaestro(op){
+    op = op || {};
+    var lista = listaMaestro(), total = clientes.length, tb = $("mae-tbody");
+    $("mae-cuenta").textContent = total ? "· " + (maestroBusq ? lista.length + " de " + total : total) : "";
+    clavesTimers.forEach(clearTimeout); clavesTimers = [];
+    if (!total){ tb.innerHTML = ""; mostrarMensajeMae("vacio"); return; }
+    if (!lista.length){ tb.innerHTML = ""; mostrarMensajeMae("sin"); return; }
+    mostrarMensajeMae(null);
+    tb.innerHTML = lista.map(filaMaestroHtml).join("");
+    if (op.animar) cascadaMae(tb);
+    else if (op.suave && !RM) tb.animate([{ opacity: .35 }, { opacity: 1 }], { duration: 170, easing: "ease-out" });
+  }
+
+  /* Huella de los datos (sin tocar fechas ni el orden) para saber si alguien más cambió algo */
+  function firmaMaestro(cl, ma){
+    var a = cl.slice().sort(function(x, y){ return x.id < y.id ? -1 : 1; }).map(function(c){
+      return COLS_CLI.map(function(k){ return c[k] === undefined ? null : c[k]; });
+    });
+    var b = ma.filter(function(m){
+      return COLS_MAE.some(function(k){ return m[k] !== null && m[k] !== undefined && m[k] !== ""; });
+    }).sort(function(x, y){ return x.cliente_id < y.cliente_id ? -1 : 1; }).map(function(m){
+      return [m.cliente_id].concat(COLS_MAE.map(function(k){ return m[k] === undefined ? null : m[k]; }));
+    });
+    return JSON.stringify([a, b]);
+  }
+
+  /* Devuelve "error", "igual" (nada nuevo) o "nuevo" (ya quedó en memoria) */
+  async function cargarMaestro(silencioso){
+    var r = await Promise.all([
+      sb.from("clientes").select(COLUMNAS_CLIENTE).order("nombre"),
+      sb.from("clientes_maestro").select(COLUMNAS_MAESTRO)
+    ]);
+    if (!maestroAbierto) return "igual";
+    var err = r[0].error || r[1].error;
+    if (err){ maestroError = String(err.message || ""); console.warn("Maestro de clientes:", maestroError); return "error"; }
+    var cl = r[0].data || [], ma = r[1].data || [];
+    if (silencioso){
+      if (maestroVuelo.length) return "igual";
+      var local = Object.keys(maestro).map(function(k){ return maestro[k]; });
+      if (firmaMaestro(cl, ma) === firmaMaestro(clientes, local)) return "igual";
+    }
+    if (firmaMaestro(cl, []) !== firmaMaestro(clientes, [])) maestroCambios = true;
+    clientes = cl;
+    maestro = {};
+    ma.forEach(function(m){ maestro[m.cliente_id] = m; });
+    return "nuevo";
+  }
+
+  async function cargarYMostrarMaestro(){
+    mostrarMensajeMae("cargando");
+    var r = await cargarMaestro(false);
+    if (!maestroAbierto) return;
+    if (r === "error"){ mostrarMensajeMae("error"); return; }
+    maestroListo = true;
+    renderMaestro({ animar: true });
+  }
+
+  function actualizarBotonMaestro(){
+    $("btn-maestro-clientes").hidden = !(esAdmin() && !$("sub-clientes").hidden);
+  }
+
+  function abrirMaestro(){
+    if (!esAdmin() || maestroAbierto) return;
+    maestroAbierto = true; maestroListo = false; maestroBusq = ""; maestroCambios = false; maestroError = "";
+    $("buscar-maestro").value = ""; $("limpiar-buscar-maestro").hidden = true;
+    $("mae-cuenta").textContent = "";
+    $("mae-cuerpo").scrollTop = 0; $("mae-cuerpo").scrollLeft = 0; $("mae-cuerpo").classList.remove("desplazado");
+    $("modal-maestro").hidden = false;
+    cargarYMostrarMaestro().then(function(){
+      if (maestroAbierto && window.matchMedia && window.matchMedia("(pointer:fine)").matches) $("buscar-maestro").focus();
+    });
+  }
+
+  async function cerrarMaestro(){
+    if (!maestroAbierto) return;
+    var a = document.activeElement;
+    if (a && $("modal-maestro").contains(a) && a.blur) a.blur();   // lo que se estaba escribiendo se guarda
+    maestroAbierto = false; maestroListo = false;
+    $("modal-maestro").hidden = true;
+    clavesTimers.forEach(clearTimeout); clavesTimers = [];
+    $("mae-tbody").innerHTML = "";                                 // no deja claves en la pantalla
+    await Promise.all(maestroVuelo.slice().map(function(p){ return p.catch(function(){}); }));
+    maestro = {}; maestroSeq = {};
+    if (maestroCambios){ maestroCambios = false; await cargarTodo(); }
+  }
+
+  /* ---- Pintar y avisar */
+  function sincronizarBotonesClave(inp){
+    var cl = inp.closest(".mae-cl");
+    if (cl) cl.querySelectorAll(".mae-ic").forEach(function(b){ b.disabled = inp.value === ""; });
+  }
+  /* Deja en cada casilla lo que dicen los datos. Con forzar = true también las que están en uso. */
+  function pintarFilaMae(id, forzar){
+    var tr = filaDomMae(id), c = maeCliente(id);
+    if (!tr || !c) return;
+    tr.classList.toggle("inactivo", c.activo === false);
+    tr.querySelectorAll("[data-campo]").forEach(function(el){
+      var campo = el.dataset.campo;
+      if (campo === "servicios"){
+        el.querySelectorAll(".mae-srv").forEach(function(b){
+          b.setAttribute("aria-pressed", String((c.servicios || []).indexOf(b.dataset.srv) !== -1));
+        });
+        return;
+      }
+      if (campo === "activo") el.dataset.v = c.activo === false ? "0" : "1";
+      if (!forzar && el === document.activeElement && el.tagName !== "SELECT") return;
+      var val = valorMae(id, campo);
+      if (el.value !== val) el.value = val;
+      if (el.classList.contains("mae-clave-in")) sincronizarBotonesClave(el);
+    });
+  }
+  function destellarMae(el){
+    var td = el && el.closest("td");
+    if (!td) return;
+    td.classList.remove("mv-flash"); void td.offsetWidth; td.classList.add("mv-flash");
+  }
+  function sacudirMae(el){
+    if (!el || RM) return;
+    el.animate([{ transform: "translateX(0)" }, { transform: "translateX(-6px)" }, { transform: "translateX(5px)" },
+      { transform: "translateX(-3px)" }, { transform: "translateX(0)" }], { duration: 320, easing: "ease-out" });
+  }
+
+  /* ---- Guardar */
+  function mensajeErrorCliente(err){
+    if (!err) return "No se pudo guardar el cambio.";
+    if (err.code === "23505") return String(err.message).indexOf("email") !== -1 ? "Ese correo ya está en uso por otro cliente." : "Ya existe un cliente con ese RUT.";
+    return "No se pudo guardar el cambio: " + err.message;
+  }
+  async function guardarClienteMae(id, patch){
+    var campos = Object.keys(patch), llave = id + ":" + campos.join(",");
+    var mi = (maestroSeq[llave] = (maestroSeq[llave] || 0) + 1);
+    var c = maeCliente(id);
+    if (!c) return;
+    var previo = {};
+    campos.forEach(function(k){ previo[k] = c[k]; c[k] = patch[k]; });
+    pintarFilaMae(id);
+    var res = await sb.from("clientes").update(patch).eq("id", id).select(COLUMNAS_CLIENTE).single();
+    if (maestroSeq[llave] !== mi) return;
+    c = maeCliente(id);                                  // la lista pudo recargarse mientras tanto
+    if (res.error || !res.data){
+      if (c) campos.forEach(function(k){ c[k] = previo[k]; });
+      if (maestroAbierto){ pintarFilaMae(id, true); sacudirMae(zonaMae(id, campos[0])); }
+      mostrarAviso(mensajeErrorCliente(res.error));
+      return;
+    }
+    maestroCambios = true;
+    if (c) COLS_CLI.forEach(function(k){ if (k in res.data) c[k] = res.data[k]; });
+    if (maestroAbierto){ pintarFilaMae(id); destellarMae(zonaMae(id, campos[0])); }
+  }
+  async function guardarMaestro(id, campo, valor){
+    var llave = id + ":" + campo, mi = (maestroSeq[llave] = (maestroSeq[llave] || 0) + 1);
+    var fila = maeFila(id), previo = fila[campo] === undefined ? null : fila[campo];
+    fila[campo] = valor;
+    var cuerpo = { cliente_id: id }; cuerpo[campo] = valor;
+    var res = await sb.from("clientes_maestro").upsert(cuerpo, { onConflict: "cliente_id" }).select(COLUMNAS_MAESTRO).single();
+    if (maestroSeq[llave] !== mi) return;
+    if (res.error || !res.data){
+      maeFila(id)[campo] = previo;
+      if (maestroAbierto){ pintarFilaMae(id, true); sacudirMae(zonaMae(id, campo)); }
+      mostrarAviso("No se pudo guardar el cambio: " + (res.error ? res.error.message : "sin respuesta"));
+      return;
+    }
+    maeFila(id)[campo] = res.data[campo];
+    if (maestroAbierto){ pintarFilaMae(id); destellarMae(zonaMae(id, campo)); }
+  }
+
+  /* Revisa lo escrito en una casilla y, si cambió, lo guarda */
+  function confirmarCampoMae(el){
+    var tr = el.closest("tr[data-id]"), campo = el.dataset.campo;
+    if (!tr || !campo || campo === "servicios" || campo === "precio_servicios") return;
+    var id = tr.dataset.id, c = maeCliente(id), p = {}, nuevo;
+    if (!c) return;
+    var v = el.value;
+    function rechazar(txt){ mostrarAviso(txt); pintarFilaMae(id, true); sacudirMae(el); }
+
+    if (campo === "nombre" || campo === "rut"){
+      v = campo === "rut" ? formatearRut(v) : v.trim();
+      if (!v) return rechazar(campo === "rut" ? "El RUT no puede quedar vacío." : "El nombre no puede quedar vacío.");
+      el.value = v;
+      if (v !== (c[campo] || "")){ p[campo] = v; seguirMae(guardarClienteMae(id, p)); }
+      return;
+    }
+    if (campo === "email"){
+      v = v.trim();
+      if (v && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) return rechazar("Ese correo no parece válido. Revísalo.");
+      el.value = v; nuevo = v || null;
+      if (nuevo !== (c.email || null)){ p.email = nuevo; seguirMae(guardarClienteMae(id, p)); }
+      return;
+    }
+    if (campo === "telefono"){
+      v = v.trim(); el.value = v; nuevo = v || null;
+      if (nuevo !== (c.telefono || null)){ p.telefono = nuevo; seguirMae(guardarClienteMae(id, p)); }
+      return;
+    }
+    if (campo === "rubro_id"){
+      nuevo = v || null;
+      if (nuevo !== (c.rubro_id || null)){ p.rubro_id = nuevo; seguirMae(guardarClienteMae(id, p)); }
+      return;
+    }
+    if (campo === "activo"){
+      nuevo = v === "true";
+      if (nuevo !== (c.activo !== false)){ p.activo = nuevo; seguirMae(guardarClienteMae(id, p)); }
+      return;
+    }
+    /* Lo que solo vive en el maestro */
+    var actual = (maestro[id] && maestro[id][campo]) || "";
+    if (campo === "rut_rep_legal") v = formatearRut(v);
+    else if (campo !== "regimen_tributario" && campo !== "tipo_contabilidad") v = v.trim();
+    el.value = v;
+    if (v !== actual) seguirMae(guardarMaestro(id, campo, v || null));
+  }
+  function confirmarPrecioMae(inp){
+    var tr = inp.closest("tr[data-id]"), id = tr && tr.dataset.id, c = id && maeCliente(id);
+    if (!c) return;
+    var v = soloDigitos(inp.value);
+    function rechazar(txt){ mostrarAviso(txt); pintarFilaMae(id, true); sacudirMae(inp); }
+    if (v === null && inp.value.trim() !== "") return rechazar("Escribe el precio solo con números.");
+    if (v !== null && v > MAX_HONORARIO) return rechazar("Ese monto es demasiado grande.");
+    var actual = (c.precio_servicios === null || c.precio_servicios === undefined) ? null : Number(c.precio_servicios);
+    inp.value = v === null ? "" : clp(v);
+    if (v !== actual) seguirMae(guardarClienteMae(id, { precio_servicios: v }));
+  }
+
+  /* ---- Servicios (casillas de colores) */
+  function alternarServicioMae(btn){
+    var tr = btn.closest("tr[data-id]"), id = tr && tr.dataset.id, c = id && maeCliente(id);
+    if (!c) return;
+    var lista = (c.servicios || []).slice(), i = lista.indexOf(btn.dataset.srv);
+    if (i === -1) lista.push(btn.dataset.srv); else lista.splice(i, 1);
+    lista = SERVICIOS_CATALOGO.map(function(s){ return s.slug; }).filter(function(s){ return lista.indexOf(s) !== -1; });
+    btn.setAttribute("aria-pressed", String(i === -1));
+    if (!RM) btn.animate([{ transform: "scale(.88)" }, { transform: "scale(1.1)", offset: .55 }, { transform: "scale(1)" }], { duration: 300, easing: MV_EASE });
+    seguirMae(guardarClienteMae(id, { servicios: lista }));
+  }
+
+  /* ---- Claves: ojito y copiar */
+  function fijarClaveOculta(inp, oculta){
+    inp.classList.toggle("oculta", oculta);
+    if (!MASCARA_CSS) inp.type = oculta ? "password" : "text";
+    var btn = inp.closest(".mae-cl").querySelector(".mae-ojo");
+    btn.setAttribute("aria-pressed", String(!oculta));
+    btn.setAttribute("aria-label", (oculta ? "Mostrar " : "Ocultar ") + btn.dataset.nombre);
+    btn.title = oculta ? "Mostrar" : "Ocultar";
+  }
+  function alternarClaveMae(btn){
+    var inp = btn.closest(".mae-cl").querySelector("input");
+    var mostrar = inp.classList.contains("oculta");
+    fijarClaveOculta(inp, !mostrar);
+    if (!RM) inp.animate([{ opacity: .3, transform: "translateY(3px)" }, { opacity: 1, transform: "none" }], { duration: 220, easing: MV_EASE });
+    /* Por si se queda a la vista: se vuelve a tapar sola al minuto */
+    if (inp._timer){ clearTimeout(inp._timer); clavesTimers = clavesTimers.filter(function(t){ return t !== inp._timer; }); inp._timer = null; }
+    if (mostrar){
+      inp._timer = setTimeout(function(){ if (inp.isConnected) fijarClaveOculta(inp, true); }, 60000);
+      clavesTimers.push(inp._timer);
+    }
+  }
+  async function copiarClaveMae(btn){
+    var inp = btn.closest(".mae-cl").querySelector("input");
+    if (!inp.value) return;
+    try {
+      await navigator.clipboard.writeText(inp.value);
+    } catch(e){
+      mostrarAviso("No se pudo copiar. Muestra la clave con el ojito y cópiala a mano.");
+      return;
+    }
+    mostrarAviso((ETIQUETA_CLAVE[btn.dataset.campoCopia] || "Clave") + " copiada.", "ok");
+    clearTimeout(btn._timer);
+    btn.classList.add("ok"); btn.innerHTML = SVG_COPIADO;
+    btn._timer = setTimeout(function(){ btn.classList.remove("ok"); btn.innerHTML = SVG_COPIAR; }, 1500);
+    if (!RM) btn.animate([{ transform: "scale(.7)" }, { transform: "scale(1.2)", offset: .6 }, { transform: "scale(1)" }], { duration: 320, easing: MV_EASE });
+  }
+
+  (function(){
+    var tabla = $("mae-tabla"), cuerpo = $("mae-cuerpo");
+    $("btn-maestro-clientes").addEventListener("click", abrirMaestro);
+    $("btn-cerrar-maestro").addEventListener("click", cerrarMaestro);
+    $("mae-msg").addEventListener("click", function(e){ if (e.target.id === "btn-reintentar-maestro") cargarYMostrarMaestro(); });
+    $("buscar-maestro").addEventListener("input", function(){
+      maestroBusq = $("buscar-maestro").value.trim();
+      $("limpiar-buscar-maestro").hidden = !maestroBusq;
+      if (maestroListo) renderMaestro({ suave: true });      // mientras carga, solo se anota la búsqueda
+    });
+    $("limpiar-buscar-maestro").addEventListener("click", function(){
+      $("buscar-maestro").value = ""; maestroBusq = "";
+      $("limpiar-buscar-maestro").hidden = true;
+      if (maestroListo) renderMaestro({ suave: true });
+      $("buscar-maestro").focus();
+    });
+    /* Sombra bajo la columna fija cuando la tabla se desplaza hacia el costado */
+    cuerpo.addEventListener("scroll", function(){ cuerpo.classList.toggle("desplazado", cuerpo.scrollLeft > 4); }, { passive: true });
+
+    /* El precio se edita como número puro y se muestra como moneda al salir */
+    tabla.addEventListener("focusin", function(e){
+      var inp = e.target;
+      if (!inp.dataset || inp.dataset.campo !== "precio_servicios") return;
+      var d = soloDigitos(inp.value);
+      inp.value = d ? String(d) : "";
+    });
+    tabla.addEventListener("focusout", function(e){
+      if (e.target.dataset && e.target.dataset.campo === "precio_servicios") confirmarPrecioMae(e.target);
+    });
+    tabla.addEventListener("input", function(e){
+      if (e.target.classList && e.target.classList.contains("mae-clave-in")) sincronizarBotonesClave(e.target);
+    });
+    tabla.addEventListener("change", function(e){
+      if (e.target.dataset && e.target.dataset.campo) confirmarCampoMae(e.target);
+    });
+    tabla.addEventListener("keydown", function(e){
+      if (e.key === "Enter" && e.target.tagName === "INPUT") e.target.blur();
+    });
+    tabla.addEventListener("click", function(e){
+      var srv = e.target.closest(".mae-srv");
+      if (srv){ alternarServicioMae(srv); return; }
+      var ojo = e.target.closest(".mae-ojo");
+      if (ojo){ alternarClaveMae(ojo); return; }
+      var cop = e.target.closest(".mae-copiar");
+      if (cop) copiarClaveMae(cop);
+    });
+    /* Esc: dentro de una casilla deshace lo escrito; fuera de ellas cierra la ventana */
+    document.addEventListener("keydown", function(e){
+      if (e.key !== "Escape" || !maestroAbierto) return;
+      var a = document.activeElement;
+      if (a && a.dataset && a.dataset.campo && tabla.contains(a)){
+        var tr = a.closest("tr[data-id]");
+        if (tr && a.dataset.campo !== "servicios") a.value = valorMae(tr.dataset.id, a.dataset.campo);
+        a.blur();
+        return;
+      }
+      cerrarMaestro();
+    });
+  })();
+
   /* ---------------------------------------------- MANTENEDOR RUBROS */
   function rubrosCatalogo(){
     return rubros.slice().sort(function(a,b){
@@ -2852,6 +3493,7 @@
     });
     $("sub-clientes").hidden = v !== "clientes";
     $("sub-leads").hidden = v !== "leads";
+    actualizarBotonMaestro();
     if (v === "leads") cargarLeads();
   }
   document.querySelectorAll("#seg-clientes-leads .seg").forEach(function(b){
